@@ -31,9 +31,7 @@ export default class Bid extends BidEntity {
     /**
      * Gets the type of bid entity.
      * 
-     * @instance
-     * @memberof Bid
-     * @readonly
+     * @type {string}
      */
     get type() {
         return "bid";
@@ -42,13 +40,17 @@ export default class Bid extends BidEntity {
     /**
      * Determines if the bid is active.
      * 
-     * @instance
-     * @memberof Bid
+     * @type {boolean}
      */
     get isActive() {
         return this._data.is_active;
     }
 
+    /**
+     * Sets the bid active state.
+     * 
+     * @type {boolean}
+     */
     set isActive(val) {
         if (_.isBoolean(val) && val != this._data.is_active) {
             this._data.is_active = val;
@@ -58,31 +60,24 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Labor Hours Property
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
     }
-    set laborHours(val) {
-        if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val)) {
-            this._data.labor_hours = Helpers.confirmNumber(val);
-            this.dirty();
-            this.emit("property.updated");
-        }
-    }
 
     /**
-     * Cost Property
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get cost() {
         return this._data.cost;
     }
+
+    /**
+     * Overrides bid cost. Overrides are distibuted proportionally to the included line items.
+     * 
+     * @type {number}
+     */
     set cost(val) {
         if (Helpers.isNumber(val)) {
             this._data.cost = Helpers.confirmNumber(val);
@@ -151,14 +146,14 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * 
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get marginPercent() {
         return Helpers.confirmNumber(this._data.margin_percent);
     }
+    /**
+     * @type {number}
+     */
     set marginPercent(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.margin_percent) {
             this._applyMarginPercentage(val);
@@ -166,11 +161,14 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Markup Percent Property
+     * @type {number}
      */
     get markupPercent() {
         return Helpers.confirmNumber(this._data.markup_percent);
     }
+    /**
+     * @type {number}
+     */
     set markupPercent(val) {
         if (Helpers.isNumber(val) && this._data.margin_percent != val) {
             this._data.markup_percent = Helpers.confirmNumber(val);
@@ -180,14 +178,14 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Price Property
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get price() {
         return Helpers.confirmNumber(this._data.price);
     }
+    /**
+     * @type {number}
+     */
     set price(val) {
         if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val)) {
             const oldPrice = Helpers.confirmNumber(this._data.price);
@@ -207,14 +205,14 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Actual Cost Property
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get actualCost() {
         return this._data.actual_cost;
     }
+    /**
+     * @type {number}
+     */
     set actualCost(val) {
         if (Helpers.confirmNumber(val, false)) {
             this._data.actual_cost = val;
@@ -222,14 +220,14 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Actual Cost Property
-     * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get actualHours() {
         return this._data.actual_hours;
     }
+    /**
+     * @type {number}
+     */
     set actualHours(val) {
         if (Helpers.confirmNumber(val, false)) {
             this._data.actual_hours = val;
@@ -237,11 +235,7 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * 
-     * 
-     * @readonly
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get watts() {
         return this._data.watts;
@@ -276,9 +270,15 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Gets a component entity by id.  If no id is passed, will return an object of keyed components.
+     * Gets a component entity by id.  If no id is passed, will return an object of keyed components by their id.
      * 
-     * @param {number=} id - The id of the component to retrieve.
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Component>,
+     *    "103" : <Component>
+     * }
+     * 
+     * @param {number} [id] - The id of the component to retrieve.
      * @returns {(Component|Object.<string, Component>|null)}
      */
     components(id) {
@@ -286,7 +286,13 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups.
+     * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <ComponentGroup>,
+     *    "103" : <ComponentGroup>
+     * }
      * 
      * @param {number} id 
      * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
@@ -570,9 +576,6 @@ export default class Bid extends BidEntity {
      * 
      * @param {Component} component - The component to determine if needs reassessment.
      * @returns {boolean}
-     * @memberof Bid
-     * @instance
-     * @private
      */
     _componentNeedsReassessment(component) {
         var totalLineItemCosts = 0,
@@ -648,8 +651,6 @@ export default class Bid extends BidEntity {
     /**
      * Gets the margin of error for indicative pricing.
      * 
-     * @instance
-     * @memberof Bid
      * @return {number}
      */
     getMarginOfError() {
@@ -669,8 +670,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if indicative pricing is enabled.
-     * @instance
-     * @memberof Bid
+     * 
      * @return {boolean}
      */
     isIndicativePricing() {
@@ -679,9 +679,7 @@ export default class Bid extends BidEntity {
 
     /**
      * 
-     * @instance
      * @returns {object}
-     * @memberof Bid
      */
     exportData() {
         let bid = Object.assign({}, this._data);
@@ -705,9 +703,6 @@ export default class Bid extends BidEntity {
 
     /**
      * Marks bid and all bid entities as clean.
-     * 
-     * @instance
-     * @memberof Bid
      */
     pristine() {
         this.is_dirty = false;

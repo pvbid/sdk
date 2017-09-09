@@ -445,6 +445,7 @@ export default class LineItem extends BidEntity {
         isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
         isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
         isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
+        isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
         isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
 
         if (isChanged || forceUpdate) {
