@@ -33,8 +33,9 @@ export default class Bid extends BidEntity {
     /**
      * Gets the type of bid entity.
      * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      * @readonly
-     * @override
      */
     get type() {
         return "bid";
@@ -42,6 +43,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if the bid is active.
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get isActive() {
         return this._data.is_active;
@@ -57,6 +61,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Labor Hours Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -71,6 +78,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Cost Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get cost() {
         return this._data.cost;
@@ -85,6 +95,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Tax Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -97,6 +110,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Tax Percent Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -111,6 +127,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Markup Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get markup() {
         return this._data.markup;
@@ -133,6 +152,12 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
+     */
     get marginPercent() {
         return Helpers.confirmNumber(this._data.margin_percent);
     }
@@ -158,6 +183,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Price Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get price() {
         return Helpers.confirmNumber(this._data.price);
@@ -182,6 +210,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Actual Cost Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get actualCost() {
         return this._data.actual_cost;
@@ -194,6 +225,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Actual Cost Property
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      */
     get actualHours() {
         return this._data.actual_hours;
@@ -204,6 +238,13 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * 
+     * @readonly
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
+     */
     get watts() {
         return this._data.watts;
     }
@@ -239,8 +280,10 @@ export default class Bid extends BidEntity {
     /**
      * Gets a component entity by id.  If no id is passed, will return an object of keyed components.
      * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      * @param {number=} id - The id of the component to retrieve.
-     * @returns {(Component|Object.<string, Component>|null)}
+     * @returns {(module:PVBid/Domain.Component|Object.<string, module:PVBid/Domain.Component>|null)}
      */
     components(id) {
         return id ? this.relations.getBidEntity("component", id) : this._data.components;
@@ -248,8 +291,11 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups.
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      * @param {number} id 
-     * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
+     * @returns {(module:PVBid/Domain.ComponentGroup|Object.<string, module:PVBid/Domain.ComponentGroup>|null)}
      */
     componentGroups(id) {
         return id ? this.relations.getBidEntity("component_group", id) : this._data.component_groups;
@@ -267,6 +313,8 @@ export default class Bid extends BidEntity {
     /**
      * Gets the total watts for the bid.
      * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      * @return {number}
      */
     getTotalWatts() {
@@ -282,6 +330,8 @@ export default class Bid extends BidEntity {
     /**
      * Calculates and returns the Bid Margin Percent.
      * 
+     * @instance
+     * @memberof module:PVBid/Domain.Bid
      * @return {number}    Returns the margin percent.
      */
     getMarginPercent() {

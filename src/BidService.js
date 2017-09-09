@@ -1,9 +1,9 @@
 import BidFactory from "./BidFactory";
-
 /**
- * @param {PVBid.Repositories.BidRepository} bidRepository
+ * @param {module:PVBid/Repositories.BidRepository} bidRepository
  * @export
- * @class PVBid.BidService
+ * @class BidService
+ * @memberof module:PVBid
  */
 export default class BidService {
     constructor(bidRepository) {
@@ -16,8 +16,8 @@ export default class BidService {
      * @instance
      * @param {number} bidId 
      * @param {module:PVBid/Domain.Project} project 
-     * @returns {Promise<PVBid/Domain.Bid>}
-     * @memberof PVBid.BidService
+     * @returns {Promise<module:PVBid/Domain.Bid>}
+     * @memberof module:PVBid.BidService
      */
     async load(bidId, project) {
         try {

@@ -2,6 +2,15 @@ import _ from "lodash";
 import Project from "./domain/Project";
 import ProjectSavingHelper from "./helpers/ProjectSavingHelper";
 
+/**
+ * 
+ * 
+ * @param {module:PVBid/Repository.ProjectRepository} projectRepository 
+ * @param {module:PVBid.BidService} bidService 
+ * @export
+ * @class ProjectService
+ * @memberof PVBid
+ */
 export default class ProjectService {
     constructor(projectRepository, bidService) {
         this.repository = projectRepository;
