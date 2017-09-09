@@ -1,9 +1,22 @@
 import EventEmitter from "eventemitter3";
 
+/**
+ * The AdvanceEventEmitter extends event emitter 3's functionality
+ * to check for max executions (due to circular loops) and adds an ability to 
+ * fire a delayed event.
+ */
 export default class AdvanceEventEmitter extends EventEmitter {
+    /**
+     * Creates an instance of AdvanceEventEmitter.
+     */
     constructor() {
         super();
         this._eventTree = {};
+
+        /**
+         * Maximum number of events fired for the requester before events stop.
+         * @type {number}
+         */
         this.maxEvents = 25;
 
         this._waitForFinalEvent = (function() {
@@ -20,6 +33,14 @@ export default class AdvanceEventEmitter extends EventEmitter {
         })();
     }
 
+    /**
+     * 
+     * 
+     * @param {string} eventName 
+     * @param {number} ms 
+     * @param {string} requesterId 
+     * @param {function} callback 
+     */
     onDelay(eventName, ms, requesterId, callback) {
         super.on(eventName, () => {
             this._waitForFinalEvent(
@@ -34,6 +55,13 @@ export default class AdvanceEventEmitter extends EventEmitter {
         });
     }
 
+    /**
+     * 
+     * 
+     * @param {string} eventName 
+     * @param {string} requesterId 
+     * @param {function} callback 
+     */
     on(eventName, requesterId, callback) {
         super.on(eventName, () => {
             if (this._shouldTrigger(requesterId)) {
@@ -42,6 +70,12 @@ export default class AdvanceEventEmitter extends EventEmitter {
         });
     }
 
+    /**
+     * 
+     * 
+     * @param {string} requesterId 
+     * @returns {boolean}
+     */
     _shouldTrigger(requesterId) {
         if (this._eventTree[requesterId]) {
             if (this._eventTree[requesterId] <= this.maxEvents) {

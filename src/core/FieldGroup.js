@@ -5,14 +5,14 @@ import BidEntity from "./BidEntity";
  * 
  * @export
  * @class FieldGroup
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class FieldGroup extends BidEntity {
     /**
      * Creates an instance of FieldGroup.
      * @param {object} fieldGroupData 
-     * @param {module:PVBid/Domain.Bid} bid 
+     * @param {Bid} bid 
      */
     constructor(fieldGroupData, bid) {
         super();

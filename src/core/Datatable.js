@@ -5,8 +5,8 @@ import BidEntity from "./BidEntity";
  * 
  * @export
  * @class Datatable
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class Datatable extends BidEntity {
     constructor(datatableData, bid) {

@@ -1,15 +1,11 @@
 import _ from "lodash";
-import Project from "./domain/Project";
-import ProjectSavingHelper from "./helpers/ProjectSavingHelper";
+import Project from "../Project";
+import ProjectSavingHelper from "./ProjectSavingHelper";
 
 /**
  * 
- * 
- * @param {module:PVBid/Repository.ProjectRepository} projectRepository 
- * @param {module:PVBid.BidService} bidService 
- * @export
- * @class ProjectService
- * @memberof PVBid
+ * @param {ProjectRepository} projectRepository 
+ * @param {BidService} bidService 
  */
 export default class ProjectService {
     constructor(projectRepository, bidService) {
@@ -19,6 +15,11 @@ export default class ProjectService {
         this._savingHelper = new ProjectSavingHelper();
     }
 
+    /**
+     * 
+     * @param {number} projectId 
+     * @returns {Promise<Project>}
+     */
     async get(projectId) {
         if (!_.isUndefined(this._projects[projectId])) {
             return Promise.resolve(this._projects[projectId]);
@@ -38,6 +39,12 @@ export default class ProjectService {
         }
     }
 
+    /**
+     * 
+     * 
+     * @param {Project} project 
+     * @returns {Promise<null>}
+     */
     async save(project) {
         const exported = this._savingHelper.extract(project);
         console.log("saved project data", exported);

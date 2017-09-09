@@ -1,14 +1,14 @@
 import _ from "lodash";
-import Bid from "./domain/Bid";
-import Field from "./domain/Field";
-import Metric from "./domain/Metric";
-import Assembly from "./domain/Assembly";
-import LineItem from "./domain/LineItem";
-import Component from "./domain/Component";
-import Datatable from "./domain/Datatable";
-import FieldGroup from "./domain/FieldGroup";
-import BidVariable from "./domain/BidVariable";
-import ComponentGroup from "./domain/ComponentGroup";
+import Bid from "../Bid";
+import Field from "../Field";
+import Metric from "../Metric";
+import Assembly from "../Assembly";
+import LineItem from "../LineItem";
+import Component from "../Component";
+import Datatable from "../Datatable";
+import FieldGroup from "../FieldGroup";
+import BidVariable from "../BidVariable";
+import ComponentGroup from "../ComponentGroup";
 
 export default class BidFactory {
     constructor() {

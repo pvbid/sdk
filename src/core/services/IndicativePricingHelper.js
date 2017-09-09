@@ -1,4 +1,4 @@
-import Helpers from "../Helpers";
+import Helpers from "../../utils/Helpers";
 
 export default class IndicativePricingHelper {
     constructor(bid) {
@@ -26,9 +26,9 @@ export default class IndicativePricingHelper {
 
     /**
      * Gets indicative price
-     * @param {float} value The value to assess.
-     * @param {string} bounds The lower or upper bounds (low | high)
-     * @return {int}
+     * @param {number} value The value to assess.
+     * @param {boolean} isLow The lower or upper bounds (low | high)
+     * @return {number}
      */
     getIndicativePrice(value, isLow) {
         var marginOfError = this.getMarginOfError();

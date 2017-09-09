@@ -1,20 +1,15 @@
 import _ from "lodash";
-import Helpers from "../Helpers";
+import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
 
 /**
  * Field Class
- * 
- * @export
- * @class Field
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
  */
 export default class Field extends BidEntity {
     /**
      * Creates an instance of Field.
      * @param {object} fieldData 
-     * @param {module:PVBid/Domain.Bid} bid 
+     * @param {Bid} bid
      */
     constructor(fieldData, bid) {
         super();
@@ -23,9 +18,19 @@ export default class Field extends BidEntity {
         this._original = Object.assign({}, fieldData);
     }
 
+    /**
+     * Gets value of the field. 
+     * If the field is of a list type, will return the associated datatable row id.
+     * 
+     * @type {string} 
+     */
     get value() {
         return this._data.value;
     }
+
+    /**
+     * @type {string}
+     */
     set value(val) {
         if (val != this._data.val) {
             this.config.is_auto_selected = false;
@@ -35,24 +40,40 @@ export default class Field extends BidEntity {
         }
     }
 
+    /**
+     * @type {string}
+     */
     get actualValue() {
         return this._data.actual_value;
     }
+
+    /**
+     * @type {string}
+     */
     set actualValue(val) {
         this._data.actual_value = val;
         this.dirty();
     }
 
+    /**
+     * Gets the configuration information for the bid entity.
+     * @type {object}
+     * @readonly
+     */
     get config() {
         return this._data.config;
     }
-    set config(val) {
-        throw "Setting config is not permitted.";
-    }
 
+    /**
+     * @type {boolean}
+     */
     get isAutoSelected() {
         return !_.isUndefined(this.config.is_auto_selected) && this.config.is_auto_selected;
     }
+
+    /**
+     * @type {boolean}
+     */
     set isAutoSelected(val) {
         if (_.isBoolean(val)) {
             this.config.is_auto_selected = val;
@@ -70,6 +91,11 @@ export default class Field extends BidEntity {
         this.emit("assessed");
     }
 
+    /**
+     * Determines if field should auto select its value.
+     * 
+     * @returns {boolean} 
+     */
     _shouldAutoSelect() {
         if (this.config.type === "list") {
             if (_.isNull(this._data.value) || _.isEmpty(this._data.value) || this.isAutoSelected) {
@@ -84,6 +110,11 @@ export default class Field extends BidEntity {
         } else return false;
     }
 
+    /**
+     * Determines if field should auto fill its value.
+     * 
+     * @returns {boolean} 
+     */
     _shouldAutoFill() {
         if (this.config.type === "number") {
             if (_.isNull(this.value) || this.value.length === 0 || this.isAutoSelected) {
@@ -92,10 +123,6 @@ export default class Field extends BidEntity {
                 }
             } else return false;
         } else return false;
-    }
-
-    compare() {
-        console.log("Field Compare: ", this._original.value, this._data.value);
     }
 
     bind() {
@@ -115,6 +142,8 @@ export default class Field extends BidEntity {
         if (dependencyValue && this._data.value != dependencyValue) {
             this._data.value = dependencyValue;
             this.config.is_auto_selected = true;
+            console.log("auto fill", this);
+
             this.dirty();
             this.emit("updated");
         }
@@ -170,6 +199,7 @@ export default class Field extends BidEntity {
         }
 
         if (isChanged) {
+            console.log("auto selected", this);
             this.emit("updated");
             this.config.is_auto_selected = true;
             this.dirty();

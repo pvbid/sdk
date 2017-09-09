@@ -1,9 +1,4 @@
-import isEmpty from "lodash/isEmpty";
-import isUndefined from "lodash/isUndefined";
-import isEqual from "lodash/isEqual";
-import toArray from "lodash/toArray";
-import keyBy from "lodash/keyBy";
-import defaults from "lodash/defaults";
+import _ from "lodash";
 /**
  * @module PVBid/Repositories
  */
@@ -16,7 +11,7 @@ import defaults from "lodash/defaults";
  * @param {any} httpProvider 
  * @export
  * @class BaseRepository
- * @memberof module:PVBid/Repositories
+ * @memberof 
  */
 export default class BaseRepository {
     constructor(endpoint, singleMap, multiMap, httpProvider) {
@@ -33,10 +28,10 @@ export default class BaseRepository {
      * @instance
      * @param {int} id The id of the entity to retrieve.
      * @param {boolean} forceReload Flags repository to force reload skipping cached data.
-     * @memberof module:PVBid/Repositories.BaseRepository
+     * @memberof .BaseRepository
      */
     async findById(id, forceReload) {
-        if (isEmpty(this.collection) || isUndefined(this.collection[id]) || forceReload) {
+        if (_.isEmpty(this.collection) || _.isUndefined(this.collection[id]) || forceReload) {
             try {
                 let response = await this.http.get(this.endpoint + id);
                 this.collection[id] = response.data.data[this.map.single];
@@ -54,33 +49,33 @@ export default class BaseRepository {
      * Retrieves an array of results for the endpoint
      * 
      * @instance
-     * @memberof module:PVBid/Repositories.BaseRepository
+     * @memberof .BaseRepository
      * @param {object} params A set of parameters to include for the endpoint.
      * @param {boolean} forceReload Flags repository to force reload skipping cached data. 
      */
     async get(params, forceReload) {
-        if (isEmpty(this.collection) || forceReload || !isEqual(params, this.params)) {
+        if (_.isEmpty(this.collection) || forceReload || !_.isEqual(params, this.params)) {
             try {
                 let res = await this.http.get(this.endpoint, {
-                    params: defaults(params, {})
+                    params: _.defaults(params, {})
                 });
-                this.collection = keyBy(res.data.data[this.map.multi], "id");
+                this.collection = _.keyBy(res.data.data[this.map.multi], "id");
                 this.metaData = res.data.data.meta ? res.data.data.meta : null;
 
-                this.params = defaults(Object.assign({}, params), {});
-                return toArray(this.collection);
+                this.params = _.defaults(Object.assign({}, params), {});
+                return _.toArray(this.collection);
             } catch (error) {
                 return Promise.reject(error);
             }
-        } else return toArray(this.collection);
+        } else return _.toArray(this.collection);
     }
 
     /**
      * 
      * @instance
-     * @param {module:PVBid/Domain.BidEntity} entity 
-     * @returns {Promise<module:PVBid/Domain.BidEntity>}
-     * @memberof module:PVBid/Repositories.BaseRepository
+     * @param {BidEntity} entity 
+     * @returns {Promise<BidEntity>}
+     * @memberof .BaseRepository
      */
     async save(entity) {
         try {

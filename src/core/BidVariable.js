@@ -5,14 +5,14 @@ import BidEntity from "./BidEntity";
  * 
  * @export
  * @class BidVariable
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class BidVariable extends BidEntity {
     /**
      * Creates an instance of BidVariable.
      * @param {obect} bidVariableData 
-     * @param {module:PVBid/Domain.Bid} bid 
+     * @param {Bid} bid 
      */
     constructor(bidVariableData, bid) {
         super(25);

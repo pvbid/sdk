@@ -1,5 +1,5 @@
 import _ from "lodash";
-import Helpers from "../Helpers";
+import Helpers from "../../utils/Helpers";
 
 export default class BidModelRelationsHelper {
     constructor(bid) {
@@ -53,7 +53,7 @@ export default class BidModelRelationsHelper {
                         dependencyContract.field.row
                     );
                 case "metric":
-                    return _.isNull(bidEntity.value) ? 0 : parseFloat(bidEntity.value);
+                    return _.isNull(bidEntity.value) ? 0 : Helpers.confirmNumber(bidEntity.value);
                 case "bid":
                     return _.isNull(bidEntity[dependencyContract.field])
                         ? 0

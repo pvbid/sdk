@@ -1,17 +1,16 @@
-import isUndefined from "lodash/isUndefined";
-import each from "lodash/each";
-import Helpers from "../Helpers";
-import BidEntity from "./BidEntity";
+import _ from "lodash";
 import now from "performance-now";
-import { waitForFinalEvent } from "../helpers/WaitForFinalEvent";
+import BidEntity from "./BidEntity";
+import Helpers from "../utils/Helpers";
+import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
  * Project Class
  * 
  * @export
  * @class Project
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class Project extends BidEntity {
     /**
@@ -191,7 +190,7 @@ export default class Project extends BidEntity {
         this.emit("assessing");
         this._clearPortfolio();
 
-        each(this.bids, bid => {
+        _.each(this.bids, bid => {
             if (bid.isActive) {
                 for (let prop of this._propertiesToSum) {
                     this._data[prop] += bid._data[prop];
@@ -215,14 +214,14 @@ export default class Project extends BidEntity {
     _calculateComponents() {
         this._data.components = {};
 
-        each(this.bids, bid => {
+        _.each(this.bids, bid => {
             if (bid.isActive) {
-                each(bid.components(), component => {
+                _.each(bid.components(), component => {
                     if (!component.config.is_nested) {
                         component.ppw = bid.watts > 0 ? component.price / bid.watts : 0;
                         component.cpw = bid.watts > 0 ? component.cost / bid.watts : 0;
 
-                        if (isUndefined(this._data.components[component.definitionId])) {
+                        if (_.isUndefined(this._data.components[component.definitionId])) {
                             this._data.components[component.definitionId] = {
                                 definition_id: component.definitionId,
                                 title: component.title,
@@ -260,7 +259,7 @@ export default class Project extends BidEntity {
     }
 
     bind() {
-        each(this.bids, bid => {
+        _.each(this.bids, bid => {
             bid.on("assessing", `project.${this.id}`, () => {
                 this.emit("assessing");
             });
@@ -273,13 +272,13 @@ export default class Project extends BidEntity {
         this.on("assessed", "project-service", () => {
             this._perf_end = now();
             console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
-
+            console.log("Project Cost/Price", this.cost, this.price);
             this._perf_start = null;
         });
     }
 
     _clearPortfolio() {
-        each(this._propertiesToSum, prop => {
+        _.each(this._propertiesToSum, prop => {
             this._data[prop] = 0;
         });
     }

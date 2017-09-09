@@ -1,15 +1,15 @@
 import _ from "lodash";
-import Helpers from "../Helpers";
+import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
-import { waitForFinalEvent } from "../helpers/WaitForFinalEvent";
+import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
  * @param {object} componentData - structured component data
- * @param {module:PVBid/Domain.Bid} bid - The bid in which the component belongs to.
+ * @param {Bid} bid - The bid in which the component belongs to.
  * @export
  * @class Component
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class Component extends BidEntity {
     constructor(componentData, bid) {
@@ -22,7 +22,7 @@ export default class Component extends BidEntity {
     /**
      * The summed cost from the nested line items.
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get cost() {
@@ -39,7 +39,7 @@ export default class Component extends BidEntity {
     /**
      * The summed taxable cost from the nested line items.
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get taxableCost() {
@@ -56,7 +56,7 @@ export default class Component extends BidEntity {
     /**
     * The average tax percentage from the nested line items.
     * 
-    * @memberof module:PVBid/Domain.Component
+    * @memberof Component
     * @instance
     */
     get taxPercent() {
@@ -73,7 +73,7 @@ export default class Component extends BidEntity {
     /**
      * Tax Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get tax() {
@@ -90,7 +90,7 @@ export default class Component extends BidEntity {
     /**
      * Markup Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get markup() {
@@ -107,7 +107,7 @@ export default class Component extends BidEntity {
     /**
      * Markup Percent Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get markupPercent() {
@@ -124,7 +124,7 @@ export default class Component extends BidEntity {
     /**
      * Labor Hours Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get laborHours() {
@@ -139,7 +139,7 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get laborCost() {
@@ -156,7 +156,7 @@ export default class Component extends BidEntity {
     /**
      * Non Labor Cost Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get nonLaborCost() {
@@ -173,7 +173,7 @@ export default class Component extends BidEntity {
     /**
      * Price Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get price() {
@@ -190,7 +190,7 @@ export default class Component extends BidEntity {
     /**
      * Config Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get config() {
@@ -203,7 +203,7 @@ export default class Component extends BidEntity {
     /**
      * Actual Cost Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      */
     get actualCost() {
         return this._data.actual_cost;
@@ -216,7 +216,7 @@ export default class Component extends BidEntity {
     /**
      * Actual Hours Property
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get actualHours() {
@@ -231,7 +231,7 @@ export default class Component extends BidEntity {
      * Definition Id Property
      * 
      * @readonly
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     get definitionId() {
@@ -245,7 +245,7 @@ export default class Component extends BidEntity {
      * @param {string} property 
      * @param {number} value 
      * @returns {boolean} Returns true if there is a change.
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     _apply(property, value) {
@@ -262,7 +262,7 @@ export default class Component extends BidEntity {
     /**
      * Assess the component instance.
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     assess() {
@@ -374,7 +374,7 @@ export default class Component extends BidEntity {
     /**
      * Binds the "updated" event for all dependant bid entities.
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     bind() {
@@ -394,10 +394,9 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Gets a list of sub-components based on the parent id.
-     * @param  {int} componentId The parent component id to retrieve the sub-component.
-     * @return {array}           Returns an array of sub-components.
-     * @instance
+     * Gets an array of nested of subcomponents.
+     * 
+     * @return {Component[]} Returns an array of subcomponents.
      */
     getSubComponents() {
         var components = [];
@@ -412,8 +411,8 @@ export default class Component extends BidEntity {
     /**
      * Gets the component's parent component, if exists.
      * 
-     * @returns {?PVBid/Domain.Component} Returns the parent component or null value.
-     * @memberof module:PVBid/Domain.Component
+     * @returns {?PVBid/Core.Component} Returns the parent component or null value.
+     * @memberof Component
      * @instance
      */
     getParent() {
@@ -426,7 +425,7 @@ export default class Component extends BidEntity {
      * Gets the level at which the component is nested: 0, 1, 2.
      * 
      * @returns {number}
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     getNestedLevel() {
@@ -441,7 +440,7 @@ export default class Component extends BidEntity {
      * 
      * @returns {boolean}
      * @instance
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      */
     isParent() {
         return !this.config.is_nested;
@@ -481,7 +480,7 @@ export default class Component extends BidEntity {
      * Sets the include status for all nested line items.
      * 
      * @param {boolean} isIncluded 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     setIncludeStatus(isIncluded) {
@@ -495,7 +494,7 @@ export default class Component extends BidEntity {
     /**
      * Resets all nested line items.
      * 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      * @instance
      */
     reset() {
@@ -514,7 +513,7 @@ export default class Component extends BidEntity {
      * @param {number} oldValue 
      * @param {number} newValue 
      * @param {boolean} overrideAllLineItems 
-     * @memberof module:PVBid/Domain.Component
+     * @memberof Component
      */
     _applyComponentValue(property, oldValue, newValue, overrideAllLineItems) {
         newValue = Helpers.confirmNumber(newValue);

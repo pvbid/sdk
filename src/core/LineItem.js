@@ -1,16 +1,15 @@
 import _ from "lodash";
-import Helpers from "../Helpers";
+import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
-import LineItemRuleService from "../LineItemRuleService";
+import LineItemRuleService from "./services/LineItemRuleService";
 
 /**
  * Represents line item data.
  * @export
  * @class LineItem
  * @param {object} entityData 
- * @param {module:PVBid/Domain.Bid} bid 
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @param {Bid} bid 
+ * 
  */
 export default class LineItem extends BidEntity {
     constructor(entityData, bid) {
@@ -25,7 +24,7 @@ export default class LineItem extends BidEntity {
     /**
      * Base Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get base() {
         return Helpers.confirmNumber(this._data.base);
@@ -42,7 +41,7 @@ export default class LineItem extends BidEntity {
     /**
      * Wage Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get wage() {
         return Helpers.confirmNumber(this._data.wage);
@@ -59,7 +58,7 @@ export default class LineItem extends BidEntity {
     /**
      * Is Included Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get isIncluded() {
         return this._data.is_included;
@@ -76,7 +75,7 @@ export default class LineItem extends BidEntity {
     /**
      * Labor Hours Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -93,7 +92,7 @@ export default class LineItem extends BidEntity {
     /**
      * Burden Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get burden() {
         return Helpers.confirmNumber(this._data.burden);
@@ -110,7 +109,7 @@ export default class LineItem extends BidEntity {
     /**
      * Scalar Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get scalar() {
         const scalarContracts = this._getExtraScalarDependencies();
@@ -138,7 +137,7 @@ export default class LineItem extends BidEntity {
     /**
      * Per Quantity Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
@@ -155,7 +154,7 @@ export default class LineItem extends BidEntity {
     /**
      * Escalator Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get escalator() {
         return Helpers.confirmNumber(this._data.escalator, 1);
@@ -172,7 +171,7 @@ export default class LineItem extends BidEntity {
     /**
      * Quantity Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get quantity() {
         return Helpers.confirmNumber(this._data.quantity);
@@ -188,7 +187,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get multiplier() {
         return this._data.multiplier;
@@ -204,7 +203,7 @@ export default class LineItem extends BidEntity {
     /**
      * Cost Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get cost() {
         return this._data.cost;
@@ -224,7 +223,7 @@ export default class LineItem extends BidEntity {
     /**
      * Tax Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -247,7 +246,7 @@ export default class LineItem extends BidEntity {
     /**
      * Tax Percent Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -265,7 +264,7 @@ export default class LineItem extends BidEntity {
     /**
      * Markup Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get markup() {
         return this._data.markup;
@@ -298,7 +297,7 @@ export default class LineItem extends BidEntity {
     /**
      * Price Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get price() {
         return _.round(Helpers.confirmNumber(this._data.price), 4);
@@ -316,7 +315,7 @@ export default class LineItem extends BidEntity {
     /**
      * Config Property
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     get config() {
         return this._data.config;
@@ -328,7 +327,7 @@ export default class LineItem extends BidEntity {
     /**
      * Gets Subtotal aka Initial Results.
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}      
      */
     get subtotal() {
@@ -340,7 +339,7 @@ export default class LineItem extends BidEntity {
      * @instance
      * @param {any} property 
      * @param {any} value 
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     override(property, value) {
         if (_.isUndefined(this._data.config.overrides)) {
@@ -366,7 +365,7 @@ export default class LineItem extends BidEntity {
      * @instance
      * @param {string} property 
      * @returns {boolean}
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     isOverridden(property) {
         return (
@@ -380,7 +379,7 @@ export default class LineItem extends BidEntity {
      * 
      * @instance
      * @param {string} property 
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     resetProperty(property) {
         if (!_.isUndefined(this._data.config.overrides) && !_.isUndefined(this._data.config.overrides[property])) {
@@ -393,7 +392,7 @@ export default class LineItem extends BidEntity {
     /**
      * 
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     resetMarkup() {
         this.resetProperty("markup");
@@ -404,7 +403,7 @@ export default class LineItem extends BidEntity {
      * 
      * 
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     reset() {
         this.config.overrides = {};
@@ -416,7 +415,7 @@ export default class LineItem extends BidEntity {
      * 
      * @instance
      * @returns {boolean}
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     isLabor() {
         return this._data.config.type === "labor";
@@ -425,11 +424,11 @@ export default class LineItem extends BidEntity {
     /**
      * 
      * @instance
-     * @fires module:PVBid/Domain.BidEntity#assessing
-     * @fires module:PVBid/Domain.BidEntity#assessed
-     * @fires module:PVBid/Domain.BidEntity#updated
+     * @emits {assessing} fires event before assessement.
+     * @emits {assessed}
+     * @emits {updated}
      * @param {boolean} forceUpdate 
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     assess(forceUpdate) {
         this.bid.emit("assessing");
@@ -460,7 +459,7 @@ export default class LineItem extends BidEntity {
     /**
      * Binds the "updated" event for all dependant bid entities.
      * 
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @instance
      */
     bind() {
@@ -473,7 +472,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
@@ -490,7 +489,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _bindLineItemRuleDependencies() {
         for (let rule of Object.values(this.config.rules)) {
@@ -511,7 +510,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _bindLineItemPredictionDependencies() {
         if (this.config.prediction_model) {
@@ -534,7 +533,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _applyProperty(property, value) {
         let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 4) : this._data[property];
@@ -552,7 +551,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _applyMarkupChange() {
         if (this.bid.includeTaxInMarkup()) {
@@ -566,7 +565,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _reverseComputeLaborHours(cost, wage, burden) {
         let wageBurden = parseFloat(wage) + parseFloat(burden);
@@ -578,7 +577,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _applyPriceChange() {
         if (this.cost === 0) {
@@ -597,7 +596,7 @@ export default class LineItem extends BidEntity {
      * 
      * @instance
      * @private
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _applyCostChange() {
         var lineItemSubtotal = this.subtotal;
@@ -625,7 +624,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      */
     _applyTaxPercentChange() {
         this._data.tax = this.cost * this.taxPercent;
@@ -639,7 +638,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getExtraScalarDependencies() {
@@ -652,7 +651,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getBaseValue() {
@@ -667,7 +666,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getWageValue() {
@@ -681,7 +680,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getIsIncludedValue() {
@@ -694,7 +693,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getLaborHoursValue() {
@@ -708,7 +707,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getBurdenValue() {
@@ -722,7 +721,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getScalarValue() {
@@ -749,7 +748,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getPerQuantityValue() {
@@ -772,7 +771,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getEscalatorValue() {
@@ -786,7 +785,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getQuantityValue() {
@@ -806,7 +805,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getCostValue() {
@@ -826,7 +825,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getTaxValue() {
@@ -841,7 +840,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getTaxPercentValue() {
@@ -855,7 +854,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getMarkupValue() {
@@ -869,7 +868,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getMarkupPercentValue() {
@@ -884,7 +883,7 @@ export default class LineItem extends BidEntity {
      * 
      * @private
      * @instance
-     * @memberof module:PVBid/Domain.LineItem
+     * @memberof LineItem
      * @return {number}
      */
     _getPriceValue() {

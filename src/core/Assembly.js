@@ -5,14 +5,14 @@ import BidEntity from "./BidEntity";
  * 
  * @export
  * @class Assembly
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class Assembly extends BidEntity {
     /**
      * Creates an instance of Assembly.
      * @param {object} assemblyData 
-     * @param {module:PVBid/Domain.Bid} bid 
+     * @param {Bid} bid 
      */
     constructor(assemblyData, bid) {
         super();

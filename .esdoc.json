@@ -1,0 +1,18 @@
+{
+    "source": "./src",
+    "destination": "./esdocs",
+    "plugins": [
+        {
+            "name": "esdoc-standard-plugin",
+            "option": {
+                "lint": { "enable": true },
+                "coverage": { "enable": false },
+                "accessor": { "access": ["public", "protected"], "autoPrivate": true },
+                "undocumentIdentifier": { "enable": true },
+                "unexportedIdentifier": { "enable": false },
+                "typeInference": { "enable": true }
+            }
+        },
+        { "name": "esdoc-exclude-source-plugin" }
+    ]
+}

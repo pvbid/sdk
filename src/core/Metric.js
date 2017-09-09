@@ -1,20 +1,20 @@
 import _ from "lodash";
 import BidEntity from "./BidEntity";
-import Helpers from "../Helpers";
+import Helpers from "../utils/Helpers";
 
 /**
  * Metric Class
  * 
  * @export
  * @class Metric
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @memberof module:PVBid/Core
+ * @extends {BidEntity}
  */
 export default class Metric extends BidEntity {
     /**
      * Creates an instance of Metric.
      * @param {object} metricData 
-     * @param {module:PVBid/Domain.Bid} bid 
+     * @param {Bid} bid 
      */
     constructor(metricData, bid) {
         super();

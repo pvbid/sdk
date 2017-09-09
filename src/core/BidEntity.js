@@ -1,15 +1,9 @@
-import AdvanceEventEmitter from "../AdvanceEventEmitter";
-
-/**
- * @module PVBid/Domain
- */
+import AdvanceEventEmitter from "../utils/AdvanceEventEmitter";
 
 /**
  * A base class for all other bid entities to extend.
  * 
- * @export
  * @class BidEntity
- * @memberof module:PVBid/Domain
  * @extends {AdvanceEventEmitter}
  */
 export default class BidEntity extends AdvanceEventEmitter {
@@ -33,8 +27,6 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Gets the id of the bid entity.
      * 
-     * @instance
-     * @memberof module:PVBid/Domain.BidEntity
      * @readonly
      */
     get id() {
@@ -44,8 +36,6 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Getter and Setter of the bid entity title.
      * 
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     get title() {
         return this._data.title;
@@ -59,8 +49,6 @@ export default class BidEntity extends AdvanceEventEmitter {
      * Gets the bid entity type.
      * 
      * @readonly
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     get type() {
         return this._data.type;
@@ -69,8 +57,6 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Flags the bid entity as dirty and to be saved.
      * 
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     dirty() {
         this.is_dirty = true;
@@ -79,8 +65,6 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Marks the bid entity as clean.
      * 
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     pristine() {
         this.is_dirty = false;
@@ -89,8 +73,6 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Exports the internal data for the bid entity.
      * @returns {object}
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     exportData() {
         return Object.assign({}, this._data);
@@ -99,28 +81,12 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Assess bid entity. 
      * 
+     * @emits {assessing} Fires as assessment begins.
+     * @emits {assessed} Fires when bid entity assessement is completed
+     * @emits {updated} Fires when the bid entity has changed.
      * @abstract
-     * @memberof module:PVBid/Domain.BidEntity
-     * @instance
      */
     assess() {
-        /**
-         * Fires as assessment begins.
-         * 
-         * @event module:PVBid/Domain.BidEntity#assessing 
-         */
-
-        /**
-         * Fires when bid entity assessement is completed.
-         * 
-         * @event module:PVBid/Domain.BidEntity#assessed
-         */
-
-        /**
-         * Fires when the bid entity has changed.
-         * 
-         * @event module:PVBid/Domain.BidEntity#updated
-         */
         throw "must be implemented by subclass";
     }
 }

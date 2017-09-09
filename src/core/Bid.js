@@ -1,18 +1,16 @@
 import _ from "lodash";
-import Helpers from "../Helpers";
+import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
 import now from "performance-now";
-import { waitForFinalEvent } from "../helpers/WaitForFinalEvent";
-import BidModelRelationsHelper from "../helpers/BidModelRelationsHelper";
-import IndicativePricingHelper from "../helpers/IndicativePricingHelper";
+import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
+import BidModelRelationsHelper from "./services/BidModelRelationsHelper";
+import IndicativePricingHelper from "./services/IndicativePricingHelper";
 
 /**
  * Bid Class.
  * 
- * @export
  * @class Bid
- * @memberof module:PVBid/Domain
- * @extends {module:PVBid/Domain.BidEntity}
+ * @extends {BidEntity}
  */
 export default class Bid extends BidEntity {
     constructor(bidData, bidService) {
@@ -34,7 +32,7 @@ export default class Bid extends BidEntity {
      * Gets the type of bid entity.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @readonly
      */
     get type() {
@@ -45,7 +43,7 @@ export default class Bid extends BidEntity {
      * Determines if the bid is active.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get isActive() {
         return this._data.is_active;
@@ -63,7 +61,7 @@ export default class Bid extends BidEntity {
      * Labor Hours Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -80,7 +78,7 @@ export default class Bid extends BidEntity {
      * Cost Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get cost() {
         return this._data.cost;
@@ -97,7 +95,7 @@ export default class Bid extends BidEntity {
      * Tax Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -112,7 +110,7 @@ export default class Bid extends BidEntity {
      * Tax Percent Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -129,7 +127,7 @@ export default class Bid extends BidEntity {
      * Markup Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get markup() {
         return this._data.markup;
@@ -156,7 +154,7 @@ export default class Bid extends BidEntity {
      * 
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get marginPercent() {
         return Helpers.confirmNumber(this._data.margin_percent);
@@ -185,7 +183,7 @@ export default class Bid extends BidEntity {
      * Price Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get price() {
         return Helpers.confirmNumber(this._data.price);
@@ -212,7 +210,7 @@ export default class Bid extends BidEntity {
      * Actual Cost Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get actualCost() {
         return this._data.actual_cost;
@@ -227,7 +225,7 @@ export default class Bid extends BidEntity {
      * Actual Cost Property
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get actualHours() {
         return this._data.actual_hours;
@@ -243,7 +241,7 @@ export default class Bid extends BidEntity {
      * 
      * @readonly
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     get watts() {
         return this._data.watts;
@@ -280,10 +278,8 @@ export default class Bid extends BidEntity {
     /**
      * Gets a component entity by id.  If no id is passed, will return an object of keyed components.
      * 
-     * @instance
-     * @memberof module:PVBid/Domain.Bid
      * @param {number=} id - The id of the component to retrieve.
-     * @returns {(module:PVBid/Domain.Component|Object.<string, module:PVBid/Domain.Component>|null)}
+     * @returns {(Component|Object.<string, Component>|null)}
      */
     components(id) {
         return id ? this.relations.getBidEntity("component", id) : this._data.components;
@@ -292,10 +288,8 @@ export default class Bid extends BidEntity {
     /**
      * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups.
      * 
-     * @instance
-     * @memberof module:PVBid/Domain.Bid
      * @param {number} id 
-     * @returns {(module:PVBid/Domain.ComponentGroup|Object.<string, module:PVBid/Domain.ComponentGroup>|null)}
+     * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
      */
     componentGroups(id) {
         return id ? this.relations.getBidEntity("component_group", id) : this._data.component_groups;
@@ -314,7 +308,7 @@ export default class Bid extends BidEntity {
      * Gets the total watts for the bid.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @return {number}
      */
     getTotalWatts() {
@@ -331,7 +325,7 @@ export default class Bid extends BidEntity {
      * Calculates and returns the Bid Margin Percent.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @return {number}    Returns the margin percent.
      */
     getMarginPercent() {
@@ -438,12 +432,12 @@ export default class Bid extends BidEntity {
     /**
      * Assess bid values. If bid values changes, the bid will be flagged as dirty and an "updated" event will fire.
      * 
-     * @fires module:PVBid/Domain.BidEntity#assessing
-     * @fires module:PVBid/Domain.BidEntity#event:assessed
-     * @fires module:PVBid/Domain.BidEntity#updated
+     * @fires BidEntity#assessing
+     * @fires BidEntity#event:assessed
+     * @fires BidEntity#updated
      * @instance
      * @param {boolean} [forceUpdate] - Force fires "update" event and flags bid as dirty.
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     assess(forceUpdate) {
         this.emit("assessing");
@@ -574,9 +568,9 @@ export default class Bid extends BidEntity {
     /**
      * Determines if components need to be reassessed by comparing bid results.
      * 
-     * @param {module:PVBid/Domain.Component} component - The component to determine if needs reassessment.
+     * @param {Component} component - The component to determine if needs reassessment.
      * @returns {boolean}
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @instance
      * @private
      */
@@ -604,7 +598,7 @@ export default class Bid extends BidEntity {
     /**
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     bind() {
         for (let f of Object.values(this.fields())) {
@@ -634,7 +628,7 @@ export default class Bid extends BidEntity {
      * 
      * @instance
      * @private
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     _handleAssessmentCompleteEvent() {
         waitForFinalEvent(
@@ -655,7 +649,7 @@ export default class Bid extends BidEntity {
      * Gets the margin of error for indicative pricing.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @return {number}
      */
     getMarginOfError() {
@@ -665,10 +659,8 @@ export default class Bid extends BidEntity {
     /**
      * Gets indicative price
      * 
-     * @instance
-     * @memberof module:PVBid/Domain.Bid
-     * @param {float} value The value to assess.
-     * @param {string} bounds The lower or upper bounds (low | high)
+     * @param {number} value The value to assess.
+     * @param {boolean} isLow The lower or upper bounds (low | high)
      * @return {number}
      */
     getIndicativePrice(value, isLow) {
@@ -678,7 +670,7 @@ export default class Bid extends BidEntity {
     /**
      * Determines if indicative pricing is enabled.
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      * @return {boolean}
      */
     isIndicativePricing() {
@@ -689,7 +681,7 @@ export default class Bid extends BidEntity {
      * 
      * @instance
      * @returns {object}
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     exportData() {
         let bid = Object.assign({}, this._data);
@@ -715,7 +707,7 @@ export default class Bid extends BidEntity {
      * Marks bid and all bid entities as clean.
      * 
      * @instance
-     * @memberof module:PVBid/Domain.Bid
+     * @memberof Bid
      */
     pristine() {
         this.is_dirty = false;

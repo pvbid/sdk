@@ -1,9 +1,9 @@
 import BidFactory from "./BidFactory";
 /**
- * @param {module:PVBid/Repositories.BidRepository} bidRepository
+ * @param {.BidRepository} bidRepository
  * @export
  * @class BidService
- * @memberof module:PVBid
+ * @memberof module:PVBid/Core
  */
 export default class BidService {
     constructor(bidRepository) {
@@ -15,9 +15,9 @@ export default class BidService {
      * 
      * @instance
      * @param {number} bidId 
-     * @param {module:PVBid/Domain.Project} project 
-     * @returns {Promise<module:PVBid/Domain.Bid>}
-     * @memberof module:PVBid.BidService
+     * @param {Project} project 
+     * @returns {Promise<Bid>}
+     * @memberof BidService
      */
     async load(bidId, project) {
         try {
@@ -38,9 +38,9 @@ export default class BidService {
      * 
      * @instance
      * @param {array} bidIds 
-     * @param {module:PVBid/Domain.Project} project 
-     * @returns {Promise.<Bid[]>}
-     * @memberof module:PVBid/Domain.BidService
+     * @param {Project} project 
+     * @returns {Promise<Bid[]>}
+     * @memberof BidService
      */
     async loadBids(bidIds, project) {
         let promises = [];
@@ -55,7 +55,6 @@ export default class BidService {
                 for (let bidObject of bidsJson) {
                     let bid = new BidFactory().create(bidObject);
 
-                    const metric = new Domain.Metric({}, bid);
                     bid.project = project;
                     bid.bind();
                     bid.reassessAll();

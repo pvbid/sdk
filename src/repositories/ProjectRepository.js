@@ -1,6 +1,6 @@
+import _ from "lodash";
+
 import BaseRepository from "./BaseRepository";
-import isEmpty from "lodash/isEmpty";
-import isUndefined from "lodash/isUndefined";
 
 export default class ProjectRepository extends BaseRepository {
     constructor(baseUri, httpProvider) {
@@ -9,9 +9,9 @@ export default class ProjectRepository extends BaseRepository {
 
     async findById(id, forceReload) {
         if (
-            isEmpty(this.collection) ||
-            isUndefined(this.collection[id]) ||
-            isUndefined(this.collection[id].bids) ||
+            _.isEmpty(this.collection) ||
+            _.isUndefined(this.collection[id]) ||
+            _.isUndefined(this.collection[id].bids) ||
             forceReload
         ) {
             let response = await this.http.get(this.endpoint + id);

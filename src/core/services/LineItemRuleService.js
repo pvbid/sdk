@@ -1,9 +1,5 @@
-import isUndefined from "lodash/isUndefined";
-import isNull from "lodash/isNull";
-import includes from "lodash/includes";
-import isBoolean from "lodash/isBoolean";
-import isNaN from "lodash/isNaN";
-import Helpers from "./Helpers";
+import _ from "lodash";
+import Helpers from "../../utils/Helpers";
 
 export default class LineItemRuleService {
     isIncluded(lineItem) {
@@ -13,7 +9,7 @@ export default class LineItemRuleService {
             for (let rule of Object.values(lineItem.config.rules)) {
                 if (
                     lineItem.config.rule_inclusion === "all" ||
-                    (lineItem.config.rule_inclusion === "any" && !includes(includeStatues, true))
+                    (lineItem.config.rule_inclusion === "any" && !_.includes(includeStatues, true))
                 ) {
                     if (rule.type === "always_include") {
                         includeStatues.push(true);
@@ -28,8 +24,8 @@ export default class LineItemRuleService {
             }
 
             return lineItem.config.rule_inclusion === "all"
-                ? !includes(includeStatues, false)
-                : includes(includeStatues, true);
+                ? !_.includes(includeStatues, false)
+                : _.includes(includeStatues, true);
         } else return false;
     }
 
@@ -51,17 +47,17 @@ export default class LineItemRuleService {
 
         var results = Helpers.evalExpression(lineItemRule.expression, valueMap);
 
-        if (!isNaN(results) && isBoolean(results)) {
+        if (!_.isNaN(results) && _.isBoolean(results)) {
             return lineItemRule.activate_on ? results : !results;
         } else return false;
     }
 
     _evalToggleFieldRule(lineItemRule, lineItem) {
         var toggleValue = lineItem.bid.relations.getDependencyValue(lineItemRule.dependencies.toggle_field);
-        toggleValue = isUndefined(toggleValue) || isNull(toggleValue) ? false : toggleValue;
+        toggleValue = _.isUndefined(toggleValue) || _.isNull(toggleValue) ? false : toggleValue;
         toggleValue = toggleValue === "0" || toggleValue === "1" ? Boolean(parseInt(toggleValue)) : toggleValue;
 
-        if (!isNaN(toggleValue) && isBoolean(toggleValue)) {
+        if (!_.isNaN(toggleValue) && _.isBoolean(toggleValue)) {
             return lineItemRule.activate_on ? toggleValue : !toggleValue;
         } else return false;
     }
@@ -71,7 +67,7 @@ export default class LineItemRuleService {
 
         var hasSelected = false;
 
-        hasSelected = includes(lineItemRule.list_options, listField.value);
+        hasSelected = _.includes(lineItemRule.list_options, listField.value);
 
         return lineItemRule.activate_on ? hasSelected : !hasSelected;
     }
