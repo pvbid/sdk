@@ -30,7 +30,13 @@ export default class ProjectRepository extends BaseRepository {
     }
 
     detachBid(projectId, bidId) {
-        return this.http.delete(this.baseUri + projectId + "/bids/" + bidId).then(function(response) {
+        return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
+            return response.data.data;
+        });
+    }
+
+    batchUpdate(projectId, data) {
+        return this.http.put(this.endpoint + projectId + "/batch/", data).then(function(response) {
             return response.data.data;
         });
     }

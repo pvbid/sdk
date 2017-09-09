@@ -44,15 +44,14 @@ module.exports = {
 
     plugins: [
         //new LodashModuleReplacementPlugin(),
-        /* new MinifyPlugin({}, { comments: false }),
-        new CompressionPlugin({
+        //new MinifyPlugin({}, { comments: false })
+        /* new CompressionPlugin({
             asset: "[path].gz[query]",
             algorithm: "gzip",
             test: /\.js$|\.css$|\.html$/,
             threshold: 10240,
             minRatio: 0.8
-        })
-        */
+        })*/
     ],
     devtool: "source-map",
     watch: process.env.WATCH === "true" ? true : false,

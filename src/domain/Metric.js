@@ -2,7 +2,20 @@ import _ from "lodash";
 import BidEntity from "./BidEntity";
 import Helpers from "../Helpers";
 
+/**
+ * Metric Class
+ * 
+ * @export
+ * @class Metric
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class Metric extends BidEntity {
+    /**
+     * Creates an instance of Metric.
+     * @param {object} metricData 
+     * @param {module:PVBid/Domain.Bid} bid 
+     */
     constructor(metricData, bid) {
         super();
         this.bid = bid;
@@ -10,28 +23,25 @@ export default class Metric extends BidEntity {
         this._original = Object.assign({}, metricData);
     }
 
-    get id() {
-        return this._data.id;
-    }
-
-    get title() {
-        return this._data.title;
-    }
-    set title(val) {
-        this._data.title = val;
-    }
-
-    get type() {
-        return "metric";
-    }
-
     get value() {
         return this._data.value;
     }
     set value(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.value) {
             this.config.override = true;
-            this._data.value = val;
+            this._data.value = Helpers.confirmNumber(val);
+            this.dirty();
+            this.emit("updated");
+        }
+    }
+
+    get actualValue() {
+        return this._data.actual_value;
+    }
+    set actualValue(val) {
+        if (Helpers.confirmNumber(val, false)) {
+            this._data.actual_value = val;
+            this.dirty();
         }
     }
 
@@ -40,6 +50,10 @@ export default class Metric extends BidEntity {
     }
     set config(val) {
         throw "Setting metric config is not permitted.";
+    }
+
+    get definitionId() {
+        return this._data.definition_id;
     }
 
     _getBaseValue() {
@@ -114,7 +128,7 @@ export default class Metric extends BidEntity {
             }
         }
 
-        this.emit("assessment.complete");
+        this.emit("assessed");
     }
 
     bind() {

@@ -1,24 +1,18 @@
 import BidEntity from "./BidEntity";
 
+/**
+ * Datatable Class
+ * 
+ * @export
+ * @class Datatable
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class Datatable extends BidEntity {
     constructor(datatableData, bid) {
         super();
         this.bid = bid;
         this._data = datatableData;
-    }
-
-    get id() {
-        return this._data.id;
-    }
-    get title() {
-        return this._data.title;
-    }
-    set title(val) {
-        this._data.title = val;
-    }
-
-    get type() {
-        return "datatable";
     }
 
     get config() {

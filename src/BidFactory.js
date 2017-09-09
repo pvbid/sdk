@@ -25,9 +25,9 @@ export default class BidFactory {
             "variables"
         ];
     }
-    create(bidData) {
+    create(bidData, bidService) {
         this._keyBidEntities(bidData);
-        let bid = new Bid(bidData);
+        let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);
 
         return bid;

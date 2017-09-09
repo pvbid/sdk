@@ -2,7 +2,20 @@ import _ from "lodash";
 import Helpers from "../Helpers";
 import BidEntity from "./BidEntity";
 
+/**
+ * Field Class
+ * 
+ * @export
+ * @class Field
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class Field extends BidEntity {
+    /**
+     * Creates an instance of Field.
+     * @param {object} fieldData 
+     * @param {module:PVBid/Domain.Bid} bid 
+     */
     constructor(fieldData, bid) {
         super();
         this.bid = bid;
@@ -10,32 +23,26 @@ export default class Field extends BidEntity {
         this._original = Object.assign({}, fieldData);
     }
 
-    get id() {
-        return this._data.id;
-    }
-
-    get title() {
-        return this._data.title;
-    }
-    set title(val) {
-        this._data.title = val;
-    }
-    get type() {
-        return this._data.type;
-    }
-    set type(val) {
-        throw "Chainging type is not permitted.";
-    }
-
     get value() {
         return this._data.value;
     }
     set value(val) {
-        this.config.is_auto_selected = false;
-        this._data.value = val;
-        this.is_dirty = true;
-        this.emit("updated");
+        if (val != this._data.val) {
+            this.config.is_auto_selected = false;
+            this._data.value = val;
+            this.dirty();
+            this.emit("updated");
+        }
     }
+
+    get actualValue() {
+        return this._data.actual_value;
+    }
+    set actualValue(val) {
+        this._data.actual_value = val;
+        this.dirty();
+    }
+
     get config() {
         return this._data.config;
     }
@@ -60,7 +67,7 @@ export default class Field extends BidEntity {
             this._autoFill();
         }
 
-        this.emit("assessment.complete");
+        this.emit("assessed");
     }
 
     _shouldAutoSelect() {
@@ -105,10 +112,10 @@ export default class Field extends BidEntity {
     _autoFill() {
         var dependencyValue = this.bid.relations.getDependencyValue(this.config.dependencies.auto_a);
 
-        if (dependencyValue) {
+        if (dependencyValue && this._data.value != dependencyValue) {
             this._data.value = dependencyValue;
             this.config.is_auto_selected = true;
-            this.is_dirty = true;
+            this.dirty();
             this.emit("updated");
         }
     }
@@ -148,17 +155,25 @@ export default class Field extends BidEntity {
             default:
         }
 
-        if (results.length === 0) {
+        let isChanged = false;
+        if (results.length === 0 && this._data.value != "") {
             this._data.value = "";
+            isChanged = true;
         } else if (results.length === 1 || results[0].value != results[1].value) {
-            this._data.value = results[0].id;
-        } else {
+            if (this._data.value != results[0].id) {
+                this._data.value = results[0].id;
+                isChanged = true;
+            }
+        } else if (this._data.value != "") {
             this._data.value = "";
+            isChanged = true;
         }
 
-        this.emit("updated");
-        this.config.is_auto_selected = true;
-        this.is_dirty = true;
+        if (isChanged) {
+            this.emit("updated");
+            this.config.is_auto_selected = true;
+            this.dirty();
+        }
     }
 
     _filterLessThan(rowValues, dependencyValue) {

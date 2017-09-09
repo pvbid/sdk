@@ -3,6 +3,15 @@ import Helpers from "../Helpers";
 import BidEntity from "./BidEntity";
 import LineItemRuleService from "../LineItemRuleService";
 
+/**
+ * Represents line item data.
+ * @export
+ * @class LineItem
+ * @param {object} entityData 
+ * @param {module:PVBid/Domain.Bid} bid 
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class LineItem extends BidEntity {
     constructor(entityData, bid) {
         super();
@@ -10,101 +19,98 @@ export default class LineItem extends BidEntity {
         this._data = entityData;
         this.bid = bid;
         this._ruleService = new LineItemRuleService(this);
-        this.is_dirty = false;
         this.onDelay("property.updated", 5, "self", () => this.assess(true));
-    }
-
-    get id() {
-        return this._data.id;
-    }
-    set id(val) {
-        throw "Changing line item id is not permitted.";
-    }
-
-    get title() {
-        return this._data.title;
-    }
-    set title(val) {
-        this._data.title = val;
-    }
-
-    get type() {
-        return this._data.type;
-    }
-    set type(val) {
-        throw "Unable to change type.";
     }
 
     /**
      * Base Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get base() {
         return Helpers.confirmNumber(this._data.base);
     }
     set base(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.isNumber(val)) {
             this._data.base = Helpers.confirmNumber(val);
             this.override("base", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Wage Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get wage() {
         return Helpers.confirmNumber(this._data.wage);
     }
     set wage(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.wage = val;
+        if (Helpers.isNumber(val)) {
+            this._data.wage = Helpers.confirmNumber(val);
             this.override("wage", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Is Included Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get isIncluded() {
         return this._data.is_included;
     }
     set isIncluded(val) {
-        this._data.is_included = val;
-        this.override("is_included", true);
-        this.emit("property.updated");
+        if (_.isBoolean(val) && this._data.is_included != val) {
+            this._data.is_included = val;
+            this.override("is_included", true);
+            this.dirty();
+            this.emit("property.updated");
+        }
     }
 
     /**
      * Labor Hours Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
     }
     set laborHours(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.labor_hours = val;
+        if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val)) {
+            this._data.labor_hours = Helpers.confirmNumber(val);
             this.override("labor_hours", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Burden Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get burden() {
         return Helpers.confirmNumber(this._data.burden);
     }
     set burden(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.burden = val;
+        if (Helpers.isNumber(val) && this._data.burden != Helpers.confirmNumber(val)) {
+            this._data.burden = Helpers.confirmNumber(val);
             this.override("burden", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Scalar Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get scalar() {
         const scalarContracts = this._getExtraScalarDependencies();
@@ -131,68 +137,85 @@ export default class LineItem extends BidEntity {
 
     /**
      * Per Quantity Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
     }
     set perQuantity(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.per_quantity = value;
+        if (Helpers.isNumber(val) && this._data.per_quantity != Helpers.confirmNumber(val)) {
+            this._data.per_quantity = Helpers.confirmNumber(val);
             this.override("per_quantity", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Escalator Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get escalator() {
         return Helpers.confirmNumber(this._data.escalator, 1);
     }
     set escalator(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.escalator = val;
+        if (Helpers.isNumber(val) && this._data.escalator != Helpers.confirmNumber(val)) {
+            this._data.escalator = Helpers.confirmNumber(val);
             setOverride("escalator", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Quantity Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get quantity() {
         return Helpers.confirmNumber(this._data.quantity);
     }
     set quantity(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.quantity = value;
+        if (Helpers.isNumber(val) && this._data.quantity != Helpers.confirmNumber(val)) {
+            this._data.quantity = Helpers.confirmNumber(val);
             this.override("quantity", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
+    /**
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     get multiplier() {
         return this._data.multiplier;
     }
     set multiplier(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.multiplier = val;
+        if (Helpers.isNumber(val) && this._data.multiplier != Helpers.confirmNumber(val)) {
+            this._data.multiplier = Helpers.confirmNumber(val);
             this.override("multiplier", true);
+            this.dirty();
+            this.emit("property.updated");
         }
     }
     /**
      * Cost Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get cost() {
         return this._data.cost;
     }
     set cost(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.cost = val;
+        if (Helpers.isNumber(val) && this._data.cost != Helpers.confirmNumber(val)) {
+            this._data.cost = Helpers.confirmNumber(val);
             this._data.escalator = 1;
             this.override("cost", true);
             this.override("escalator", true);
-
+            this.dirty();
             this._applyCostChange();
             this.emit("property.updated");
         }
@@ -200,53 +223,59 @@ export default class LineItem extends BidEntity {
 
     /**
      * Tax Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
     }
     set tax(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.tax = val;
+        if (Helpers.isNumber(val) && this._data.tax != Helpers.confirmNumber(val)) {
+            this._data.tax = Helpers.confirmNumber(val);
             this.override("tax", true);
             this.override("tax_percent", true);
+            this.dirty();
 
             this._data.tax_percent = this.cost > 0 ? Helpers.confirmNumber(this.tax / this.cost) * 100 : 0;
 
             if (this.bid.includeTaxInMarkup()) {
                 this.markup = Helpers.confirmNumber(this.cost + this.tax) * (this.markupPercent / 100);
-            } else calculate(lineItem);
+            } else this.assess();
         }
     }
 
     /**
      * Tax Percent Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
     }
     set taxPercent(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.tax_percent = val;
+        if (Helpers.isNumber(val) && this._data.tax_percent != Helpers.confirmNumber(val)) {
+            this._data.tax_percent = Helpers.confirmNumber(val);
             this.override("tax_percent", true);
             this._applyTaxPercentChange();
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Markup Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get markup() {
-        let markup = this.bid.includeTaxInMarkup() ? this.cost + this.tax : this.cost;
-        markup = markup * (this.markupPercent / 100);
-
-        return (this._data.markup = Helpers.confirmNumber(markup));
+        return this._data.markup;
     }
     set markup(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.markup = __.round(Helpers.confirmNumber(val), 4);
+        if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val)) {
+            this._data.markup = _.round(Helpers.confirmNumber(val), 4);
             this.override("markup", true);
             this._applyMarkupChange();
+            this.dirty();
             this.emit("property.updated");
         }
     }
@@ -258,30 +287,36 @@ export default class LineItem extends BidEntity {
         return _.round(Helpers.confirmNumber(this._data.markup_percent), 4);
     }
     set markupPercent(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.isNumber(val) && this._data.markup_percent != Helpers.confirmNumber(val)) {
             this._data.markup_percent = _.round(Helpers.confirmNumber(val), 4);
             this.override("markup_percent", true);
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Price Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get price() {
         return _.round(Helpers.confirmNumber(this._data.price), 4);
     }
     set price(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.price = val;
+        if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val)) {
+            this._data.price = Helpers.confirmNumber(val);
             this.override("price", true);
             this._applyPriceChange();
+            this.dirty();
             this.emit("property.updated");
         }
     }
 
     /**
      * Config Property
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
      */
     get config() {
         return this._data.config;
@@ -292,12 +327,21 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets Subtotal aka Initial Results.
-     * @return {[type]}      [description]
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}      
      */
     get subtotal() {
         return Helpers.confirmNumber(parseFloat(this.quantity) * parseFloat(this.perQuantity) + parseFloat(this.base));
     }
 
+    /**
+     * 
+     * @instance
+     * @param {any} property 
+     * @param {any} value 
+     * @memberof module:PVBid/Domain.LineItem
+     */
     override(property, value) {
         if (_.isUndefined(this._data.config.overrides)) {
             this._data.config.overrides = {};
@@ -317,6 +361,13 @@ export default class LineItem extends BidEntity {
         this._data.config.overrides[property] = value;
     }
 
+    /**
+     * 
+     * @instance
+     * @param {string} property 
+     * @returns {boolean}
+     * @memberof module:PVBid/Domain.LineItem
+     */
     isOverridden(property) {
         return (
             !_.isUndefined(this._data.config.overrides) &&
@@ -325,38 +376,61 @@ export default class LineItem extends BidEntity {
         );
     }
 
+    /**
+     * 
+     * @instance
+     * @param {string} property 
+     * @memberof module:PVBid/Domain.LineItem
+     */
     resetProperty(property) {
         if (!_.isUndefined(this._data.config.overrides) && !_.isUndefined(this._data.config.overrides[property])) {
             delete this._data.config.overrides[property];
+            this.dirty();
             this.emit("property.updated", property);
         }
     }
 
+    /**
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
+    resetMarkup() {
+        this.resetProperty("markup");
+        this.resetProperty("markup_percent");
+    }
+
+    /**
+     * 
+     * 
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
+    reset() {
+        this.config.overrides = {};
+        this._data.multiplier = 1;
+        this.assess(true);
+    }
+
+    /**
+     * 
+     * @instance
+     * @returns {boolean}
+     * @memberof module:PVBid/Domain.LineItem
+     */
     isLabor() {
         return this._data.config.type === "labor";
     }
 
-    calculate() {}
-
-    exportData() {
-        return Object.assign({}, this._data);
-    }
-
-    compare() {
-        return {
-            cost: _.round(this._original.cost - this._data.cost, 4),
-            price: _.round(this._original.price - this._data.price, 4),
-            //markup_percent: _.round(this._original.markup_percent - this._data.markup_percent, 4),
-            //tax_percent: _.round(this._original.tax_percent - this._data.tax_percent, 4),
-            base: _.round(this._original.base - this._data.base, 4),
-            labor_hours: _.round(this._original.labor_hours - this._data.labor_hours, 4),
-            quantity: _.round(this._original.quantity - this._data.quantity, 4),
-            per_quantity: _.round(this._original.per_quantity - this._data.per_quantity, 7)
-            //  base: _.round(this._original.base - this._data.base, 4),
-            //labor_hours: _.round(this._original.labor_hours - this._data.labor_hours, 4)
-        };
-    }
-
+    /**
+     * 
+     * @instance
+     * @fires module:PVBid/Domain.BidEntity#assessing
+     * @fires module:PVBid/Domain.BidEntity#assessed
+     * @fires module:PVBid/Domain.BidEntity#updated
+     * @param {boolean} forceUpdate 
+     * @memberof module:PVBid/Domain.LineItem
+     */
     assess(forceUpdate) {
         this.bid.emit("assessing");
         var isChanged = false;
@@ -374,16 +448,33 @@ export default class LineItem extends BidEntity {
         isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
         isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
 
-        if (isChanged || forceUpdate) this.emit("updated");
-        this.emit("assessment.complete");
+        if (isChanged || forceUpdate) {
+            this.is_dirty = true;
+
+            this.emit("updated");
+        }
+
+        this.emit("assessed");
     }
 
+    /**
+     * Binds the "updated" event for all dependant bid entities.
+     * 
+     * @memberof module:PVBid/Domain.LineItem
+     * @instance
+     */
     bind() {
         this._bindLineItemDependencies();
         this._bindLineItemRuleDependencies();
         this._bindLineItemPredictionDependencies();
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
             if (!_.isEmpty(dependencyContract)) {
@@ -395,6 +486,12 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _bindLineItemRuleDependencies() {
         for (let rule of Object.values(this.config.rules)) {
             if (rule.dependencies) {
@@ -410,6 +507,12 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _bindLineItemPredictionDependencies() {
         if (this.config.prediction_model) {
             var predictionModels = this.config.prediction_model;
@@ -427,6 +530,12 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _applyProperty(property, value) {
         let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 4) : this._data[property];
         let newValue = !_.isBoolean(value) ? _.round(value, 4) : value;
@@ -439,6 +548,12 @@ export default class LineItem extends BidEntity {
         } else return false;
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _applyMarkupChange() {
         if (this.bid.includeTaxInMarkup()) {
             this.markupPercent = _.round(Helpers.confirmNumber(this.markup / (this.cost + this.tax)) * 100, 4);
@@ -447,6 +562,12 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _reverseComputeLaborHours(cost, wage, burden) {
         let wageBurden = parseFloat(wage) + parseFloat(burden);
         return Helpers.confirmNumber(parseFloat(cost) / wageBurden);
@@ -454,7 +575,11 @@ export default class LineItem extends BidEntity {
 
     /**
      * Internal method to calcualte a Unit price change.
-    */
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _applyPriceChange() {
         if (this.cost === 0) {
             const taxMarkupRate = (this.taxPercent + this.markupPercent) / 100;
@@ -463,12 +588,16 @@ export default class LineItem extends BidEntity {
             this.base = this.isLabor() ? this._reverseComputeLaborHours(newCost, this.wage, this.burden) : newCost;
         } else {
             const markupChange = this.price - (this.cost + this.tax + this.markup);
-            this.markup = Helpers.confirmNumber(this.markup + markupChange);
+            this.markup = Helpers.confirmNumber(this._data.markup + markupChange);
         }
     }
 
     /**
      * Internal method that recalculates a line item cost change.
+     * 
+     * @instance
+     * @private
+     * @memberof module:PVBid/Domain.LineItem
      */
     _applyCostChange() {
         var lineItemSubtotal = this.subtotal;
@@ -492,6 +621,12 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     */
     _applyTaxPercentChange() {
         this._data.tax = this.cost * this.taxPercent;
 
@@ -500,6 +635,13 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
+     */
     _getExtraScalarDependencies() {
         return _.pickBy(this.config.dependencies, function(el, key) {
             return key.indexOf("scalar_") === 0;
@@ -507,7 +649,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Base Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getBaseValue() {
         if (!this.isOverridden("base")) {
@@ -518,7 +664,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Wage Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getWageValue() {
         if (!this.isOverridden("wage")) {
@@ -528,7 +678,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Is Included Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getIsIncludedValue() {
         if (!this.isOverridden("is_included")) {
@@ -537,7 +691,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Labor Hours Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getLaborHoursValue() {
         if (!this.isOverridden("labor_hours")) {
@@ -547,7 +705,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Burden Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getBurdenValue() {
         if (!this.isOverridden("burden")) {
@@ -557,7 +719,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Scalar Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getScalarValue() {
         const scalarContracts = this._getExtraScalarDependencies();
@@ -580,7 +746,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Per Quantity Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getPerQuantityValue() {
         if (!this.isOverridden("per_quantity")) {
@@ -599,7 +769,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Escalator Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getEscalatorValue() {
         if (!this.isOverridden("escalator")) {
@@ -609,7 +783,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Quantity Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getQuantityValue() {
         if (!this.isOverridden("quantity")) {
@@ -625,7 +803,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Cost Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getCostValue() {
         if (!this.isOverridden("cost")) {
@@ -641,7 +823,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Tax Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getTaxValue() {
         if (!this.isOverridden("tax")) {
@@ -652,7 +838,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Tax Percent Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getTaxPercentValue() {
         if (!this.isOverridden("tax_percent")) {
@@ -662,17 +852,25 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Markup Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getMarkupValue() {
-        let costToMarkup = this.bid.includeTaxInMarkup() ? this.cost + this.tax : this.cost;
-        let markup = costToMarkup * (this.markupPercent / 100);
-
-        return _.round(Helpers.confirmNumber(markup), 4);
+        if (!this.isOverridden("markup")) {
+            const costToMarkup = this.bid.includeTaxInMarkup() ? this.cost + this.tax : this.cost;
+            return _.round(costToMarkup * (this.markupPercent / 100), 4);
+        } else return _.round(Helpers.confirmNumber(this._data.markup), 4);
     }
 
     /**
-     * Markup Percent Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getMarkupPercentValue() {
         if (!this.isOverridden("markup_percent")) {
@@ -683,7 +881,11 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Price Property
+     * 
+     * @private
+     * @instance
+     * @memberof module:PVBid/Domain.LineItem
+     * @return {number}
      */
     _getPriceValue() {
         if (!this.isOverridden("price")) {

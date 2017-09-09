@@ -7,9 +7,17 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "webpack",
         "build-node": "PLATFORM=node webpack",
-        "watch": "WATCH=true webpack"
+        "watch": "WATCH=true webpack",
+        "jsdocs": "jsdoc -c .jsdoc.json",
+        "docs": "documentation build src/** -f html -o docs"
     },
-    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
+    "keywords": [
+        "pvbid",
+        "solar",
+        "javascript",
+        "estimating",
+        "bidding"
+    ],
     "author": "PVBid, Inc",
     "license": "UNLICENSED",
     "devDependencies": {
@@ -33,7 +41,9 @@
         "eslint-plugin-promise": "^3.5.0",
         "eslint-plugin-standard": "^3.0.1",
         "jest": "^20.0.4",
+        "jsdoc-template": "github:braintree/jsdoc-template",
         "lodash-webpack-plugin": "^0.11.4",
+        "minami": "^1.2.3",
         "path": "^0.12.7",
         "webpack": "^3.5.5"
     },

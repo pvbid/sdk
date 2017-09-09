@@ -1,11 +1,13 @@
 import _ from "lodash";
 import Project from "./domain/Project";
+import ProjectSavingHelper from "./helpers/ProjectSavingHelper";
 
 export default class ProjectService {
     constructor(projectRepository, bidService) {
         this.repository = projectRepository;
         this._bidService = bidService;
         this._projects = {};
+        this._savingHelper = new ProjectSavingHelper();
     }
 
     async get(projectId) {
@@ -28,7 +30,18 @@ export default class ProjectService {
     }
 
     async save(project) {
-        return project;
+        const exported = this._savingHelper.extract(project);
+        console.log("saved project data", exported);
+        return this.repository
+            .batchUpdate(project.id, exported)
+            .then(() => {
+                _.each(project.bids, bid => {
+                    bid.pristine();
+                });
+                project.pristine();
+                return;
+            })
+            .catch(err => console.log(err));
     }
 
     async reconcile(project) {

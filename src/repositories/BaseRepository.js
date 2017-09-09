@@ -4,7 +4,20 @@ import isEqual from "lodash/isEqual";
 import toArray from "lodash/toArray";
 import keyBy from "lodash/keyBy";
 import defaults from "lodash/defaults";
+/**
+ * @module PVBid/Repositories
+ */
 
+/**
+ * 
+ * @param {any} endpoint 
+ * @param {any} singleMap 
+ * @param {any} multiMap 
+ * @param {any} httpProvider 
+ * @export
+ * @class BaseRepository
+ * @memberof module:PVBid/Repositories
+ */
 export default class BaseRepository {
     constructor(endpoint, singleMap, multiMap, httpProvider) {
         this.metaData = null;
@@ -17,8 +30,10 @@ export default class BaseRepository {
 
     /**
      * Retrieves a single domain object by its id.
+     * @instance
      * @param {int} id The id of the entity to retrieve.
-     * @param {boolean} forceReload Flags repository to force reload skipping cached data. 
+     * @param {boolean} forceReload Flags repository to force reload skipping cached data.
+     * @memberof module:PVBid/Repositories.BaseRepository
      */
     async findById(id, forceReload) {
         if (isEmpty(this.collection) || isUndefined(this.collection[id]) || forceReload) {
@@ -37,6 +52,9 @@ export default class BaseRepository {
 
     /**
      * Retrieves an array of results for the endpoint
+     * 
+     * @instance
+     * @memberof module:PVBid/Repositories.BaseRepository
      * @param {object} params A set of parameters to include for the endpoint.
      * @param {boolean} forceReload Flags repository to force reload skipping cached data. 
      */
@@ -57,6 +75,13 @@ export default class BaseRepository {
         } else return toArray(this.collection);
     }
 
+    /**
+     * 
+     * @instance
+     * @param {module:PVBid/Domain.BidEntity} entity 
+     * @returns {Promise<module:PVBid/Domain.BidEntity>}
+     * @memberof module:PVBid/Repositories.BaseRepository
+     */
     async save(entity) {
         try {
             let response = await this.http.put(this.endpoint + entity.id, entity);

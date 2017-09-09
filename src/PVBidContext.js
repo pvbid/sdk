@@ -6,6 +6,12 @@ import ProjectRepository from "./repositories/ProjectRepository";
 import BidRepository from "./repositories/BidRepository";
 import ProjectStatusRepository from "./repositories/ProjectStatusRepository";
 
+/**
+ * 
+ * @param {object} config
+ * @export
+ * @class PVBid.PVBidContext
+ */
 export default class PVBidContext {
     constructor(config) {
         if (_.isUndefined(config) || _.isUndefined(config.token)) {

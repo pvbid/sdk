@@ -3,10 +3,21 @@ import each from "lodash/each";
 import Helpers from "../Helpers";
 import BidEntity from "./BidEntity";
 import now from "performance-now";
-
 import { waitForFinalEvent } from "../helpers/WaitForFinalEvent";
 
+/**
+ * Project Class
+ * 
+ * @export
+ * @class Project
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class Project extends BidEntity {
+    /**
+     * Creates an instance of Project.
+     * @param {object} entityData 
+     */
     constructor(entityData) {
         super();
         this._original = Object.assign({}, entityData);
@@ -19,13 +30,6 @@ export default class Project extends BidEntity {
         this.onDelay("property.updated", 5, "self", this.assess);
     }
 
-    get id() {
-        return this._data.id;
-    }
-    set id(val) {
-        throw "Changing project id is not permitted.";
-    }
-
     get title() {
         return this._data.title;
     }
@@ -36,9 +40,6 @@ export default class Project extends BidEntity {
 
     get type() {
         return "project";
-    }
-    set type(val) {
-        throw "Unable to change type.";
     }
 
     get bids() {
@@ -203,7 +204,7 @@ export default class Project extends BidEntity {
 
         this.is_dirty = true;
         this.emit("updated");
-        this.emit("assessment.complete");
+        this.emit("assessed");
     }
 
     _calculateMargin() {
@@ -264,12 +265,12 @@ export default class Project extends BidEntity {
                 this.emit("assessing");
             });
 
-            bid.on("assessment.complete", "project-service", () => {
+            bid.on("assessed", "project-service", () => {
                 waitForFinalEvent(() => this.assess(), 500, `project.${this.id}.assessments.completed`);
             });
         });
 
-        this.on("assessment.complete", "project-service", () => {
+        this.on("assessed", "project-service", () => {
             this._perf_end = now();
             console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
 
@@ -281,5 +282,12 @@ export default class Project extends BidEntity {
         each(this._propertiesToSum, prop => {
             this._data[prop] = 0;
         });
+    }
+
+    exportData() {
+        let project = Object.assign({}, this._data);
+        delete project.bids;
+        delete project.components;
+        return project;
     }
 }

@@ -8,7 +8,6 @@ math.import(require("mathjs/lib/expression"));
 math.import(require("mathjs/lib/function/arithmetic"));
 math.import(require("mathjs/lib/function/relational"));
 math.import(require("mathjs/lib/function/statistics"));
-
 math.import(require("mathjs/lib/constants"));
 
 export default class Helpers {
@@ -27,6 +26,11 @@ export default class Helpers {
         val = _.replace(val, new RegExp(",", "g"), "");
         val = _.toNumber(val);
         return _.isNumber(val) && _.isFinite(val) ? val : dflt;
+    }
+
+    static isNumber(val) {
+        val = _.replace(val, new RegExp(",", "g"), "");
+        return _.isFinite(_.toNumber(val));
     }
 
     static calculateFormula(formula, valuesMap) {

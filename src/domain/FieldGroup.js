@@ -1,6 +1,19 @@
 import BidEntity from "./BidEntity";
 
+/**
+ * Field Group Class
+ * 
+ * @export
+ * @class FieldGroup
+ * @memberof module:PVBid/Domain
+ * @extends {module:PVBid/Domain.BidEntity}
+ */
 export default class FieldGroup extends BidEntity {
+    /**
+     * Creates an instance of FieldGroup.
+     * @param {object} fieldGroupData 
+     * @param {module:PVBid/Domain.Bid} bid 
+     */
     constructor(fieldGroupData, bid) {
         super();
         this.bid = bid;
