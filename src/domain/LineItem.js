@@ -318,6 +318,16 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Gets the line item's definition id.
+     * 
+     * @type {number}
+     * @deprecated Definition ids will become obsolete in planned data structure upgrade.
+     */
+    get definitionId() {
+        return this._data.definition_id;
+    }
+
+    /**
      * Config Property
      * @instance
      * @memberof LineItem

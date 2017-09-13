@@ -56,6 +56,12 @@ export default class Metric extends BidEntity {
         throw "Setting metric config is not permitted.";
     }
 
+    /**
+     * Gets the metrics's definition id.
+     * 
+     * @type {number}
+     * @deprecated Definition ids will become obsolete in planned data structure upgrade.
+     */
     get definitionId() {
         return this._data.definition_id;
     }

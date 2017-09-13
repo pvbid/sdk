@@ -76,6 +76,16 @@ export default class Field extends BidEntity {
     }
 
     /**
+     * Gets the field's definition id.
+     * 
+     * @type {number}
+     * @deprecated Definition ids will become obsolete in planned data structure upgrade.
+     */
+    get definitionId() {
+        return this._data.definition_id;
+    }
+
+    /**
      * Gets the configuration information for the bid entity.
      * @type {object}
      */

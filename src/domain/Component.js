@@ -271,7 +271,10 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Gets the component's definition id.
+     * 
      * @type {number}
+     * @deprecated Definition ids will become obsolete in planned data structure upgrade.
      */
     get definitionId() {
         return this._data.definition_id;
