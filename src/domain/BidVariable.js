@@ -2,29 +2,25 @@ import BidEntity from "./BidEntity";
 
 /**
  * Bid Variable Class
- * 
- * @export
- * @class BidVariable
- * @memberof module:PVBid/Core
- * @extends {BidEntity}
  */
 export default class BidVariable extends BidEntity {
     /**
      * Creates an instance of BidVariable.
-     * @param {obect} bidVariableData 
+     * @param {object} bidVariableData 
      * @param {Bid} bid 
      */
     constructor(bidVariableData, bid) {
         super(25);
+        /**
+         * Reference to the bid that the bid variable belongs to.
+         * @type {Bid}
+         */
         this.bid = bid;
         this._data = bidVariableData;
     }
 
     /**
      * Gets the bid entity type. 
-     * 
-     * @override
-     * @readonly
      */
     get type() {
         return "bid_variable";
@@ -54,12 +50,5 @@ export default class BidVariable extends BidEntity {
         this._data.value = val;
         this.dirty();
         this.emit("updated");
-    }
-
-    get config() {
-        throw "Bid variables do not have config data.";
-    }
-    set config(val) {
-        throw "Bid variables do not have config data.";
     }
 }

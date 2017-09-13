@@ -1,12 +1,13 @@
 import _ from "lodash";
 
-import BaseRepository from "./BaseRepository";
+import CacheRepository from "./CacheRepository";
 
-export default class ProjectRepository extends BaseRepository {
-    constructor(baseUri, httpProvider) {
-        super(baseUri + "/projects/", "project", "projects", httpProvider);
+export default class ProjectRepository extends CacheRepository {
+    constructor(config) {
+        super(config.base_uri + "/projects/", "project", "projects", config);
     }
 
+    /*
     async findById(id, forceReload) {
         if (
             _.isEmpty(this.collection) ||
@@ -21,21 +22,21 @@ export default class ProjectRepository extends BaseRepository {
         } else {
             return this.collection[id];
         }
-    }
+    }*/
 
-    attachBid(projectId, bidId) {
+    async attachBid(projectId, bidId) {
         return this.http.post(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
             return response.data.data;
         });
     }
 
-    detachBid(projectId, bidId) {
+    async detachBid(projectId, bidId) {
         return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
             return response.data.data;
         });
     }
 
-    batchUpdate(projectId, data) {
+    async batchUpdate(projectId, data) {
         return this.http.put(this.endpoint + projectId + "/batch/", data).then(function(response) {
             return response.data.data;
         });

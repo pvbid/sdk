@@ -9,10 +9,16 @@ import Datatable from "../Datatable";
 import FieldGroup from "../FieldGroup";
 import BidVariable from "../BidVariable";
 import ComponentGroup from "../ComponentGroup";
+import BidService from "../services/BidService";
 
+/**
+ * Factory class to generate a Bid object.
+ * 
+ * @class BidFactory
+ */
 export default class BidFactory {
     constructor() {
-        this._map = [
+        this._entities = [
             "fields",
             "metrics",
             "line_items",
@@ -25,23 +31,49 @@ export default class BidFactory {
             "variables"
         ];
     }
-    create(bidData, bidService) {
+
+    /**
+      * Creates a Bid object from bid data.
+      * 
+      * @param {object} bidData 
+      * @param {object} repositories       
+      * @param {Project} project 
+      * @returns  
+      */
+    create(bidData, repositories, project) {
+        const bidService = new BidService(repositories);
         this._keyBidEntities(bidData);
         let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);
+        bid.validate();
+        bid.project = project;
+        bid.bind();
+        bid.reassessAll();
 
         return bid;
     }
+
+    /**
+     * Keys all bid entities  by their id.
+     * 
+     * @param {object} bidData 
+     */
     _keyBidEntities(bidData) {
-        for (let key of this._map) {
+        for (let key of this._entities) {
             if (key !== "variables") {
                 bidData[key] = _.keyBy(bidData[key], "id");
             }
         }
     }
 
+    /**
+     * Creates the bid entity class for each bid entity data object.
+     * 
+     * @param {Bid} bid 
+     * @param {object} bidData 
+     */
     _createBidEntities(bid, bidData) {
-        for (let key of this._map) {
+        for (let key of this._entities) {
             switch (key) {
                 case "line_items":
                     for (let i in bidData[key]) {
@@ -71,6 +103,16 @@ export default class BidFactory {
                 case "datatables":
                     for (const i in bidData[key]) {
                         bidData[key][i] = new Datatable(bidData[key][i], bid);
+                    }
+                    break;
+                case "component_groups":
+                    for (const i in bidData[key]) {
+                        bidData[key][i] = new ComponentGroup(bidData[key][i], bid);
+                    }
+                    break;
+                case "field_groups":
+                    for (const i in bidData[key]) {
+                        bidData[key][i] = new FieldGroup(bidData[key][i], bid);
                     }
                     break;
                 case "variables":

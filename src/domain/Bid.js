@@ -8,16 +8,20 @@ import IndicativePricingHelper from "./services/IndicativePricingHelper";
 
 /**
  * Bid Class.
- * 
- * @class Bid
- * @extends {BidEntity}
+
  */
 export default class Bid extends BidEntity {
+    /**
+     * Creates an instance of Bid.
+     * @param {any} bidData 
+     * @param {BidService} bidService 
+     */
     constructor(bidData, bidService) {
         super();
+        this._calcRounds = 0;
         this._data = bidData;
         this._bidService = bidService;
-        this.maxEvents = 15;
+        this.maxEvents = 25;
         this.relations = new BidModelRelationsHelper(this);
         this._indicativePricingHelper = new IndicativePricingHelper(this);
         this._wattMetricDef = null;
@@ -26,6 +30,17 @@ export default class Bid extends BidEntity {
                 this._perf_start = now();
             }
         });
+    }
+
+    /**
+     * Persistent id of the bid.
+     * NOTE: id will soon be in UUID format
+     * 
+     * @type {number}
+     */
+
+    get id() {
+        return this._data.id;
     }
 
     /**
@@ -96,7 +111,8 @@ export default class Bid extends BidEntity {
         return Helpers.confirmNumber(this._data.tax);
     }
     set tax(val) {
-        if (Helpers.isNumber(val)) {
+        throw "Overriding bid tax is not supported";
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax) {
             this._data.tax = val;
         }
     }
@@ -265,6 +281,18 @@ export default class Bid extends BidEntity {
         return id ? this.relations.getBidEntity("assembly", id) : this._data.assemblies;
     }
 
+    /**
+     * Gets a bid variable entity by id.  If no id is passed, will return an object of keyed bid variables by their id.
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "xyg4" : <BidVariable>,
+     *    "burden" : <BidVariable>
+     * }
+     * 
+     * @param {number} [id] - The id of the component to retrieve.
+     * @returns {(Component|Object.<string, Component>|null)}
+     */
     variables(id) {
         return id ? this.relations.getBidEntity("bid_variable", id) : this._data.variables;
     }
@@ -305,6 +333,9 @@ export default class Bid extends BidEntity {
         return id ? this.relations.getBidEntity("assembly_map", id) : this._data.assembly_maps;
     }
 
+    /**
+     * @deprecated use isActive property.
+     */
     toggleActive() {
         this._data.is_active = !this._data.is_active;
         this.assess(true);
@@ -313,11 +344,9 @@ export default class Bid extends BidEntity {
     /**
      * Gets the total watts for the bid.
      * 
-     * @instance
-     * @memberof Bid
      * @return {number}
      */
-    getTotalWatts() {
+    _getTotalWatts() {
         if (_.isNull(this._wattMetricDef)) {
             this._wattMetricDef = _.find(this.metrics(), function(el) {
                 return el.title.toLowerCase() === "watt" || el.title.toLowerCase() === "watts" ? true : false;
@@ -330,9 +359,7 @@ export default class Bid extends BidEntity {
     /**
      * Calculates and returns the Bid Margin Percent.
      * 
-     * @instance
-     * @memberof Bid
-     * @return {number}    Returns the margin percent.
+     * @return {number}
      */
     getMarginPercent() {
         var bidPrice = parseFloat(this.price);
@@ -344,7 +371,14 @@ export default class Bid extends BidEntity {
         return this._data.is_shell;
     }
 
+    /**
+     * Determines if bid is updateable by the user.
+     * Considers if the bid is locked, if the project is closed, and the user permissions.
+     * 
+     * @returns {boolean} 
+     */
     isUpdateable() {
+        //TODO: add in user permission logic.
         return !this._data.is_locked && _.isNull(this.project.closedAt);
     }
 
@@ -362,14 +396,14 @@ export default class Bid extends BidEntity {
     lock() {
         if ($this.canLock()) {
             this._data.is_locked = true;
-            this.is_dirty = true;
+            this.dirty();
             this.emit("property.updated");
         }
     }
     unlock() {
         if ($this.canUnlock()) {
             this._data.is_locked = false;
-            this.is_dirty = true;
+            this.dirt();
             this.emit("property.updated");
         }
     }
@@ -379,9 +413,8 @@ export default class Bid extends BidEntity {
     }
 
     _applyMarginPercentage(newMarginPercent) {
-        var bidCost = this.cost + this.tax;
-
-        let oldMarkup = parseFloat(this.markup),
+        let bidCost = this.cost + this.tax,
+            oldMarkup = parseFloat(this.markup),
             newPrice = parseFloat(bidCost) / (1 - Heleprs.confirmNumber(newMarginPercent) / 100);
         var newMarkup = newPrice - bidCost;
 
@@ -438,10 +471,9 @@ export default class Bid extends BidEntity {
     /**
      * Assess bid values. If bid values changes, the bid will be flagged as dirty and an "updated" event will fire.
      * 
-     * @fires BidEntity#assessing
-     * @fires BidEntity#event:assessed
-     * @fires BidEntity#updated
-     * @instance
+     * @emits {assessing}
+     * @emits {assessed}
+     * @emits {updated}
      * @param {boolean} [forceUpdate] - Force fires "update" event and flags bid as dirty.
      * @memberof Bid
      */
@@ -453,13 +485,14 @@ export default class Bid extends BidEntity {
             price: 0,
             markup: 0,
             tax: 0,
+            taxable_cost: 0,
             margin_percent: 0,
             labor_hours: 0,
             labor_cost: 0,
             watts: 0
         };
 
-        _.each(this.lineItems(), function(li) {
+        _.each(this.lineItems(), li => {
             if (li.isIncluded) {
                 bidValues.cost += li.cost;
                 bidValues.price += li.price;
@@ -468,11 +501,13 @@ export default class Bid extends BidEntity {
                 if (li.isLabor()) {
                     bidValues.labor_hours += li.laborHours;
                     bidValues.labor_cost += li.cost;
+                } else {
+                    bidValues.taxable_cost += li.cost;
                 }
             }
         });
 
-        bidValues.watts = this.getTotalWatts();
+        bidValues.watts = this._getTotalWatts();
 
         bidValues.margin_percent = bidValues.price > 0 ? bidValues.markup / bidValues.price * 100 : 0;
 
@@ -496,28 +531,9 @@ export default class Bid extends BidEntity {
         //this.bid.prediction = PredictionService.getBidPrediction();
 
         if (isChanged || forceUpdate) {
-            this.is_dirty = true;
-
+            this._calcRounds += 1;
+            this.dirty();
             this.emit("updated");
-            /*
-
-           //TODO: relocate logic
-            if (this.bid.is_active) {
-                _.each(this.bid.project.bids, function(projectBid) {
-                    if (projectBid.id === BidRepository.bid().id) {
-                        _.each(BidRepository.bid(), function(value, key) {
-                            if (!isObject(value) && !isArray(value)) {
-                                projectBid[key] = value;
-                            }
-                        });
-                    }
-                });
-                _projectService.calculate();
-            }
-            */
-
-            //console.log("markup", this.markup, "price", this.price);
-            //BidEventService.trigger("bid.bid");
         }
 
         this.emit("assessed");
@@ -598,10 +614,25 @@ export default class Bid extends BidEntity {
             : false;
     }
 
+    clearAllBindings() {
+        this.removeAllListeners();
+
+        for (let f of Object.values(this.fields())) {
+            f.removeAllListeners();
+        }
+        for (let m of Object.values(this.metrics())) {
+            m.removeAllListeners();
+        }
+        for (let li of Object.values(this.lineItems())) {
+            li.removeAllListeners();
+        }
+        for (let c of Object.values(this.components())) {
+            c.removeAllListeners();
+        }
+    }
+
     /**
-     * 
-     * @instance
-     * @memberof Bid
+     * Binds all interconnected bid entity "update" events
      */
     bind() {
         for (let f of Object.values(this.fields())) {
@@ -628,10 +659,7 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * 
-     * @instance
-     * @private
-     * @memberof Bid
+     * @listens {assessed}
      */
     _handleAssessmentCompleteEvent() {
         waitForFinalEvent(
@@ -639,11 +667,13 @@ export default class Bid extends BidEntity {
                 this._perf_end = now();
 
                 console.log(`Bid Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
+                console.log("Maxed events used", this._calcRounds);
+                this._calcRounds = 0;
 
                 this._perf_start = null;
                 this.emit(`bid.assessments.completed`);
             },
-            500,
+            100,
             `bid.${this.id}.assessments.completed`
         );
     }
@@ -678,8 +708,29 @@ export default class Bid extends BidEntity {
     }
 
     /**
+     * Exports the bid's data to an object.
      * 
      * @returns {object}
+     * @property {number} id NOTE: id will soon be in UUID format.
+     * @property {string} title
+     * @property {number} cost
+     * @property {number} taxable_cost
+     * @property {number} labor_cost
+     * @property {number} labor_hours
+     * @property {number} price
+     * @property {number} margin_percent
+     * @property {number} markup
+     * @property {number} markup_percent
+     * @property {number} tax
+     * @property {number} tax_percent
+     * @property {number} price
+     * @property {number} actual_cost
+     * @property {number} actual_hours
+     * @property {number} watts
+     * @property {boolean} is_active
+     * @property {boolean} is_locked
+     * @property {string} created_at
+     * @property {string} updated_at
      */
     exportData() {
         let bid = Object.assign({}, this._data);
@@ -705,7 +756,7 @@ export default class Bid extends BidEntity {
      * Marks bid and all bid entities as clean.
      */
     pristine() {
-        this.is_dirty = false;
+        this._is_dirty = false;
         const properties = [
             "lineItems",
             "fields",
@@ -719,8 +770,29 @@ export default class Bid extends BidEntity {
 
         _.each(properties, prop => {
             _.each(this[prop](), item => {
-                item.is_dirty = false;
+                item.pristine();
             });
         });
+    }
+
+    /**
+     * Creates a snapshot of current Bid data.
+     * 
+     * @param {?string} title 
+     * @param {?string} description 
+     * @returns {Promise.<object>} Returns a data object of the snapshot.
+     * @property {number} id The snapshot id.
+     * @property {string} title
+     * @property {number} bid_id
+     * @property {string} description
+     * @property {boolean} is_auto A flag to indicate the snapshot was generated automatically by the PVBid system.
+     * @property {string} created_at Example format: 2016-04-10T21:08:05+00:00
+     */
+    async createSnapshot(title, description) {
+        return this._bidService.createSnapshot(this, title, description);
+    }
+
+    validate() {
+        return this._bidService.validate(this);
     }
 }

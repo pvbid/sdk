@@ -6,35 +6,24 @@ import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
  * Project Class
- * 
- * @export
- * @class Project
- * @memberof module:PVBid/Core
- * @extends {BidEntity}
  */
 export default class Project extends BidEntity {
     /**
      * Creates an instance of Project.
      * @param {object} entityData 
+     * @param {ProjectService} projectService
      */
-    constructor(entityData) {
+    constructor(entityData, projectService) {
         super();
         this._original = Object.assign({}, entityData);
+        this._projectService = projectService;
         this._data = entityData;
+        this._bids = {};
         this._propertiesToSum = ["price", "cost", "tax", "markup", "watts", "labor_hours"];
-        this.is_dirty = false;
-        this.on("assessing", `project.${this.id}`, () => {
+        this.on("assessing", `project.${this.id}.perf`, () => {
             if (!this._perf_start) this._perf_start = now();
         });
         this.onDelay("property.updated", 5, "self", this.assess);
-    }
-
-    get title() {
-        return this._data.title;
-    }
-    set title(val) {
-        this._data.title = val;
-        this.is_dirty = true;
     }
 
     get type() {
@@ -42,10 +31,7 @@ export default class Project extends BidEntity {
     }
 
     get bids() {
-        return this._data.bids;
-    }
-    set bids(val) {
-        this._data.bids = val;
+        return this._bids;
     }
 
     /**
@@ -54,25 +40,12 @@ export default class Project extends BidEntity {
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
     }
-    set laborHours(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.labor_hours = val;
-            this.emit("property.updated");
-        }
-    }
 
     /**
      * Cost Property
      */
     get cost() {
         return this._data.cost;
-    }
-    set cost(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.cost = val;
-
-            this.emit("property.updated");
-        }
     }
 
     /**
@@ -81,12 +54,6 @@ export default class Project extends BidEntity {
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
     }
-    set tax(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.tax = val;
-            this.emit("property.updated");
-        }
-    }
 
     /**
      * Tax Percent Property
@@ -94,26 +61,12 @@ export default class Project extends BidEntity {
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
     }
-    set taxPercent(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.tax_percent = val;
-
-            this.emit("property.updated");
-        }
-    }
 
     /**
      * Markup Property
      */
     get markup() {
         return this._data.markup;
-    }
-    set markup(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.markup = Helpers.confirmNumber(val);
-
-            this.emit("property.updated");
-        }
     }
 
     /**
@@ -129,26 +82,12 @@ export default class Project extends BidEntity {
     get markupPercent() {
         return Helpers.confirmNumber(this._data.markup_percent);
     }
-    set markupPercent(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.markup_percent = Helpers.confirmNumber(val);
-
-            this.emit("property.updated");
-        }
-    }
 
     /**
      * Price Property
      */
     get price() {
         return Helpers.confirmNumber(this._data.price);
-    }
-    set price(val) {
-        if (Helpers.confirmNumber(val, false)) {
-            this._data.price = val;
-
-            this.emit("property.updated");
-        }
     }
 
     get createdAt() {
@@ -183,6 +122,7 @@ export default class Project extends BidEntity {
     }
     set projectStatus(val) {
         this._data.project_status = val;
+        this.dirty();
         this.emit("property.updated");
     }
 
@@ -193,7 +133,7 @@ export default class Project extends BidEntity {
         _.each(this.bids, bid => {
             if (bid.isActive) {
                 for (let prop of this._propertiesToSum) {
-                    this._data[prop] += bid._data[prop];
+                    this._data[prop] += Helpers.confirmNumber(bid._data[prop]);
                 }
             }
         });
@@ -201,7 +141,7 @@ export default class Project extends BidEntity {
         this._data.margin = this._calculateMargin();
         this._calculateComponents();
 
-        this.is_dirty = true;
+        this.dirty();
         this.emit("updated");
         this.emit("assessed");
     }
@@ -258,23 +198,50 @@ export default class Project extends BidEntity {
         });
     }
 
+    clearAllBindings() {
+        this.removeAllListeners();
+        _.each(this.bids, bid => bid.clearAllBindings());
+    }
+
+    /**
+     * Binds the "updated" event for all dependant bids.
+     */
     bind() {
-        _.each(this.bids, bid => {
-            bid.on("assessing", `project.${this.id}`, () => {
-                this.emit("assessing");
-            });
+        //_.each(this.bids, bid => this._bindToBid(bid));
 
-            bid.on("assessed", "project-service", () => {
-                waitForFinalEvent(() => this.assess(), 500, `project.${this.id}.assessments.completed`);
-            });
-        });
-
-        this.on("assessed", "project-service", () => {
+        this.on("assessed", `project.${this.id}.final`, () => {
             this._perf_end = now();
             console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
             console.log("Project Cost/Price", this.cost, this.price);
             this._perf_start = null;
         });
+    }
+
+    _bindToBid(bid) {
+        bid.onDelay("assessing", 10, `project.${this.id}`, () => {
+            this.emit("assessing");
+        });
+
+        bid.onDelay("assessed", 200, `project.${this.id}.assessed`, () => {
+            //console.log("assess Cost/Price", this.cost, this.price);
+            waitForFinalEvent(() => this.assess(), 400, `project.${this.id}.assessments.completed`);
+        });
+    }
+
+    attachBid(bid) {
+        if (this.bids[bid.id]) {
+            throw "Bid is already attached.";
+        } else if (bid._data.project_id != this.id) {
+            //TODO: Add attach bid on the fly, updating the database.
+            throw "Bid is not associated with project.";
+        }
+
+        this._bids[bid.id] = bid;
+        this._bindToBid(this._bids[bid.id]);
+    }
+
+    async createBid(title) {
+        return this._projectService.createBid(this, title);
     }
 
     _clearPortfolio() {
@@ -283,6 +250,40 @@ export default class Project extends BidEntity {
         });
     }
 
+    /**
+     * Saves project and underlying bids.
+     * 
+     * @returns {Promise<null>}
+     */
+    async save() {
+        return this._projectService.save(this);
+    }
+
+    /**
+     * Exports the project's data to an object.
+     * 
+     * @returns {object}
+     * @property {number} id
+     * @property {string} title
+     * @property {number} cost
+     * @property {number} taxable_cost
+     * @property {number} labor_cost
+     * @property {number} labor_hours
+     * @property {number} price
+     * @property {number} margin_percent
+     * @property {number} markup
+     * @property {number} markup_percent
+     * @property {number} tax
+     * @property {number} tax_percent
+     * @property {number} price
+     * @property {number} actual_cost
+     * @property {number} actual_hours
+     * @property {number} watts
+     * @property {string} created_at
+     * @property {string} updated_at
+     * @property {string} closed_at
+     * @property {string} reconciled_at
+     */
     exportData() {
         let project = Object.assign({}, this._data);
         delete project.bids;

@@ -42,17 +42,21 @@ export default class AdvanceEventEmitter extends EventEmitter {
      * @param {function} callback 
      */
     onDelay(eventName, ms, requesterId, callback) {
-        super.on(eventName, () => {
-            this._waitForFinalEvent(
-                () => {
-                    if (this._shouldTrigger(requesterId)) {
-                        callback(requesterId);
-                    }
-                },
-                ms,
-                "on.delay." + eventName
-            );
-        });
+        super.on(
+            eventName,
+            () => {
+                this._waitForFinalEvent(
+                    () => {
+                        if (this._shouldTrigger(requesterId)) {
+                            callback(requesterId);
+                        }
+                    },
+                    ms,
+                    "on.delay." + eventName
+                );
+            },
+            requesterId
+        );
     }
 
     /**
@@ -63,11 +67,15 @@ export default class AdvanceEventEmitter extends EventEmitter {
      * @param {function} callback 
      */
     on(eventName, requesterId, callback) {
-        super.on(eventName, () => {
-            if (this._shouldTrigger(requesterId)) {
-                callback(requesterId);
-            }
-        });
+        super.on(
+            eventName,
+            () => {
+                if (this._shouldTrigger(requesterId)) {
+                    callback(requesterId);
+                }
+            },
+            requesterId
+        );
     }
 
     /**

@@ -1,5 +1,5 @@
 {
-    "name": "pvbid",
+    "name": "pvbid-sdk",
     "version": "1.0.0",
     "description": "",
     "main": "src/pvbid.js",
@@ -8,9 +8,7 @@
         "build": "webpack",
         "build-node": "PLATFORM=node webpack",
         "watch": "WATCH=true webpack",
-        "jsdocs": "jsdoc -c .jsdoc.json",
-        "docs": "documentation build src/** -f html -o docs",
-        "esdocs": "./node_modules/.bin/esdoc"
+        "docs": "./node_modules/.bin/esdoc"
     },
     "keywords": [
         "pvbid",
@@ -44,6 +42,7 @@
         "eslint-plugin-node": "^5.1.1",
         "eslint-plugin-promise": "^3.5.0",
         "eslint-plugin-standard": "^3.0.1",
+        "happypack": "^4.0.0",
         "jest": "^20.0.4",
         "jsdoc-template": "github:braintree/jsdoc-template",
         "lodash-webpack-plugin": "^0.11.4",

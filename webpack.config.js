@@ -2,6 +2,7 @@ var path = require("path");
 var webpack = require("webpack");
 const MinifyPlugin = require("babel-minify-webpack-plugin");
 var CompressionPlugin = require("compression-webpack-plugin");
+const HappyPack = require("happypack");
 
 module.exports = {
     entry: ["./src/pvbid.js"],
@@ -19,7 +20,7 @@ module.exports = {
             {
                 test: /\.js$/,
                 exclude: /node_modules/,
-                loader: "babel",
+                loader: "happypack/loader", //"babel",
                 query: {
                     presets: [["es2015", { modules: false }], "stage-1"],
                     plugins: ["lodash", "transform-runtime", "syntax-async-functions", "transform-regenerator"]
@@ -43,6 +44,20 @@ module.exports = {
     },
 
     plugins: [
+        new HappyPack({
+            // 3) re-add the loaders you replaced above in #1:
+            loaders: [
+                {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "babel",
+                    query: {
+                        presets: [["es2015", { modules: false }], "stage-1"],
+                        plugins: ["lodash", "transform-runtime", "syntax-async-functions", "transform-regenerator"]
+                    }
+                }
+            ]
+        })
         //new LodashModuleReplacementPlugin(),
         //new MinifyPlugin({}, { comments: false })
         /* new CompressionPlugin({

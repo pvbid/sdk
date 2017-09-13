@@ -154,6 +154,17 @@ export default class BidModelRelationsHelper {
         return options;
     }
 
+    dependencyExists(dependencyContract) {
+        var dependency = null;
+        try {
+            dependency = this.getDependency(dependencyContract);
+        } catch (e) {
+            console.log(e);
+        }
+
+        return !_.isUndefined(dependency) && !_.isNull(dependency);
+    }
+
     bidEntityExists(type, id) {
         let bidEntity = this.getBidEntity(type, id);
         return bidEntity ? true : false;

@@ -2,11 +2,6 @@ import BidEntity from "./BidEntity";
 
 /**
  * Assembly Class
- * 
- * @export
- * @class Assembly
- * @memberof module:PVBid/Core
- * @extends {BidEntity}
  */
 export default class Assembly extends BidEntity {
     /**
@@ -16,14 +11,18 @@ export default class Assembly extends BidEntity {
      */
     constructor(assemblyData, bid) {
         super();
+        /**
+         * Reference to the bid that the assembly belongs to.
+         * @type {Bid}
+         */
         this.bid = bid;
         this._data = assemblyData;
     }
 
+    /**
+     * @type {object}
+     */
     get config() {
         return this._data.config;
-    }
-    set config(val) {
-        throw "Setting assembly config is not permitted.";
     }
 }

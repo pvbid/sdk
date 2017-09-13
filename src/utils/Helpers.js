@@ -13,6 +13,7 @@ math.import(require("mathjs/lib/constants"));
 export default class Helpers {
     constructor() {}
     static confirmNumber(val, dflt, convertBoolean) {
+        if (_.isFinite(val)) return val;
         dflt = _.isUndefined(dflt) || _.isNull(dflt) ? 0 : dflt;
         if (_.isUndefined(val) || _.isNull(val)) return dflt;
 
@@ -29,6 +30,7 @@ export default class Helpers {
     }
 
     static isNumber(val) {
+        if (_.isFinite(val)) return true;
         val = _.replace(val, new RegExp(",", "g"), "");
         return _.isFinite(_.toNumber(val));
     }

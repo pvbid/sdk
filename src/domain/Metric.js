@@ -18,6 +18,10 @@ export default class Metric extends BidEntity {
      */
     constructor(metricData, bid) {
         super();
+        /**
+         * Reference to the bid that the metric belongs to.
+         * @type {Bid}
+         */
         this.bid = bid;
         this._data = metricData;
         this._original = Object.assign({}, metricData);
@@ -100,9 +104,8 @@ export default class Metric extends BidEntity {
         return manipulatedValue;
     }
     reset() {
-        this.is_dirty = true;
+        this.dirty();
         this.config.override = false;
-
         this.assess();
     }
 
@@ -118,11 +121,11 @@ export default class Metric extends BidEntity {
             baseValue = this._getBaseValue();
             finalValue = this._calculateMetricManipulations(baseValue);
 
-            var metricValue = this._data.value ? this._data.value : 0;
+            var oldValue = this._data.value ? _.round(this._data.value, 4) : 0;
 
-            if (metricValue.toFixed(7) !== finalValue.toFixed(7)) {
+            if (oldValue !== _.round(finalValue, 4)) {
                 this._data.value = finalValue;
-                this.is_dirty = true;
+                this.dirty();
 
                 this.emit("updated");
             }
@@ -131,6 +134,9 @@ export default class Metric extends BidEntity {
         this.emit("assessed");
     }
 
+    /**
+     * Binds the "updated" event for all dependant bid entities.
+     */
     bind() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
             if (!_.isEmpty(dependencyContract)) {

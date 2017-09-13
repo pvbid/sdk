@@ -14,9 +14,14 @@ import LineItemRuleService from "./services/LineItemRuleService";
 export default class LineItem extends BidEntity {
     constructor(entityData, bid) {
         super();
+        /**
+         * Reference to the bid that the line item belongs to.
+         * @type {Bid}
+         */
+        this.bid = bid;
+        this.maxEvents = 25;
         this._original = Object.assign({}, entityData);
         this._data = entityData;
-        this.bid = bid;
         this._ruleService = new LineItemRuleService(this);
         this.onDelay("property.updated", 5, "self", () => this.assess(true));
     }
@@ -206,7 +211,7 @@ export default class LineItem extends BidEntity {
      * @memberof LineItem
      */
     get cost() {
-        return this._data.cost;
+        return Helpers.confirmNumber(this._data.cost);
     }
     set cost(val) {
         if (Helpers.isNumber(val) && this._data.cost != Helpers.confirmNumber(val)) {
@@ -449,8 +454,7 @@ export default class LineItem extends BidEntity {
         isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
 
         if (isChanged || forceUpdate) {
-            this.is_dirty = true;
-
+            this.dirty();
             this.emit("updated");
         }
 
@@ -459,9 +463,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Binds the "updated" event for all dependant bid entities.
-     * 
-     * @memberof LineItem
-     * @instance
      */
     bind() {
         this._bindLineItemDependencies();
@@ -532,18 +533,15 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _applyProperty(property, value) {
-        let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 4) : this._data[property];
-        let newValue = !_.isBoolean(value) ? _.round(value, 4) : value;
+        let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 2) : this._data[property];
+        let newValue = !_.isBoolean(value) ? _.round(value, 2) : value;
 
         if (oldValue != newValue) {
             //console.log("li changed", property, oldValue, newValue);
 
-            this._data[property] = value;
+            this._data[property] = _.round(value, 6);
             return true;
         } else return false;
     }
@@ -665,9 +663,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getWageValue() {
@@ -679,9 +674,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getIsIncludedValue() {
@@ -793,7 +785,8 @@ export default class LineItem extends BidEntity {
         if (!this.isOverridden("quantity")) {
             let val = 0;
 
-            if (this.config.quantity.type === "value") {
+            //Must check for quantity property, as legacy bids do not contain this property.
+            if (!_.isUndefined(this.config.quantity) && this.config.quantity.type === "value") {
                 val = this.config.quantity.value;
             } else {
                 val = this.bid.relations.getDependencyValue(this.config.dependencies.quantity);

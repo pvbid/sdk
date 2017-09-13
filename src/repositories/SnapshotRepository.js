@@ -1,3 +1,46 @@
+import CacheRepository from "./CacheRepository";
+
+/**
+ * 
+ */
+export default class SnapshotRepository extends CacheRepository {
+    constructor(config) {
+        super(`${config.base_uri}`, "snapshot", "snapshots", config);
+    }
+
+    async findById(bidId, snapshotId) {
+        this.endpoint = `${this.config.base_uri}/bids/${bidId}/snapshots/`;
+        return super.findById(snapshotId);
+    }
+
+    async get(bidId, params, forceReload) {
+        this.endpoint = `${this.config.base_uri}/bids/${bidId}/snapshots/`;
+
+        return super.get(params, forceReload);
+    }
+
+    async create(bidId, snapshotObject) {
+        this.endpoint = `${this.config.base_uri}/bids/${bidId}/snapshots/`;
+        return super.create(snapshotObject);
+    }
+
+    async delete(bidId, snapshotId) {
+        this.endpoint = `${this.config.base_uri}/bids/${bidId}/snapshots/`;
+        return super.delete(snapshotId);
+    }
+
+    async recover(bidId, snapshotId) {
+        this.endpoint = `${this.config.base_uri}/bids/${bidId}/snapshots/${snapshotId}/recover`;
+
+        try {
+            return this.http.post(this.endpoint);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+}
+
+/*
 REPOServices.factory("SnapshotRepository", function(API_URL, $q, $http) {
     var _keyedSnapshots = {},
         _isLoaded = false,
@@ -37,7 +80,7 @@ REPOServices.factory("SnapshotRepository", function(API_URL, $q, $http) {
 
     function save(snapshot, forceSave) {
         var deferred = $q.defer();
-        if (snapshot.is_dirty || forceSave) {
+        if (snapshot.isDirty() || forceSave) {
             snapshot.id = isUndefined(snapshot.id) ? null : snapshot.id;
 
             $http
@@ -104,3 +147,5 @@ REPOServices.factory("SnapshotRepository", function(API_URL, $q, $http) {
         recover: recover
     };
 });
+
+*/

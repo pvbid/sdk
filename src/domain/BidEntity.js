@@ -4,13 +4,16 @@ import AdvanceEventEmitter from "../utils/AdvanceEventEmitter";
  * A base class for all other bid entities to extend.
  * 
  * @class BidEntity
- * @extends {AdvanceEventEmitter}
  */
 export default class BidEntity extends AdvanceEventEmitter {
     constructor() {
         super();
+
+        /**
+         * Internal data store for the bid entity.
+         * @type {object}
+         */
         this._data = {};
-        this.is_dirty = false;
 
         this.on("assessed", "self", () =>
             this._waitForFinalEvent(
@@ -26,20 +29,28 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Gets the id of the bid entity.
+     * NOTE: Esculding Projects, all bid entity id's will soon be in UUID format
      * 
-     * @readonly
+     * @type {number}
      */
     get id() {
         return this._data.id;
     }
 
     /**
-     * Getter and Setter of the bid entity title.
+     * Gets the bid entity title.
      * 
+     * @type {string}
      */
     get title() {
         return this._data.title;
     }
+
+    /**
+     * Sets the bid entity title. Flags bid entity as dirty.
+     * 
+     * @type {string}
+     */
     set title(val) {
         this._data.title = val;
         this.dirty();
@@ -48,26 +59,33 @@ export default class BidEntity extends AdvanceEventEmitter {
     /**
      * Gets the bid entity type.
      * 
-     * @readonly
+     * @type {string}
      */
     get type() {
         return this._data.type;
     }
 
     /**
-     * Flags the bid entity as dirty and to be saved.
+     * Determines of bid entity is dirty.
      * 
+     * @returns {boolean} 
+     */
+    isDirty() {
+        return this._is_dirty;
+    }
+
+    /**
+     * Flags the bid entity as dirty and to be saved.
      */
     dirty() {
-        this.is_dirty = true;
+        this._is_dirty = true;
     }
 
     /**
      * Marks the bid entity as clean.
-     * 
      */
     pristine() {
-        this.is_dirty = false;
+        this._is_dirty = false;
     }
 
     /**
@@ -79,7 +97,7 @@ export default class BidEntity extends AdvanceEventEmitter {
     }
 
     /**
-     * Assess bid entity. 
+     * Assesses bid entity. 
      * 
      * @emits {assessing} Fires as assessment begins.
      * @emits {assessed} Fires when bid entity assessement is completed
@@ -87,6 +105,6 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @abstract
      */
     assess() {
-        throw "must be implemented by subclass";
+        throw "Must be implemented by subclass.";
     }
 }

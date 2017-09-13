@@ -4,16 +4,20 @@ import BidEntity from "./BidEntity";
 import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
- * @param {object} componentData - structured component data
- * @param {Bid} bid - The bid in which the component belongs to.
- * @export
- * @class Component
- * @memberof module:PVBid/Core
- * @extends {BidEntity}
+ * Component Class
  */
 export default class Component extends BidEntity {
+    /**
+     * Creates an instance of Component.
+     * @param {object} componentData - structured component data
+     * @param {Bid} bid - The bid in which the component belongs to.
+     */
     constructor(componentData, bid) {
         super(25);
+        /**
+         * Reference to the bid that the component belongs to.
+         * @type {Bid}
+         */
         this.bid = bid;
         this._original = Object.assign({}, componentData);
         this._data = componentData;
@@ -22,12 +26,15 @@ export default class Component extends BidEntity {
     /**
      * The summed cost from the nested line items.
      * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get cost() {
         return this._data.cost;
     }
+
+    /**
+     * @type {number}
+     */
     set cost(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.cost) {
             this._applyComponentValue("cost", this._data.cost, val, false);
@@ -39,12 +46,16 @@ export default class Component extends BidEntity {
     /**
      * The summed taxable cost from the nested line items.
      * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get taxableCost() {
         return this._data.taxable_cost;
     }
+    /**
+     * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
+     * 
+     * @type {number}
+     */
     set taxableCost(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.taxable_cost) {
             this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
@@ -54,14 +65,17 @@ export default class Component extends BidEntity {
     }
 
     /**
-    * The average tax percentage from the nested line items.
-    * 
-    * @memberof Component
-    * @instance
-    */
+     * The average tax percentage from the nested line items.
+     *
+     * @type {number}
+     */
     get taxPercent() {
         return this._data.tax_percent;
     }
+
+    /**
+     * @type {number}
+     */
     set taxPercent(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax_percent) {
             this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
@@ -71,14 +85,14 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Tax Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get tax() {
         return this._data.tax;
     }
+    /**
+     * @type {number}
+     */
     set tax(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax_percent) {
             this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
@@ -88,14 +102,15 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Markup Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get markup() {
         return this._data.markup;
     }
+
+    /**
+     * @type {number}
+     */
     set markup(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.markup) {
             this._applyComponentValue("markup", this._data.markup, val, false);
@@ -105,14 +120,15 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Markup Percent Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get markupPercent() {
         return this._data.markup_percent;
     }
+
+    /**
+     * @type {number}
+     */
     set markupPercent(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.markup_percent) {
             this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
@@ -122,14 +138,15 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Labor Hours Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get laborHours() {
         return this._data.labor_hours;
     }
+
+    /**
+     * @type {number}
+     */
     set laborHours(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.labor_hours) {
             this._applyComponentValue("laborHours", this._data.labor_hours, val, false);
@@ -139,46 +156,30 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get laborCost() {
         return this._data.labor_cost;
     }
-    set laborCost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.labor_cost) {
-            this._applyComponentValue("laborCost", this._data.labor_cost, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
 
     /**
-     * Non Labor Cost Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get nonLaborCost() {
         return this._data.non_labor_cost;
-    }
-    set nonLaborCost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.non_labor_cost) {
-            this._applyComponentValue("nonLaborCost", this._data.non_labor_cost, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
     }
 
     /**
      * Price Property
      * 
-     * @memberof Component
-     * @instance
      */
     get price() {
         return this._data.price;
     }
+
+    /**
+     * @type {number}
+     */
     set price(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.price) {
             this._applyComponentValue("price", this._data.price, val, false);
@@ -188,51 +189,89 @@ export default class Component extends BidEntity {
     }
 
     /**
-     * Config Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {object}
      */
     get config() {
         return this._data.config;
     }
-    set config(val) {
-        throw "Setting component config is not permitted.";
-    }
 
     /**
-     * Actual Cost Property
-     * 
-     * @memberof Component
+     * @type {number}
      */
     get actualCost() {
         return this._data.actual_cost;
     }
+
+    /**
+     * @type {number}
+     */
     set actualCost(val) {
         this._data.actual_cost = val;
         this.dirty();
     }
 
     /**
-     * Actual Hours Property
-     * 
-     * @memberof Component
-     * @instance
+     * @type {number}
      */
     get actualHours() {
         return this._data.actual_hours;
     }
+
+    /**
+     * @type {number}
+     */
     set actualHours(val) {
         this._data.actual_hours = val;
         this.dirty();
     }
 
     /**
-     * Definition Id Property
-     * 
-     * @readonly
-     * @memberof Component
-     * @instance
+     * @type {number}
+     */
+    get baseAvg() {
+        if (this._data.properties && this._data.properties.base_avg) {
+            return this._data.properties.base_avg.value;
+        } else return 0;
+    }
+
+    /**
+     * @type {number}
+     */
+    get wageAvg() {
+        if (this._data.properties && this._data.properties.wage_avg) {
+            return this._data.properties.wage_avg.value;
+        } else return 0;
+    }
+
+    /**
+     * @type {number}
+     */
+    get burdenAvg() {
+        if (this._data.properties && this._data.properties.burden_avg) {
+            return this._data.properties.burden_avg.value;
+        } else return 0;
+    }
+
+    /**
+     * @type {number}
+     */
+    get quantityAvg() {
+        if (this._data.properties && this._data.properties.per_quantity) {
+            return this._data.properties.per_quantity.value;
+        } else return 0;
+    }
+
+    /**
+     * @type {number}
+     */
+    get perQuantityAvg() {
+        if (this._data.properties && this._data.properties.per_quantity_avg) {
+            return this._data.properties.per_quantity_avg.value;
+        } else return 0;
+    }
+
+    /**
+     * @type {number}
      */
     get definitionId() {
         return this._data.definition_id;
@@ -241,18 +280,48 @@ export default class Component extends BidEntity {
     /**
      * Applies a new value to the component and assesses if there is a change.
      * 
-     * @private
      * @param {string} property 
      * @param {number} value 
      * @returns {boolean} Returns true if there is a change.
-     * @memberof Component
-     * @instance
      */
     _apply(property, value) {
         var oldValue = _.round(this._data[property], 4);
         var newValue = _.round(Helpers.confirmNumber(value), 4);
         if (oldValue !== newValue) {
+            //console.log("Component Change", property, oldValue, newValue);
             this._data[property] = Helpers.confirmNumber(value);
+            this.dirty();
+
+            return true;
+        } else return false;
+    }
+
+    /**
+     * Applies a new virtual property value to the component and returns true if there is a change.
+     * 
+     * @param {string} property 
+     * @param {number} value 
+     * @returns {boolean}
+     */
+    _applyVirtualProperty(property, value) {
+        //Must check if config.properties exists due to not existing in legacy bids.
+        if (_.isUndefined(this._data.properties) || _.isNull(this._data.properties)) {
+            this._data.properties = {};
+        }
+
+        if (_.isUndefined(this._data.properties[property])) {
+            this._data.properties[property] = {
+                value: 0,
+                config: {
+                    data_type: "number"
+                }
+            };
+        }
+
+        var oldValue = _.round(this._data.properties[property].value, 4);
+        var newValue = _.round(Helpers.confirmNumber(value), 4);
+        if (oldValue !== newValue) {
+            this._data.properties[property].value = newValue;
             this.dirty();
 
             return true;
@@ -262,8 +331,9 @@ export default class Component extends BidEntity {
     /**
      * Assess the component instance.
      * 
-     * @memberof Component
-     * @instance
+     * @emits {assessing}
+     * @emits {assessed}
+     * @emits {updated}
      */
     assess() {
         var isChanged = false;
@@ -342,28 +412,38 @@ export default class Component extends BidEntity {
         var quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
         var perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
 
-        isChanged = isChanged || this._apply("cost", cost);
-        isChanged = isChanged || this._apply("price", price);
-        isChanged = isChanged || this._apply("taxable_cost", taxableCost);
-        isChanged = isChanged || this._apply("tax", tax);
-        isChanged = isChanged || this._apply("markup", markup);
-        isChanged = isChanged || this._apply("tax_percent", taxPercent);
-        isChanged = isChanged || this._apply("markup_percent", markupPercent);
-        isChanged = isChanged || this._apply("base", base);
-        isChanged = isChanged || this._apply("base_avg", baseAvg);
-        isChanged = isChanged || this._apply("wage", wage);
-        isChanged = isChanged || this._apply("wage_avg", wageAvg);
-        isChanged = isChanged || this._apply("burden", burden);
-        isChanged = isChanged || this._apply("burden_avg", burdenAvg);
-        isChanged = isChanged || this._apply("quantity", quantity);
-        isChanged = isChanged || this._apply("quantity_avg", quantityAvg);
-        isChanged = isChanged || this._apply("per_quantity", perQuantity);
-        isChanged = isChanged || this._apply("per_quantity_avg", perQuantityAvg);
-        isChanged = isChanged || this._apply("non_labor_cost", nonLaborCosts);
-        isChanged = isChanged || this._apply("labor_hours", laborHours);
-        isChanged = isChanged || this._apply("labor_cost", laborCosts);
-        isChanged = isChanged || this._apply("included_labor_count", totalLaborLinetItems);
-        isChanged = isChanged || this._apply("included_count", totalLineItems);
+        isChanged = this._apply("cost", cost) || isChanged;
+        isChanged = this._apply("price", price) || isChanged;
+        isChanged = this._apply("taxable_cost", taxableCost) || isChanged;
+        isChanged = this._apply("tax", tax) || isChanged;
+        isChanged = this._apply("markup", markup) || isChanged;
+        isChanged = this._apply("tax_percent", taxPercent) || isChanged;
+        isChanged = this._apply("markup_percent", markupPercent) || isChanged;
+        // isChanged = this._apply("base", base) || isChanged;
+        //isChanged = this._apply("wage", wage) || isChanged;
+        //isChanged = this._apply("quantity", quantity) || isChanged;
+        //isChanged = this._apply("burden", burden) || isChanged;
+        //isChanged = this._apply("per_quantity", perQuantity) || isChanged;
+
+        isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
+        isChanged = this._apply("labor_hours", laborHours) || isChanged;
+        isChanged = this._apply("labor_cost", laborCosts) || isChanged;
+        // isChanged = this._apply("included_labor_count", totalLaborLinetItems) || isChanged;
+        // isChanged = this._apply("included_count", totalLineItems) || isChanged;
+
+        this._applyVirtualProperty("base", base);
+        this._applyVirtualProperty("burden", burden);
+        this._applyVirtualProperty("wage", wage);
+        this._applyVirtualProperty("quantity", quantity);
+        this._applyVirtualProperty("per_quantity", perQuantity);
+        this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
+        this._applyVirtualProperty("included_count", totalLineItems);
+
+        this._applyVirtualProperty("base_avg", baseAvg);
+        this._applyVirtualProperty("wage_avg", wageAvg);
+        this._applyVirtualProperty("burden_avg", burdenAvg);
+        this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
+        this._applyVirtualProperty("quantity_avg", quantityAvg);
 
         //FIXME: component.prediction = PredictionService.getComponentPrediction(component);
         if (isChanged) this.emit("updated");
@@ -373,9 +453,6 @@ export default class Component extends BidEntity {
 
     /**
      * Binds the "updated" event for all dependant bid entities.
-     * 
-     * @memberof Component
-     * @instance
      */
     bind() {
         for (let lineItemId of this.config.line_items) {
@@ -396,7 +473,7 @@ export default class Component extends BidEntity {
     /**
      * Gets an array of nested of subcomponents.
      * 
-     * @return {Component[]} Returns an array of subcomponents.
+     * @return {Component[]}
      */
     getSubComponents() {
         var components = [];
@@ -411,9 +488,7 @@ export default class Component extends BidEntity {
     /**
      * Gets the component's parent component, if exists.
      * 
-     * @returns {?PVBid/Core.Component} Returns the parent component or null value.
-     * @memberof Component
-     * @instance
+     * @returns {?Component}
      */
     getParent() {
         if (this.config.is_nested) {
@@ -425,8 +500,6 @@ export default class Component extends BidEntity {
      * Gets the level at which the component is nested: 0, 1, 2.
      * 
      * @returns {number}
-     * @memberof Component
-     * @instance
      */
     getNestedLevel() {
         const parent = this.getParent();
@@ -439,8 +512,6 @@ export default class Component extends BidEntity {
      * Determines of component is a top parent component, in which is not nested.
      * 
      * @returns {boolean}
-     * @instance
-     * @memberof Component
      */
     isParent() {
         return !this.config.is_nested;
@@ -451,7 +522,6 @@ export default class Component extends BidEntity {
      * 
      * @param  {boolean} includeSubComponents
      * @return {array} Returns an array of line items in component.
-     * @instance
      */
     getLineItems(includeSubComponents) {
         includeSubComponents = typeof includeSubComponents === "undefined" ? false : includeSubComponents;
@@ -480,8 +550,6 @@ export default class Component extends BidEntity {
      * Sets the include status for all nested line items.
      * 
      * @param {boolean} isIncluded 
-     * @memberof Component
-     * @instance
      */
     setIncludeStatus(isIncluded) {
         var lineItems = this.getLineItems(true);
@@ -493,9 +561,6 @@ export default class Component extends BidEntity {
 
     /**
      * Resets all nested line items.
-     * 
-     * @memberof Component
-     * @instance
      */
     reset() {
         var lineItems = this.getLineItems(true);
@@ -508,12 +573,10 @@ export default class Component extends BidEntity {
     /**
      * Applies the component value change to the nested line items. 
      * 
-     * @private
      * @param {string} property 
      * @param {number} oldValue 
      * @param {number} newValue 
      * @param {boolean} overrideAllLineItems 
-     * @memberof Component
      */
     _applyComponentValue(property, oldValue, newValue, overrideAllLineItems) {
         newValue = Helpers.confirmNumber(newValue);
