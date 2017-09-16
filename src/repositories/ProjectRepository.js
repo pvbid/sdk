@@ -1,8 +1,8 @@
 import _ from "lodash";
 
-import CacheRepository from "./CacheRepository";
+import BaseRepository from "./BaseRepository";
 
-export default class ProjectRepository extends CacheRepository {
+export default class ProjectRepository extends BaseRepository {
     constructor(config) {
         super(config.base_uri + "/projects/", "project", "projects", config);
     }

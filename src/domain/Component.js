@@ -19,7 +19,7 @@ export default class Component extends BidEntity {
          * @type {Bid}
          */
         this.bid = bid;
-        this._original = Object.assign({}, componentData);
+        this._original = _.cloneDeep(componentData);
         this._data = componentData;
     }
 
@@ -339,138 +339,142 @@ export default class Component extends BidEntity {
      * @emits {updated}
      */
     assess() {
-        var isChanged = false;
+        if (this.bid.isAssessable()) {
+            var isChanged = false;
 
-        let cost = 0,
-            taxableCost = 0,
-            price = 0,
-            markup = 0,
-            tax = 0,
-            base = 0,
-            laborHours = 0,
-            totalLineItems = 0,
-            totalLaborLinetItems = 0,
-            wage = 0,
-            burden = 0,
-            quantity = 0,
-            perQuantity = 0,
-            laborCosts = 0,
-            nonLaborCosts = 0;
+            let cost = 0,
+                taxableCost = 0,
+                price = 0,
+                markup = 0,
+                tax = 0,
+                base = 0,
+                laborHours = 0,
+                totalLineItems = 0,
+                totalLaborLinetItems = 0,
+                wage = 0,
+                burden = 0,
+                quantity = 0,
+                perQuantity = 0,
+                laborCosts = 0,
+                nonLaborCosts = 0;
 
-        _.each(this.getLineItems(), lineItem => {
-            if (!_.isNull(lineItem) && lineItem.isIncluded) {
-                totalLineItems += 1;
-                if (lineItem.isLabor()) {
-                    totalLaborLinetItems += 1;
-                    laborCosts += lineItem.cost;
-                    laborHours += lineItem.laborHours;
-                } else {
-                    nonLaborCosts += lineItem.cost;
-                    taxableCost += lineItem.cost;
+            _.each(this.getLineItems(), lineItem => {
+                if (!_.isNull(lineItem) && lineItem.isIncluded) {
+                    totalLineItems += 1;
+                    if (lineItem.isLabor()) {
+                        totalLaborLinetItems += 1;
+                        laborCosts += lineItem.cost;
+                        laborHours += lineItem.laborHours;
+                    } else {
+                        nonLaborCosts += lineItem.cost;
+                        taxableCost += lineItem.cost;
+                    }
+
+                    cost += lineItem.cost;
+                    price += lineItem.price;
+                    markup += lineItem.markup;
+                    tax += lineItem.tax;
+                    base += lineItem.base;
+                    wage += lineItem.wage;
+                    burden += lineItem.burden;
+                    quantity += lineItem.quantity;
+                    perQuantity += lineItem.perQuantity;
                 }
+            });
 
-                cost += lineItem.cost;
-                price += lineItem.price;
-                markup += lineItem.markup;
-                tax += lineItem.tax;
-                base += lineItem.base;
-                wage += lineItem.wage;
-                burden += lineItem.burden;
-                quantity += lineItem.quantity;
-                perQuantity += lineItem.perQuantity;
+            _.each(this.getSubComponents(), subComponent => {
+                subComponent.assess();
+                cost += Helpers.confirmNumber(subComponent.cost);
+                price += Helpers.confirmNumber(subComponent.price);
+                markup += Helpers.confirmNumber(subComponent.markup);
+                tax += Helpers.confirmNumber(subComponent.tax);
+                taxableCost += Helpers.confirmNumber(subComponent.taxableCost);
+                laborHours += Helpers.confirmNumber(subComponent.laborHours);
+                laborCosts += Helpers.confirmNumber(subComponent.laborCost);
+                nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
+                base += Helpers.confirmNumber(subComponent._data.base);
+                wage += Helpers.confirmNumber(subComponent._data.wage);
+                burden += Helpers.confirmNumber(subComponent._data.burden);
+                quantity += Helpers.confirmNumber(subComponent._data.quantity);
+                perQuantity += Helpers.confirmNumber(subComponent._data.per_quantity);
+                totalLineItems += Helpers.confirmNumber(subComponent._data.included_count);
+                totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.included_labor_count);
+            });
+
+            var markupPercent = 0;
+            if (this.bid.includeTaxInMarkup()) {
+                var adjCost = cost + tax;
+                markupPercent = adjCost > 0 ? markup / adjCost * 100 : 0;
+            } else {
+                markupPercent = cost > 0 ? markup / cost * 100 : 0;
             }
-        });
 
-        _.each(this.getSubComponents(), subComponent => {
-            subComponent.assess();
-            cost += Helpers.confirmNumber(subComponent.cost);
-            price += Helpers.confirmNumber(subComponent.price);
-            markup += Helpers.confirmNumber(subComponent.markup);
-            tax += Helpers.confirmNumber(subComponent.tax);
-            taxableCost += Helpers.confirmNumber(subComponent.taxableCost);
-            laborHours += Helpers.confirmNumber(subComponent.laborHours);
-            laborCosts += Helpers.confirmNumber(subComponent.laborCost);
-            nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
-            base += Helpers.confirmNumber(subComponent._data.base);
-            wage += Helpers.confirmNumber(subComponent._data.wage);
-            burden += Helpers.confirmNumber(subComponent._data.burden);
-            quantity += Helpers.confirmNumber(subComponent._data.quantity);
-            perQuantity += Helpers.confirmNumber(subComponent._data.per_quantity);
-            totalLineItems += Helpers.confirmNumber(subComponent._data.included_count);
-            totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.included_labor_count);
-        });
+            var taxPercent = taxableCost > 0 ? tax / taxableCost * 100 : 0;
+            var baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
+            var wageAvg = totalLaborLinetItems > 0 ? wage / totalLaborLinetItems : 0;
+            var burdenAvg = totalLaborLinetItems > 0 ? burden / totalLaborLinetItems : 0;
+            var quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
+            var perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
 
-        var markupPercent = 0;
-        if (this.bid.includeTaxInMarkup()) {
-            var adjCost = cost + tax;
-            markupPercent = adjCost > 0 ? markup / adjCost * 100 : 0;
-        } else {
-            markupPercent = cost > 0 ? markup / cost * 100 : 0;
+            isChanged = this._apply("cost", cost) || isChanged;
+            isChanged = this._apply("price", price) || isChanged;
+            isChanged = this._apply("taxable_cost", taxableCost) || isChanged;
+            isChanged = this._apply("tax", tax) || isChanged;
+            isChanged = this._apply("markup", markup) || isChanged;
+            isChanged = this._apply("tax_percent", taxPercent) || isChanged;
+            isChanged = this._apply("markup_percent", markupPercent) || isChanged;
+            // isChanged = this._apply("base", base) || isChanged;
+            //isChanged = this._apply("wage", wage) || isChanged;
+            //isChanged = this._apply("quantity", quantity) || isChanged;
+            //isChanged = this._apply("burden", burden) || isChanged;
+            //isChanged = this._apply("per_quantity", perQuantity) || isChanged;
+
+            isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
+            isChanged = this._apply("labor_hours", laborHours) || isChanged;
+            isChanged = this._apply("labor_cost", laborCosts) || isChanged;
+            // isChanged = this._apply("included_labor_count", totalLaborLinetItems) || isChanged;
+            // isChanged = this._apply("included_count", totalLineItems) || isChanged;
+
+            this._applyVirtualProperty("base", base);
+            this._applyVirtualProperty("burden", burden);
+            this._applyVirtualProperty("wage", wage);
+            this._applyVirtualProperty("quantity", quantity);
+            this._applyVirtualProperty("per_quantity", perQuantity);
+            this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
+            this._applyVirtualProperty("included_count", totalLineItems);
+
+            this._applyVirtualProperty("base_avg", baseAvg);
+            this._applyVirtualProperty("wage_avg", wageAvg);
+            this._applyVirtualProperty("burden_avg", burdenAvg);
+            this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
+            this._applyVirtualProperty("quantity_avg", quantityAvg);
+
+            //FIXME: component.prediction = PredictionService.getComponentPrediction(component);
+            if (isChanged) this.emit("updated");
+
+            this.emit("assessed");
         }
-
-        var taxPercent = taxableCost > 0 ? tax / taxableCost * 100 : 0;
-        var baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
-        var wageAvg = totalLaborLinetItems > 0 ? wage / totalLaborLinetItems : 0;
-        var burdenAvg = totalLaborLinetItems > 0 ? burden / totalLaborLinetItems : 0;
-        var quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
-        var perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
-
-        isChanged = this._apply("cost", cost) || isChanged;
-        isChanged = this._apply("price", price) || isChanged;
-        isChanged = this._apply("taxable_cost", taxableCost) || isChanged;
-        isChanged = this._apply("tax", tax) || isChanged;
-        isChanged = this._apply("markup", markup) || isChanged;
-        isChanged = this._apply("tax_percent", taxPercent) || isChanged;
-        isChanged = this._apply("markup_percent", markupPercent) || isChanged;
-        // isChanged = this._apply("base", base) || isChanged;
-        //isChanged = this._apply("wage", wage) || isChanged;
-        //isChanged = this._apply("quantity", quantity) || isChanged;
-        //isChanged = this._apply("burden", burden) || isChanged;
-        //isChanged = this._apply("per_quantity", perQuantity) || isChanged;
-
-        isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
-        isChanged = this._apply("labor_hours", laborHours) || isChanged;
-        isChanged = this._apply("labor_cost", laborCosts) || isChanged;
-        // isChanged = this._apply("included_labor_count", totalLaborLinetItems) || isChanged;
-        // isChanged = this._apply("included_count", totalLineItems) || isChanged;
-
-        this._applyVirtualProperty("base", base);
-        this._applyVirtualProperty("burden", burden);
-        this._applyVirtualProperty("wage", wage);
-        this._applyVirtualProperty("quantity", quantity);
-        this._applyVirtualProperty("per_quantity", perQuantity);
-        this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
-        this._applyVirtualProperty("included_count", totalLineItems);
-
-        this._applyVirtualProperty("base_avg", baseAvg);
-        this._applyVirtualProperty("wage_avg", wageAvg);
-        this._applyVirtualProperty("burden_avg", burdenAvg);
-        this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
-        this._applyVirtualProperty("quantity_avg", quantityAvg);
-
-        //FIXME: component.prediction = PredictionService.getComponentPrediction(component);
-        if (isChanged) this.emit("updated");
-
-        this.emit("assessed");
     }
 
     /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        for (let lineItemId of this.config.line_items) {
-            const lineItem = this.bid.lineItems(lineItemId);
+        if (this.bid.isAssessable()) {
+            for (let lineItemId of this.config.line_items) {
+                const lineItem = this.bid.lineItems(lineItemId);
 
-            lineItem.on("updated", `component.${this.id}`, requesterId => {
-                waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.lineItem.${requesterId}`);
+                lineItem.on("updated", `component.${this.id}`, requesterId => {
+                    waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.lineItem.${requesterId}`);
+                });
+            }
+
+            _.each(this.getSubComponents(), c => {
+                c.onDelay("updated", 5, `component.${this.id}`, requesterId => {
+                    waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.${requesterId}`);
+                });
             });
         }
-
-        _.each(this.getSubComponents(), c => {
-            c.onDelay("updated", 5, `component.${this.id}`, requesterId => {
-                waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.${requesterId}`);
-            });
-        });
     }
 
     /**
@@ -555,22 +559,26 @@ export default class Component extends BidEntity {
      * @param {boolean} isIncluded 
      */
     setIncludeStatus(isIncluded) {
-        var lineItems = this.getLineItems(true);
+        if (this.bid.isAssessable()) {
+            var lineItems = this.getLineItems(true);
 
-        _.each(lineItems, function(lineItem) {
-            lineItem.isIncluded = isIncluded;
-        });
+            _.each(lineItems, function(lineItem) {
+                lineItem.isIncluded = isIncluded;
+            });
+        }
     }
 
     /**
      * Resets all nested line items.
      */
     reset() {
-        var lineItems = this.getLineItems(true);
+        if (this.bid.isAssessable()) {
+            var lineItems = this.getLineItems(true);
 
-        _.each(lineItems, function(lineItem) {
-            lineItem.reset();
-        });
+            _.each(lineItems, function(lineItem) {
+                lineItem.reset();
+            });
+        }
     }
 
     /**
@@ -603,5 +611,12 @@ export default class Component extends BidEntity {
                 }
             }
         }
+    }
+
+    exportData() {
+        let data = _.cloneDeep(this._data);
+        if (_.isEqual(data.config, this._original.config)) delete data.config;
+
+        return data;
     }
 }

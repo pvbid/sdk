@@ -11,14 +11,16 @@ export default class BaseRepository {
      * @param {string} singleMap 
      * @param {string} multiMap 
      */
-    constructor(endpoint, singleMap, multiMap, config) {
-        axios.defaults.headers.common["Authorization"] = config.token;
-        this.config = config;
+    constructor(endpoint, singleMap, multiMap, httpConfig) {
+        axios.defaults.headers.common["Authorization"] = httpConfig.token;
+        this.httpConfig = httpConfig;
         this.metaData = null;
         this.params = {};
         this.endpoint = endpoint;
         this.map = { single: singleMap, multi: multiMap };
         this.http = axios;
+
+        this._applyIntercepts();
     }
 
     /**
@@ -62,7 +64,7 @@ export default class BaseRepository {
     async save(entity) {
         try {
             let response = await this.http.put(this.endpoint + entity.id, entity);
-            return response.data.data;
+            return response.data.data[this.map.single];
         } catch (error) {
             return Promise.reject(error.response.data);
         }
@@ -84,5 +86,22 @@ export default class BaseRepository {
         } catch (error) {
             return Promise.reject(error.response.data);
         }
+    }
+
+    _applyIntercepts() {
+        this.http.interceptors.request.use(
+            configuration => {
+                if (this.httpConfig.impersonate_id) {
+                    if (_.isUndefined(configuration.params)) {
+                        configuration.params = {};
+                    }
+                    configuration.params.impersonate_id = this.httpConfig.impersonate_id;
+                }
+                return configuration;
+            },
+            function(error) {
+                return Promise.reject(error);
+            }
+        );
     }
 }

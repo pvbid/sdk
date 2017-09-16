@@ -88,24 +88,24 @@ export default class BidModelRelationsHelper {
     getBidEntity(type, id) {
         //make typeKey plural.
         let typeKey = type === "assembly" ? "assemblies" : type + "s";
-
+        const collection = this.getCollection(typeKey);
         if (!_.isUndefined(id)) {
             if (_.isNull(id)) {
                 return null;
             }
 
-            if (typeKey === "bid_variables") {
-                return !_.isUndefined(this.bid._data.variables[id]) ? this.bid._data.variables[id].value : null;
-            } else {
-                return !_.isUndefined(this.bid._data[typeKey][id]) ? this.bid._data[typeKey][id] : null;
-            }
+            return !_.isUndefined(collection[id]) ? collection[id] : null;
         } else {
-            if (typeKey === "bid_variables") {
-                return this._variables;
-            } else {
-                return !_.isUndefined(this.bid._data[typeKey]) ? this.bid._data[typeKey] : null;
-            }
+            return collection;
         }
+    }
+
+    getCollection(type) {
+        if (type === "bid_variables") {
+            return this._variables;
+        } else if (!_.isUndefined(this.bid._data[type])) {
+            return this.bid._data[type];
+        } else throw `Bid entity collection ${type} does not exist`;
     }
 
     getComponentByDefId(defId) {
@@ -168,5 +168,20 @@ export default class BidModelRelationsHelper {
     bidEntityExists(type, id) {
         let bidEntity = this.getBidEntity(type, id);
         return bidEntity ? true : false;
+    }
+
+    /**
+     * Searches and returns an array of bid entities by their title.
+     * Results are case-insensitive.
+     * 
+     * @param {string} type The type of bid entity to search for: line_item, field, metric, component, assembly, etc.
+     * @param {string} query 
+     * @returns {BidEntity[]}
+     */
+    findByTitle(type, query) {
+        let collection = this.getCollection(type);
+        return _.filter(collection, item => {
+            return item.title.toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
+        });
     }
 }

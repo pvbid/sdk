@@ -24,16 +24,20 @@ export default class CacheRepository extends BaseRepository {
      * @param {boolean} forceReload Flags repository to force reload skipping cached data.
      */
     async findById(id, forceReload) {
-        if (_.isEmpty(this._cache) || _.isUndefined(this._cache[id]) || forceReload) {
+        if (_.isEmpty(this._cache[this.endpoint]) || _.isUndefined(this._cache[this.endpoint][id]) || forceReload) {
             try {
                 let res = await super.findById(id);
-                this._cache[id] = _.cloneDeep(res);
+                if (_.isUndefined(this._cache[this.endpoint])) {
+                    this._cache[this.endpoint] = {};
+                }
+                this._cache[this.endpoint][id] = _.cloneDeep(res);
                 return res;
             } catch (error) {
                 return Promise.reject(error);
             }
         } else {
-            return _.cloneDeep(this._cache[id]);
+            console.log("Cache FindById: ", this.endpoint, id);
+            return _.cloneDeep(this._cache[this.endpoint][id]);
         }
     }
 
@@ -44,17 +48,24 @@ export default class CacheRepository extends BaseRepository {
      * @param {boolean} forceReload Flags repository to force reload skipping cached data. 
      */
     async get(params, forceReload) {
-        if (_.isEmpty(this._cache) || forceReload || !_.isEqual(params, this.params)) {
+        if (
+            forceReload ||
+            _.isEmpty(this._cache["GET_" + this.endpoint]) ||
+            (!_.isUndefined(params) && !_.isEqual(params, this.params))
+        ) {
             try {
                 let response = await super.get(params);
                 const keyed = _.keyBy(response, "id");
-                this._cache = _.cloneDeep(keyed);
+                this._cache["GET_" + this.endpoint] = _.cloneDeep(keyed);
 
                 return response;
             } catch (error) {
                 return Promise.reject(error);
             }
-        } else return _.cloneDeep(this._cache);
+        } else {
+            console.log("Cache GET: ", this.endpoint);
+            return _.cloneDeep(this._cache["GET_" + this.endpoint]);
+        }
     }
 
     /**
@@ -65,17 +76,12 @@ export default class CacheRepository extends BaseRepository {
     async save(entity) {
         try {
             let response = await super.save(entity);
-            this._cache[entity.id] = _.cloneDeep(entity);
-            return response;
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
 
-    async create(entity) {
-        try {
-            let response = await super.create(entity);
-            this._cache[response.id] = _.cloneDeep(response);
+            //invalidate cache as it's stale
+            if (this._cache[this.endpoint] && this._cache[this.endpoint][entity.id]) {
+                delete this._cache[this.endpoint][entity.id];
+                console.log("Cache Save (delete): ", this.endpoint, entity.id);
+            }
 
             return response;
         } catch (error) {
@@ -86,8 +92,9 @@ export default class CacheRepository extends BaseRepository {
     async delete(id) {
         try {
             let response = await super.delete(id);
-            if (this._cache[id]) {
-                delete this._cache[id];
+            if (this._cache[this.endpoint] && this._cache[this.endpoint][id]) {
+                delete this._cache[this.endpoint][id];
+                console.log("Cache Delete (delete): ", this.endpoint, id);
             }
             return response;
         } catch (error) {

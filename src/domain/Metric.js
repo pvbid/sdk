@@ -24,14 +24,14 @@ export default class Metric extends BidEntity {
          */
         this.bid = bid;
         this._data = metricData;
-        this._original = Object.assign({}, metricData);
+        this._original = _.cloneDeep(metricData);
     }
 
     get value() {
         return this._data.value;
     }
     set value(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.value) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.value && !this.bid.isReadOnly()) {
             this.config.override = true;
             this._data.value = Helpers.confirmNumber(val);
             this.dirty();
@@ -43,7 +43,7 @@ export default class Metric extends BidEntity {
         return this._data.actual_value;
     }
     set actualValue(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.confirmNumber(val, false) && !this.bid.isReadOnly()) {
             this._data.actual_value = val;
             this.dirty();
         }
@@ -110,9 +110,11 @@ export default class Metric extends BidEntity {
         return manipulatedValue;
     }
     reset() {
-        this.dirty();
-        this.config.override = false;
-        this.assess();
+        if (this.bid.isAssessable()) {
+            this.dirty();
+            this.config.override = false;
+            this.assess();
+        }
     }
 
     compare() {
@@ -120,50 +122,61 @@ export default class Metric extends BidEntity {
     }
 
     assess() {
-        if (!this.config.override) {
-            var baseValue = 0,
-                finalValue = 0;
+        if (this.bid.isAssessable()) {
+            if (!this.config.override) {
+                var baseValue = 0,
+                    finalValue = 0;
 
-            baseValue = this._getBaseValue();
-            finalValue = this._calculateMetricManipulations(baseValue);
+                baseValue = this._getBaseValue();
+                finalValue = this._calculateMetricManipulations(baseValue);
 
-            var oldValue = this._data.value ? _.round(this._data.value, 4) : 0;
+                var oldValue = this._data.value ? _.round(this._data.value, 4) : 0;
 
-            if (oldValue !== _.round(finalValue, 4)) {
-                this._data.value = finalValue;
-                this.dirty();
+                if (oldValue !== _.round(finalValue, 4)) {
+                    this._data.value = finalValue;
+                    this.dirty();
 
-                this.emit("updated");
+                    this.emit("updated");
+                }
             }
-        }
 
-        this.emit("assessed");
+            this.emit("assessed");
+        }
     }
 
     /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        for (let dependencyContract of Object.values(this.config.dependencies)) {
-            if (!_.isEmpty(dependencyContract)) {
-                const dependency = this.bid.relations.getDependency(dependencyContract);
-                if (dependency && dependency.on) {
-                    dependency.on("updated", "metric." + this.id, () => this.assess());
-                } else {
-                    console.log("m dep", dependencyContract);
+        if (this.bid.isAssessable()) {
+            for (let dependencyContract of Object.values(this.config.dependencies)) {
+                if (!_.isEmpty(dependencyContract)) {
+                    const dependency = this.bid.relations.getDependency(dependencyContract);
+                    if (dependency && dependency.on) {
+                        dependency.on("updated", "metric." + this.id, () => this.assess());
+                    } else {
+                        console.log("m dep", dependencyContract);
+                    }
                 }
             }
-        }
 
-        if (!_.isUndefined(this.config.manipulations)) {
-            for (let manipulation of Object.values(this.config.manipulations)) {
-                for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
-                    if (!_.isEmpty(manipulationDepCtrct)) {
-                        const dependency = this.bid.relations.getDependency(manipulationDepCtrct);
-                        dependency.on("updated", "metric-contract." + this.id, () => this.assess());
+            if (!_.isUndefined(this.config.manipulations)) {
+                for (let manipulation of Object.values(this.config.manipulations)) {
+                    for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
+                        if (!_.isEmpty(manipulationDepCtrct)) {
+                            const dependency = this.bid.relations.getDependency(manipulationDepCtrct);
+                            dependency.on("updated", "metric-contract." + this.id, () => this.assess());
+                        }
                     }
                 }
             }
         }
+    }
+
+    exportData() {
+        let data = _.cloneDeep(this._data);
+        if (_.isEqual(data.config, this._original.config)) delete data.config;
+
+        return data;
     }
 }

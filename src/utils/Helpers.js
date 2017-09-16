@@ -6,6 +6,9 @@ math.import(require("mathjs/lib/type/complex"));
 math.import(require("mathjs/lib/function/utils"));
 math.import(require("mathjs/lib/expression"));
 math.import(require("mathjs/lib/function/arithmetic"));
+math.import(require("mathjs/lib/function/trigonometry"));
+math.import(require("mathjs/lib/function/logical"));
+
 math.import(require("mathjs/lib/function/relational"));
 math.import(require("mathjs/lib/function/statistics"));
 math.import(require("mathjs/lib/constants"));

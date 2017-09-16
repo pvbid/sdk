@@ -79,6 +79,7 @@ export default class BidEntity extends AdvanceEventEmitter {
      */
     dirty() {
         this._is_dirty = true;
+        this.emit("changed");
     }
 
     /**
@@ -93,7 +94,7 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @returns {object}
      */
     exportData() {
-        return Object.assign({}, this._data);
+        return _.cloneDeep(this._data);
     }
 
     /**

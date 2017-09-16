@@ -1,9 +1,9 @@
-import CacheRepository from "./CacheRepository";
+import BaseRepository from "./BaseRepository";
 
 /**
  * 
  */
-export default class BidRepository extends CacheRepository {
+export default class BidRepository extends BaseRepository {
     constructor(config) {
         super(config.base_uri + "/bids/", "bid", "bids", config);
     }

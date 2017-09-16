@@ -20,7 +20,7 @@ export default class LineItem extends BidEntity {
          */
         this.bid = bid;
         this.maxEvents = 25;
-        this._original = Object.assign({}, entityData);
+        this._original = _.cloneDeep(entityData);
         this._data = entityData;
         this._ruleService = new LineItemRuleService(this);
         this.onDelay("property.updated", 5, "self", () => this.assess(true));
@@ -45,8 +45,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Wage Property
-     * @instance
-     * @memberof LineItem
      */
     get wage() {
         return Helpers.confirmNumber(this._data.wage);
@@ -62,8 +60,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Is Included Property
-     * @instance
-     * @memberof LineItem
      */
     get isIncluded() {
         return this._data.is_included;
@@ -79,8 +75,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Labor Hours Property
-     * @instance
-     * @memberof LineItem
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -96,8 +90,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Burden Property
-     * @instance
-     * @memberof LineItem
      */
     get burden() {
         return Helpers.confirmNumber(this._data.burden);
@@ -113,8 +105,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Scalar Property
-     * @instance
-     * @memberof LineItem
      */
     get scalar() {
         const scalarContracts = this._getExtraScalarDependencies();
@@ -135,14 +125,9 @@ export default class LineItem extends BidEntity {
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return Helpers.confirmNumber(results, 1);
     }
-    set scalar(val) {
-        throw "Setting line item scalar property not permitted";
-    }
 
     /**
      * Per Quantity Property
-     * @instance
-     * @memberof LineItem
      */
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
@@ -158,8 +143,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Escalator Property
-     * @instance
-     * @memberof LineItem
      */
     get escalator() {
         return Helpers.confirmNumber(this._data.escalator, 1);
@@ -175,8 +158,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Quantity Property
-     * @instance
-     * @memberof LineItem
      */
     get quantity() {
         return Helpers.confirmNumber(this._data.quantity);
@@ -191,8 +172,6 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * @instance
-     * @memberof LineItem
      */
     get multiplier() {
         return this._data.multiplier;
@@ -207,8 +186,6 @@ export default class LineItem extends BidEntity {
     }
     /**
      * Cost Property
-     * @instance
-     * @memberof LineItem
      */
     get cost() {
         return Helpers.confirmNumber(this._data.cost);
@@ -227,8 +204,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Tax Property
-     * @instance
-     * @memberof LineItem
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -250,8 +225,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Tax Percent Property
-     * @instance
-     * @memberof LineItem
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -268,8 +241,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Markup Property
-     * @instance
-     * @memberof LineItem
      */
     get markup() {
         return this._data.markup;
@@ -301,8 +272,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Price Property
-     * @instance
-     * @memberof LineItem
      */
     get price() {
         return _.round(Helpers.confirmNumber(this._data.price), 4);
@@ -329,8 +298,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * Config Property
-     * @instance
-     * @memberof LineItem
      */
     get config() {
         return this._data.config;
@@ -341,8 +308,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets Subtotal aka Initial Results.
-     * @instance
-     * @memberof LineItem
+     * 
      * @return {number}      
      */
     get subtotal() {
@@ -351,36 +317,34 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @instance
      * @param {any} property 
      * @param {any} value 
-     * @memberof LineItem
      */
     override(property, value) {
-        if (_.isUndefined(this._data.config.overrides)) {
-            this._data.config.overrides = {};
-        }
+        if (!this.bid.isReadOnly()) {
+            if (_.isUndefined(this._data.config.overrides)) {
+                this._data.config.overrides = {};
+            }
 
-        // If initially empty, the .config can be interpreted as an array.
-        // This line converts the array to an object.
-        if (_.isArray(this._data.config.overrides)) {
-            this._data.config.overrides = _.reduce(
-                this._data.config.overrides,
-                function(o, k) {
-                    return _.assign(o, k);
-                },
-                {}
-            );
+            // If initially empty, the .config can be interpreted as an array.
+            // This line converts the array to an object.
+            if (_.isArray(this._data.config.overrides)) {
+                this._data.config.overrides = _.reduce(
+                    this._data.config.overrides,
+                    function(o, k) {
+                        return _.assign(o, k);
+                    },
+                    {}
+                );
+            }
+            this._data.config.overrides[property] = value;
         }
-        this._data.config.overrides[property] = value;
     }
 
     /**
      * 
-     * @instance
      * @param {string} property 
      * @returns {boolean}
-     * @memberof LineItem
      */
     isOverridden(property) {
         return (
@@ -392,12 +356,14 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @instance
      * @param {string} property 
-     * @memberof LineItem
      */
     resetProperty(property) {
-        if (!_.isUndefined(this._data.config.overrides) && !_.isUndefined(this._data.config.overrides[property])) {
+        if (
+            this.bid.isAssessable() &&
+            !_.isUndefined(this._data.config.overrides) &&
+            !_.isUndefined(this._data.config.overrides[property])
+        ) {
             delete this._data.config.overrides[property];
             this.dirty();
             this.emit("property.updated", property);
@@ -406,31 +372,29 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @instance
-     * @memberof LineItem
      */
     resetMarkup() {
-        this.resetProperty("markup");
-        this.resetProperty("markup_percent");
+        if (this.bid.isAssessable()) {
+            this.resetProperty("markup");
+            this.resetProperty("markup_percent");
+        }
     }
 
     /**
      * 
      * 
-     * @instance
-     * @memberof LineItem
      */
     reset() {
-        this.config.overrides = {};
-        this._data.multiplier = 1;
-        this.assess(true);
+        if (this.bid.isAssessable()) {
+            this.config.overrides = {};
+            this._data.multiplier = 1;
+            this.assess(true);
+        }
     }
 
     /**
      * 
-     * @instance
      * @returns {boolean}
-     * @memberof LineItem
      */
     isLabor() {
         return this._data.config.type === "labor";
@@ -438,53 +402,52 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @instance
      * @emits {assessing} fires event before assessement.
      * @emits {assessed}
      * @emits {updated}
      * @param {boolean} forceUpdate 
-     * @memberof LineItem
      */
     assess(forceUpdate) {
-        this.bid.emit("assessing");
-        var isChanged = false;
-        isChanged = this._applyProperty("base", this._getBaseValue()) || isChanged;
-        isChanged = this._applyProperty("burden", this._getBurdenValue()) || isChanged;
-        isChanged = this._applyProperty("wage", this._getWageValue()) || isChanged;
-        isChanged = this._applyProperty("quantity", this._getQuantityValue()) || isChanged;
-        isChanged = this._applyProperty("per_quantity", this._getPerQuantityValue()) || isChanged;
-        isChanged = this._applyProperty("escalator", this._getEscalatorValue()) || isChanged;
-        isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
-        isChanged = this._applyProperty("markup_percent", this._getMarkupPercentValue()) || isChanged;
-        isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
-        isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
-        isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
-        isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
-        isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
-        isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
+        if (this.bid.isAssessable()) {
+            this.bid.emit("assessing");
+            var isChanged = false;
+            isChanged = this._applyProperty("base", this._getBaseValue()) || isChanged;
+            isChanged = this._applyProperty("burden", this._getBurdenValue()) || isChanged;
+            isChanged = this._applyProperty("wage", this._getWageValue()) || isChanged;
+            isChanged = this._applyProperty("quantity", this._getQuantityValue()) || isChanged;
+            isChanged = this._applyProperty("per_quantity", this._getPerQuantityValue()) || isChanged;
+            isChanged = this._applyProperty("escalator", this._getEscalatorValue()) || isChanged;
+            isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
+            isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
+            isChanged = this._applyProperty("markup_percent", this._getMarkupPercentValue()) || isChanged;
+            isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
+            isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
+            isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
+            isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
+            isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
 
-        if (isChanged || forceUpdate) {
-            this.dirty();
-            this.emit("updated");
+            if (isChanged || forceUpdate) {
+                this.dirty();
+                this.emit("updated");
+            }
+
+            this.emit("assessed");
         }
-
-        this.emit("assessed");
     }
 
     /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        this._bindLineItemDependencies();
-        this._bindLineItemRuleDependencies();
-        this._bindLineItemPredictionDependencies();
+        if (this.bid.isAssessable()) {
+            this._bindLineItemDependencies();
+            this._bindLineItemRuleDependencies();
+            this._bindLineItemPredictionDependencies();
+        }
     }
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
@@ -499,9 +462,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _bindLineItemRuleDependencies() {
         for (let rule of Object.values(this.config.rules)) {
@@ -520,9 +480,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _bindLineItemPredictionDependencies() {
         if (this.config.prediction_model) {
@@ -558,9 +515,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _applyMarkupChange() {
         if (this.bid.includeTaxInMarkup()) {
@@ -572,9 +526,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _reverseComputeLaborHours(cost, wage, burden) {
         let wageBurden = parseFloat(wage) + parseFloat(burden);
@@ -584,9 +535,6 @@ export default class LineItem extends BidEntity {
     /**
      * Internal method to calcualte a Unit price change.
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _applyPriceChange() {
         if (this.cost === 0) {
@@ -603,9 +551,6 @@ export default class LineItem extends BidEntity {
     /**
      * Internal method that recalculates a line item cost change.
      * 
-     * @instance
-     * @private
-     * @memberof LineItem
      */
     _applyCostChange() {
         var lineItemSubtotal = this.subtotal;
@@ -631,9 +576,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      */
     _applyTaxPercentChange() {
         this._data.tax = this.cost * this.taxPercent;
@@ -645,9 +587,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getExtraScalarDependencies() {
@@ -658,9 +597,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getBaseValue() {
@@ -694,9 +630,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getLaborHoursValue() {
@@ -708,9 +641,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getBurdenValue() {
@@ -722,9 +652,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getScalarValue() {
@@ -749,9 +676,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getPerQuantityValue() {
@@ -772,9 +696,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getEscalatorValue() {
@@ -786,9 +707,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getQuantityValue() {
@@ -807,9 +725,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getCostValue() {
@@ -827,9 +742,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getTaxValue() {
@@ -842,9 +754,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getTaxPercentValue() {
@@ -856,9 +765,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getMarkupValue() {
@@ -870,9 +776,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getMarkupPercentValue() {
@@ -885,9 +788,6 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @private
-     * @instance
-     * @memberof LineItem
      * @return {number}
      */
     _getPriceValue() {
@@ -895,5 +795,12 @@ export default class LineItem extends BidEntity {
             let price = this.cost + this.tax + this._getMarkupValue();
             return _.round(Helpers.confirmNumber(price), 4);
         } else return _.round(Helpers.confirmNumber(this._data.price), 4);
+    }
+
+    exportData() {
+        let data = _.cloneDeep(this._data);
+        if (_.isEqual(data.config, this._original.config)) delete data.config;
+
+        return data;
     }
 }

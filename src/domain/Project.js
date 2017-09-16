@@ -120,10 +120,25 @@ export default class Project extends BidEntity {
     get projectStatus() {
         return this._data.project_status;
     }
+
     set projectStatus(val) {
-        this._data.project_status = val;
-        this.dirty();
-        this.emit("property.updated");
+        if (!_.isUndefined(val.id) && !_.isUndefined(val.core_status)) {
+            const oldValue = _.cloneDeep(this._data.project_status);
+            this._data.project_status_id = val.id;
+            this._data.project_status = val;
+            this.dirty();
+            this._projectService.repositories.projects
+                .save(this.exportData())
+                .then(projectData => {
+                    this._data.closed_at = projectData.closed_at;
+                    this._data.reconciled_at = projectData.reconciled_at;
+                    this.emit("updated");
+                })
+                .catch(error => {
+                    this._data.project_status = oldValue;
+                    throw error;
+                });
+        }
     }
 
     assess() {
@@ -155,28 +170,28 @@ export default class Project extends BidEntity {
         this._data.components = {};
 
         _.each(this.bids, bid => {
-            if (bid.isActive) {
-                _.each(bid.components(), component => {
-                    if (!component.config.is_nested) {
-                        component.ppw = bid.watts > 0 ? component.price / bid.watts : 0;
-                        component.cpw = bid.watts > 0 ? component.cost / bid.watts : 0;
+            _.each(bid.components(), component => {
+                if (!component.config.is_nested) {
+                    component.ppw = bid.watts > 0 ? component.price / bid.watts : 0;
+                    component.cpw = bid.watts > 0 ? component.cost / bid.watts : 0;
 
-                        if (_.isUndefined(this._data.components[component.definitionId])) {
-                            this._data.components[component.definitionId] = {
-                                definition_id: component.definitionId,
-                                title: component.title,
-                                price: 0,
-                                cost: 0,
-                                markup: 0,
-                                tax: 0,
-                                labor_hours: 0,
-                                labor_cost: 0,
-                                quantity: 0,
-                                cpw: 0,
-                                ppw: 0
-                            };
-                        }
+                    if (_.isUndefined(this._data.components[component.definitionId])) {
+                        this._data.components[component.definitionId] = {
+                            definition_id: component.definitionId,
+                            title: component.title,
+                            price: 0,
+                            cost: 0,
+                            markup: 0,
+                            tax: 0,
+                            labor_hours: 0,
+                            labor_cost: 0,
+                            quantity: 0,
+                            cpw: 0,
+                            ppw: 0
+                        };
+                    }
 
+                    if (bid.isActive) {
                         this._data.components[component.definitionId].labor_cost += component.laborCost;
                         this._data.components[component.definitionId].price += component.price;
                         this._data.components[component.definitionId].cost += component.cost;
@@ -193,8 +208,8 @@ export default class Project extends BidEntity {
                                 ? this._data.components[component.definitionId].price / this._data.watts
                                 : 0;
                     }
-                });
-            }
+                }
+            });
         });
     }
 
@@ -221,6 +236,8 @@ export default class Project extends BidEntity {
         bid.onDelay("assessing", 10, `project.${this.id}`, () => {
             this.emit("assessing");
         });
+
+        bid.on("changed", () => this.dirty());
 
         bid.onDelay("assessed", 200, `project.${this.id}.assessed`, () => {
             //console.log("assess Cost/Price", this.cost, this.price);

@@ -19,7 +19,7 @@ export default class Field extends BidEntity {
          */
         this.bid = bid;
         this._data = fieldData;
-        this._original = Object.assign({}, fieldData);
+        this._original = _.cloneDeep(fieldData);
         this._autoPopulateService = new FieldAutoPopulateService(this);
     }
 
@@ -40,7 +40,7 @@ export default class Field extends BidEntity {
      * @type {string}
      */
     set value(val) {
-        if (val != this._data.val) {
+        if (val != this._data.val && !this.bid.isReadOnly()) {
             this.config.is_auto_selected = false;
             this._data.value = val;
             this.dirty();
@@ -110,23 +110,27 @@ export default class Field extends BidEntity {
      * @emits {updated} Fires event if the field has been changed during assessment.
      */
     assess() {
-        this.emit("assessing");
-        if (this._autoPopulateService.shouldAutoPopulate()) {
-            this._autoPopulateService.autoPopulate();
-        }
+        if (this.bid.isAssessable()) {
+            this.emit("assessing");
+            if (this._autoPopulateService.shouldAutoPopulate()) {
+                this._autoPopulateService.autoPopulate();
+            }
 
-        this.emit("assessed");
+            this.emit("assessed");
+        }
     }
 
     /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        for (let dependencyContract of Object.values(this.config.dependencies)) {
-            if (!_.isEmpty(dependencyContract)) {
-                const dependency = this.bid.relations.getDependency(dependencyContract);
-                if (dependency) {
-                    dependency.on("updated", `field.${this.id}`, () => this.assess());
+        if (this.bid.isAssessable()) {
+            for (let dependencyContract of Object.values(this.config.dependencies)) {
+                if (!_.isEmpty(dependencyContract)) {
+                    const dependency = this.bid.relations.getDependency(dependencyContract);
+                    if (dependency) {
+                        dependency.on("updated", `field.${this.id}`, () => this.assess());
+                    }
                 }
             }
         }
@@ -145,5 +149,12 @@ export default class Field extends BidEntity {
                 return el.row_id === this.value;
             });
         } else return null;
+    }
+
+    exportData() {
+        let data = _.cloneDeep(this._data);
+        if (_.isEqual(data.config, this._original.config)) delete data.config;
+
+        return data;
     }
 }

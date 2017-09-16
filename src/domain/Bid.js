@@ -7,8 +7,11 @@ import BidModelRelationsHelper from "./services/BidModelRelationsHelper";
 import IndicativePricingHelper from "./services/IndicativePricingHelper";
 
 /**
- * Bid Class.
-
+ * Bids are self assessing classes representing the totality of a bid estimate.
+ * A bid contains collections of the following type of {@link BidEntity}s: 
+ * {@link LineItem}, {@link Metric}, {@link Field}, {@link Component}, {@link Datatable}, 
+ * {@link Assembly}, {@link FieldGroup}, {@link ComponentGroup}.
+ * 
  */
 export default class Bid extends BidEntity {
     /**
@@ -94,7 +97,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set cost(val) {
-        if (Helpers.isNumber(val)) {
+        if (Helpers.isNumber(val) && !this.isReadOnly()) {
             this._data.cost = Helpers.confirmNumber(val);
             this.dirty();
             this.emit("property.updated");
@@ -110,24 +113,17 @@ export default class Bid extends BidEntity {
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
     }
-    set tax(val) {
-        throw "Overriding bid tax is not supported";
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax) {
-            this._data.tax = val;
-        }
-    }
 
     /**
      * Tax Percent Property
      * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
     }
     set taxPercent(val) {
-        if (Helpers.isNumber(val)) {
+        if (Helpers.isNumber(val) && !this.isReadOnly()) {
             this._data.tax_percent = val;
             this.dirty();
             this.emit("property.updated");
@@ -137,14 +133,13 @@ export default class Bid extends BidEntity {
     /**
      * Markup Property
      * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get markup() {
         return this._data.markup;
     }
     set markup(val) {
-        if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val)) {
+        if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             const newValue = Helpers.confirmNumber(val);
             const oldValue = Helpers.confirmNumber(this._data.markup);
             const changePercent = 1 + (newValue - oldValue) / oldValue;
@@ -171,7 +166,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set marginPercent(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.margin_percent) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.margin_percent && !this.isReadOnly()) {
             this._applyMarginPercentage(val);
         }
     }
@@ -186,7 +181,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set markupPercent(val) {
-        if (Helpers.isNumber(val) && this._data.margin_percent != val) {
+        if (Helpers.isNumber(val) && this._data.margin_percent != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             this._data.markup_percent = Helpers.confirmNumber(val);
             this.dirty();
             this.emit("property.updated");
@@ -203,7 +198,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set price(val) {
-        if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val)) {
+        if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             const oldPrice = Helpers.confirmNumber(this._data.price);
             const newPrice = Helpers.confirmNumber(val);
             const changePercent = (newPrice - oldPrice) / oldPrice;
@@ -230,7 +225,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set actualCost(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.confirmNumber(val, false) && !this.isReadOnly()) {
             this._data.actual_cost = val;
         }
     }
@@ -245,9 +240,23 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set actualHours(val) {
-        if (Helpers.confirmNumber(val, false)) {
+        if (Helpers.confirmNumber(val, false) && !this.isReadOnly()) {
             this._data.actual_hours = val;
         }
+    }
+
+    /**
+     * @type {number}
+     */
+    get createdAt() {
+        return this._data.created_at;
+    }
+
+    /**
+     * @type {number}
+     */
+    get updatedAt() {
+        return this._data.updated_at;
     }
 
     /**
@@ -334,11 +343,35 @@ export default class Bid extends BidEntity {
     }
 
     /**
+     * Gets all the uncategorized Line Items by component group.
+     * 
+     * @param  {number} componentGroupId     The component group id.
+     * @return {LineItem[]}              Returns an array of Line Items.
+     */
+    getUncategorizedLineItems(componentGroupId) {
+        var categorizedLineItemIds = [];
+        var uncategorizedLineItems = [];
+
+        _.each(this.components(), component => {
+            if (component.config.component_group_id === componentGroupId) {
+                categorizedLineItemIds = _.concat(categorizedLineItemIds, component.config.line_items);
+            }
+        });
+
+        _.each(this.lineItems(), lineItem => {
+            if (categorizedLineItemIds.indexOf(lineItem.id) < 0) {
+                uncategorizedLineItems.push(lineItem);
+            }
+        });
+
+        return uncategorizedLineItems;
+    }
+
+    /**
      * @deprecated use isActive property.
      */
     toggleActive() {
-        this._data.is_active = !this._data.is_active;
-        this.assess(true);
+        this.isActive = !this.isActive;
     }
 
     /**
@@ -366,46 +399,6 @@ export default class Bid extends BidEntity {
         var percent = bidPrice > 0 ? parseFloat(this.markup) / bidPrice * 100 : 0;
         percent = Math.round(percent * 100) / 100;
         return percent;
-    }
-    isShell() {
-        return this._data.is_shell;
-    }
-
-    /**
-     * Determines if bid is updateable by the user.
-     * Considers if the bid is locked, if the project is closed, and the user permissions.
-     * 
-     * @returns {boolean} 
-     */
-    isUpdateable() {
-        //TODO: add in user permission logic.
-        return !this._data.is_locked && _.isNull(this.project.closedAt);
-    }
-
-    isLocked() {
-        return this._data.is_locked;
-    }
-
-    canLock() {
-        // TODO: needs additional logic for user permissions.
-        return !this.isLocked();
-    }
-    canUnlock() {
-        return this.isLocked();
-    }
-    lock() {
-        if ($this.canLock()) {
-            this._data.is_locked = true;
-            this.dirty();
-            this.emit("property.updated");
-        }
-    }
-    unlock() {
-        if ($this.canUnlock()) {
-            this._data.is_locked = false;
-            this.dirt();
-            this.emit("property.updated");
-        }
     }
 
     includeTaxInMarkup() {
@@ -455,17 +448,21 @@ export default class Bid extends BidEntity {
     }
 
     resetMarkup() {
-        _.each(this.lineItems(), lineItem => {
-            lineItem.resetMarkup();
-        });
+        if (this.isAssessable()) {
+            _.each(this.lineItems(), lineItem => {
+                lineItem.resetMarkup();
+            });
+        }
     }
 
     applySubMarginChange() {
-        let totalSubMargins = 0;
-        _.each(this.variables().sub_margins.value, subMargin => {
-            totalSubMargins += Heleprs.confirmNumber(subMargin.value);
-        });
-        this.marginPercent = totalSubMargins;
+        if (this.isAssessable()) {
+            let totalSubMargins = 0;
+            _.each(this.variables().sub_margins.value, subMargin => {
+                totalSubMargins += Heleprs.confirmNumber(subMargin.value);
+            });
+            this.marginPercent = totalSubMargins;
+        }
     }
 
     /**
@@ -478,79 +475,83 @@ export default class Bid extends BidEntity {
      * @memberof Bid
      */
     assess(forceUpdate) {
-        this.emit("assessing");
+        if (this.isAssessable()) {
+            this.emit("assessing");
 
-        var bidValues = {
-            cost: 0,
-            price: 0,
-            markup: 0,
-            tax: 0,
-            taxable_cost: 0,
-            margin_percent: 0,
-            labor_hours: 0,
-            labor_cost: 0,
-            watts: 0
-        };
+            var bidValues = {
+                cost: 0,
+                price: 0,
+                markup: 0,
+                tax: 0,
+                taxable_cost: 0,
+                margin_percent: 0,
+                labor_hours: 0,
+                labor_cost: 0,
+                watts: 0
+            };
 
-        _.each(this.lineItems(), li => {
-            if (li.isIncluded) {
-                bidValues.cost += li.cost;
-                bidValues.price += li.price;
-                bidValues.tax += li.tax;
-                bidValues.markup += li.markup;
-                if (li.isLabor()) {
-                    bidValues.labor_hours += li.laborHours;
-                    bidValues.labor_cost += li.cost;
-                } else {
-                    bidValues.taxable_cost += li.cost;
+            _.each(this.lineItems(), li => {
+                if (li.isIncluded) {
+                    bidValues.cost += li.cost;
+                    bidValues.price += li.price;
+                    bidValues.tax += li.tax;
+                    bidValues.markup += li.markup;
+                    if (li.isLabor()) {
+                        bidValues.labor_hours += li.laborHours;
+                        bidValues.labor_cost += li.cost;
+                    } else {
+                        bidValues.taxable_cost += li.cost;
+                    }
                 }
+            });
+
+            bidValues.watts = this._getTotalWatts();
+
+            bidValues.margin_percent = bidValues.price > 0 ? bidValues.markup / bidValues.price * 100 : 0;
+
+            bidValues.margin_percent = Math.round(bidValues.margin_percent * 100) / 100;
+
+            var isChanged = false;
+
+            _.each(bidValues, (value, key) => {
+                const roundPoint = ["price", "cost"].indexOf(key) >= 0 ? 1 : 3;
+                var originalVal = _.round(Helpers.confirmNumber(this._data[key]), roundPoint);
+                var updatedVal = _.round(Helpers.confirmNumber(value), roundPoint);
+
+                if (originalVal !== updatedVal) {
+                    this._data[key] = _.round(Helpers.confirmNumber(value), 4);
+                    isChanged = true;
+                }
+            });
+            this._resetSubMargins();
+
+            //TODO: Fix prediction assignment
+            //this.bid.prediction = PredictionService.getBidPrediction();
+
+            if (isChanged || forceUpdate) {
+                this._calcRounds += 1;
+                this.dirty();
+                this.emit("updated");
             }
-        });
 
-        bidValues.watts = this._getTotalWatts();
-
-        bidValues.margin_percent = bidValues.price > 0 ? bidValues.markup / bidValues.price * 100 : 0;
-
-        bidValues.margin_percent = Math.round(bidValues.margin_percent * 100) / 100;
-
-        var isChanged = false;
-
-        _.each(bidValues, (value, key) => {
-            const roundPoint = ["price", "cost"].indexOf(key) >= 0 ? 1 : 3;
-            var originalVal = _.round(Helpers.confirmNumber(this._data[key]), roundPoint);
-            var updatedVal = _.round(Helpers.confirmNumber(value), roundPoint);
-
-            if (originalVal !== updatedVal) {
-                this._data[key] = _.round(Helpers.confirmNumber(value), 4);
-                isChanged = true;
-            }
-        });
-        this._resetSubMargins();
-
-        //TODO: Fix prediction assignment
-        //this.bid.prediction = PredictionService.getBidPrediction();
-
-        if (isChanged || forceUpdate) {
-            this._calcRounds += 1;
-            this.dirty();
-            this.emit("updated");
+            this.emit("assessed");
         }
-
-        this.emit("assessed");
     }
 
     reassessAll(forceReassessment) {
-        if (forceReassessment || this.needsReassessment()) {
-            console.log("Start Bid  Reassessment", "Bid: ", this.id);
+        if (this.isAssessable()) {
+            if (forceReassessment || this.needsReassessment()) {
+                console.log("Start Bid  Reassessment", "Bid: ", this.id);
 
-            for (let f of Object.values(this.fields())) {
-                f.assess();
-            }
-            for (let m of Object.values(this.metrics())) {
-                m.assess();
-            }
-            for (let li of Object.values(this.lineItems())) {
-                li.assess();
+                for (let f of Object.values(this.fields())) {
+                    f.assess();
+                }
+                for (let m of Object.values(this.metrics())) {
+                    m.assess();
+                }
+                for (let li of Object.values(this.lineItems())) {
+                    li.assess();
+                }
             }
         }
     }
@@ -635,27 +636,29 @@ export default class Bid extends BidEntity {
      * Binds all interconnected bid entity "update" events
      */
     bind() {
-        for (let f of Object.values(this.fields())) {
-            f.bind();
-            f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let m of Object.values(this.metrics())) {
-            m.bind();
-            m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let li of Object.values(this.lineItems())) {
-            li.bind();
-            li.on("updated", "line_item." + li.id, () => {
-                waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
-            });
-            li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let c of Object.values(this.components())) {
-            c.bind();
-            c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
+        if (this.isAssessable()) {
+            for (let f of Object.values(this.fields())) {
+                f.bind();
+                f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let m of Object.values(this.metrics())) {
+                m.bind();
+                m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let li of Object.values(this.lineItems())) {
+                li.bind();
+                li.on("updated", "line_item." + li.id, () => {
+                    waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
+                });
+                li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let c of Object.values(this.components())) {
+                c.bind();
+                c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
 
-        this.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            this.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+        }
     }
 
     /**
@@ -733,7 +736,7 @@ export default class Bid extends BidEntity {
      * @property {string} updated_at
      */
     exportData() {
-        let bid = Object.assign({}, this._data);
+        let bid = _.cloneDeep(this._data);
         delete bid.line_items;
         delete bid.fields;
         delete bid.components;
@@ -743,7 +746,6 @@ export default class Bid extends BidEntity {
         delete bid.assembly_maps;
         delete bid.field_groups;
         delete bid.datatables;
-        bid.variables = {};
 
         _.each(this.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
@@ -786,13 +788,93 @@ export default class Bid extends BidEntity {
      * @property {number} bid_id
      * @property {string} description
      * @property {boolean} is_auto A flag to indicate the snapshot was generated automatically by the PVBid system.
-     * @property {string} created_at Example format: 2016-04-10T21:08:05+00:00
+     * @property {string} created_at Example format: 2016-04-11T21:08:05+00:00
      */
     async createSnapshot(title, description) {
         return this._bidService.createSnapshot(this, title, description);
     }
 
+    isAssessable() {
+        return !this.isShell() && !this.isReadOnly() && this.isValid();
+    }
+
+    /**
+     * Determines if is a shell bid. Shell bids are simple data stores for past bids
+     * that can not be assesed. Shell bids do not have line items. Typically shell 
+     * bids are created to import old bid data prior a companies using PVBid.
+     * 
+     * @returns {boolean} 
+     */
+    isShell() {
+        return this._data.is_shell;
+    }
+
+    /**
+     * Determines if bid is updateable by the user.
+     * This method is deprecated. Use {@link Bid.isReadOnly} instead.
+     * 
+     * @deprecated 
+     * @returns {boolean} 
+     */
+    isUpdateable() {
+        return !this.isReadOnly();
+    }
+
+    /**
+     * Determines if bid can be modified by the user.
+     * Considers if the bid is locked, if the project is closed, and the user permissions.
+     * 
+     * @returns {boolean} 
+     */
+    isReadOnly() {
+        //TODO: add in user permission logic.
+        return this.isLocked() || !_.isNull(this.project.closedAt);
+    }
+
+    isLocked() {
+        return this._data.is_locked;
+    }
+
+    canLock() {
+        // TODO: needs additional logic for user permissions.
+        return !this.isLocked();
+    }
+    canUnlock() {
+        return this.isLocked();
+    }
+    async lock() {
+        if (this.canLock()) {
+            this._data.is_locked = true;
+            this.dirty();
+            return this.project.save();
+        }
+    }
+    async unlock() {
+        if (this.canUnlock()) {
+            this._data.is_locked = false;
+            this.dirty();
+            return this.project.save();
+        }
+    }
+
+    /**
+     * Determines if bid has valid dependency references and configurations..
+     * 
+     * @returns {boolean} 
+     */
+    isValid() {
+        if (_.isUndefined(this.validationResults)) {
+            this.validate();
+            return this.validationResults.length === 0;
+        } else return this.validationResults.length === 0;
+    }
+
+    /**
+     * Validates bid and returns a resultset of issues, if exists.
+     * 
+     * @returns {object[]} 
+     */
     validate() {
-        return this._bidService.validate(this);
+        return (this.validationResults = this._bidService.validate(this));
     }
 }

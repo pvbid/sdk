@@ -65,7 +65,6 @@ export default class FieldAutoPopulateService {
         if (dependencyValue && this._field._data.value != dependencyValue) {
             this._field._data.value = dependencyValue;
             this._field.config.is_auto_selected = true;
-            console.log("auto fill", this._field);
 
             this._field.dirty();
             this._field.emit("updated");
@@ -128,7 +127,6 @@ export default class FieldAutoPopulateService {
         }
 
         if (isChanged) {
-            console.log("auto selected", this._field);
             this._field.emit("updated");
             this._field.config.is_auto_selected = true;
             this._field.dirty();

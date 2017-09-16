@@ -45,10 +45,12 @@ export default class BidFactory {
         this._keyBidEntities(bidData);
         let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);
-        bid.validate();
         bid.project = project;
-        bid.bind();
-        bid.reassessAll();
+
+        if (bid.isAssessable()) {
+            bid.bind();
+            bid.reassessAll();
+        }
 
         return bid;
     }

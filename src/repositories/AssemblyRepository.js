@@ -1,20 +1,20 @@
-import CacheRepository from "./CacheRepository";
+import BaseRepository from "./BaseRepository";
 
 /**
  * 
  */
-export default class AssemblyRepository extends CacheRepository {
+export default class AssemblyRepository extends BaseRepository {
     constructor(config) {
         super(`${config.base_uri}`, "assembly", "assemblies", config);
     }
 
     async findById(bidId, assemblyId) {
-        this.endpoint = `${this.config.base_uri}/bids/${bidId}/assemblies/`;
+        this.endpoint = `${this.httpConfig.base_uri}/bids/${bidId}/assemblies/`;
         return super.findById(assemblyId);
     }
 
     async get(bidId, params, forceReload) {
-        this.endpoint = `${this.config.base_uri}/bids/${bidId}/assemblies/`;
+        this.endpoint = `${this.httpConfig.base_uri}/bids/${bidId}/assemblies/`;
 
         return super.get(params, forceReload);
     }
@@ -29,12 +29,12 @@ export default class AssemblyRepository extends CacheRepository {
     }
 
     async delete(bidId, assemblyId) {
-        this.endpoint = `${this.config.base_uri}/bids/${bidId}/assemblies/`;
+        this.endpoint = `${this.httpConfig.base_uri}/bids/${bidId}/assemblies/`;
         return super.delete(assemblyId);
     }
 
     async implement(bidId, assemblyId) {
-        this.endpoint = `${this.config.base_uri}/bids/${bidId}/assembly_maps/${assemblyId}/implement`;
+        this.endpoint = `${this.httpConfig.base_uri}/bids/${bidId}/assembly_maps/${assemblyId}/implement`;
 
         try {
             return this.http.post(this.endpoint);
