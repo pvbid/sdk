@@ -252,6 +252,18 @@ export default class Project extends BidEntity {
         this._bindToBid(this._bids[bid.id]);
     }
 
+    detachBid(bid) {
+        if (_.isUndefined(this.bids[bid.id])) {
+            throw "Bid is not attached.";
+        } else if (bid._data.project_id != this.id) {
+            //TODO: Add attach bid on the fly, updating the database.
+            throw "Bid is not associated with project.";
+        }
+        bid.removeAllListeners();
+        delete this.bids[bid.id];
+        this.assess();
+    }
+
     async createBid(title) {
         return this._projectService.createBid(this, title);
     }

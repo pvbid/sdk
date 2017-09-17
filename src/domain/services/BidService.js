@@ -141,4 +141,19 @@ export default class BidService {
             return Promise.reject(error);
         }
     }
+
+    /**
+     * Deletes bid.
+     * 
+     * @param {Bid} bid 
+     * @return {Promise<null>}
+     */
+    async deleteBid(bid) {
+        await this.repositories.bids.delete(bid.id);
+        bid.project.detachBid(bid);
+        bid.clearEntityBindings();
+        bid.removeAllListeners();
+        bid.project = null;
+        return;
+    }
 }

@@ -41,10 +41,11 @@ export default class Field extends BidEntity {
      */
     set value(val) {
         if (val != this._data.val && !this.bid.isReadOnly()) {
-            this.config.is_auto_selected = false;
+            if (val != "" && !_.isNull(val)) this.config.is_auto_selected = false;
             this._data.value = val;
             this.dirty();
             this.emit("updated");
+            this.assess();
         }
     }
 
@@ -156,5 +157,9 @@ export default class Field extends BidEntity {
         if (_.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
+    }
+
+    isDirty() {
+        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
     }
 }

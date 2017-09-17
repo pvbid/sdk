@@ -867,4 +867,13 @@ export default class Bid extends BidEntity {
     validate() {
         return (this.validationResults = this._bidService.validate(this));
     }
+
+    /**
+     * Deletes bid. Wrapper function for {@link BidService.deleteBid}
+     * 
+     * @returns {Promise<null>}
+     */
+    async delete() {
+        return this._bidService.deleteBid(this);
+    }
 }
