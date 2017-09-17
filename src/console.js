@@ -32,7 +32,7 @@ rl.on("line", (data, args) => {
             rl.close();
             break;
         case "compare":
-            for (let li of Object.values(bidEngine.bid.components())) {
+            for (let li of Object.values(bidEngine.bid.entities.components())) {
                 // li.compare();
 
                 let compared = li.compare();

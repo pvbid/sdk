@@ -60,7 +60,7 @@ export default class FieldAutoPopulateService {
     }
 
     _autoFill() {
-        var dependencyValue = this._field.bid.relations.getDependencyValue(this._field.config.dependencies.auto_a);
+        var dependencyValue = this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_a);
 
         if (dependencyValue && this._field._data.value != dependencyValue) {
             this._field._data.value = dependencyValue;
@@ -73,7 +73,7 @@ export default class FieldAutoPopulateService {
 
     _autoSelect() {
         var expression = this._field.config.auto_populate.expression_type;
-        var rowValues = this._field.bid.relations.getDatatableColumnRows(
+        var rowValues = this._field.bid.entities.getDatatableColumnRows(
             this._field.config.dependencies.datatable.bid_entity_id,
             this._field.config.auto_populate.column_id
         );
@@ -83,10 +83,10 @@ export default class FieldAutoPopulateService {
                 value: Helpers.confirmNumber(el.value)
             };
         });
-        var dependencyValueA = this._field.bid.relations.getDependencyValue(this._field.config.dependencies.auto_a);
+        var dependencyValueA = this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_a);
         var dependencyValueB =
             expression === "between"
-                ? this._field.bid.relations.getDependencyValue(this._field.config.dependencies.auto_b)
+                ? this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_b)
                 : null;
         var results = null;
         switch (expression) {

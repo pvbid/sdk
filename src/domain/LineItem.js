@@ -113,13 +113,13 @@ export default class LineItem extends BidEntity {
 
         _.each(scalarContracts, (dependencyContract, key) => {
             valueMap[key.charAt(7)] = Helpers.confirmNumber(
-                this.bid.relations.getDependencyValue(dependencyContract),
+                this.bid.entities.getDependencyValue(dependencyContract),
                 0,
                 true
             );
         });
 
-        var xScalarValue = this.bid.relations.getDependencyValue(this.config.dependencies.scalar);
+        var xScalarValue = this.bid.entities.getDependencyValue(this.config.dependencies.scalar);
         valueMap.x = Helpers.confirmNumber(xScalarValue, 1, true);
 
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
@@ -452,7 +452,7 @@ export default class LineItem extends BidEntity {
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
             if (!_.isEmpty(dependencyContract)) {
-                let dependency = this.bid.relations.getDependency(dependencyContract);
+                let dependency = this.bid.entities.getDependency(dependencyContract);
                 if (dependency) {
                     dependency.on("updated", `line_item.${this.id}`, () => this.assess());
                 }
@@ -468,7 +468,7 @@ export default class LineItem extends BidEntity {
             if (rule.dependencies) {
                 for (let dependencyContract of Object.values(rule.dependencies)) {
                     if (!_.isEmpty(dependencyContract)) {
-                        let dependency = this.bid.relations.getDependency(dependencyContract);
+                        let dependency = this.bid.entities.getDependency(dependencyContract);
                         if (dependency) {
                             dependency.on("updated", `line_item.${this.id}`, () => this.assess());
                         }
@@ -613,7 +613,7 @@ export default class LineItem extends BidEntity {
      */
     _getWageValue() {
         if (!this.isOverridden("wage")) {
-            var dependencyValue = this.bid.relations.getDependencyValue(this.config.dependencies.wage);
+            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.wage);
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.wage), 4);
     }
@@ -645,7 +645,7 @@ export default class LineItem extends BidEntity {
      */
     _getBurdenValue() {
         if (!this.isOverridden("burden")) {
-            var dependencyValue = this.bid.relations.getDependencyValue(this.config.dependencies.burden);
+            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.burden);
             return Helpers.confirmNumber(dependencyValue);
         } else return Helpers.confirmNumber(this._data.burden);
     }
@@ -661,13 +661,13 @@ export default class LineItem extends BidEntity {
 
         _.each(scalarContracts, (dependencyContract, key) => {
             valueMap[key.charAt(7)] = Helpers.confirmNumber(
-                this.bid.relations.getDependencyValue(dependencyContract),
+                this.bid.entities.getDependencyValue(dependencyContract),
                 0,
                 true
             );
         });
 
-        var xScalarValue = this.bid.relations.getDependencyValue(this.config.dependencies.scalar);
+        var xScalarValue = this.bid.entities.getDependencyValue(this.config.dependencies.scalar);
         valueMap.x = Helpers.confirmNumber(xScalarValue, 1, true);
 
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
@@ -685,7 +685,7 @@ export default class LineItem extends BidEntity {
             if (this.config.per_quantity.type === "value") {
                 val = this.config.per_quantity.value;
             } else {
-                val = this.bid.relations.getDependencyValue(this.config.dependencies.per_quantity);
+                val = this.bid.entities.getDependencyValue(this.config.dependencies.per_quantity);
             }
 
             var scaledPerQuantity = Helpers.confirmNumber(val) * this.scalar;
@@ -700,7 +700,7 @@ export default class LineItem extends BidEntity {
      */
     _getEscalatorValue() {
         if (!this.isOverridden("escalator")) {
-            var dependencyValue = this.bid.relations.getDependencyValue(this.config.dependencies.escalator);
+            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.escalator);
             return _.round(Helpers.confirmNumber(dependencyValue, 1), 4);
         } else return _.round(Helpers.confirmNumber(this._data.escalator, 1), 4);
     }
@@ -717,7 +717,7 @@ export default class LineItem extends BidEntity {
             if (!_.isUndefined(this.config.quantity) && this.config.quantity.type === "value") {
                 val = this.config.quantity.value;
             } else {
-                val = this.bid.relations.getDependencyValue(this.config.dependencies.quantity);
+                val = this.bid.entities.getDependencyValue(this.config.dependencies.quantity);
             }
             return _.round(Helpers.confirmNumber(val), 4);
         } else return _.round(Helpers.confirmNumber(this._data.quantity), 4);
@@ -758,7 +758,7 @@ export default class LineItem extends BidEntity {
      */
     _getTaxPercentValue() {
         if (!this.isOverridden("tax_percent")) {
-            var dependencyValue = this.bid.relations.getDependencyValue(this.config.dependencies.tax);
+            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.tax);
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.tax_percent), 4);
     }
@@ -780,7 +780,7 @@ export default class LineItem extends BidEntity {
      */
     _getMarkupPercentValue() {
         if (!this.isOverridden("markup_percent")) {
-            let dependencyValue = this.bid.relations.getDependencyValue(this._data.config.dependencies.markup);
+            let dependencyValue = this.bid.entities.getDependencyValue(this._data.config.dependencies.markup);
 
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.markup_percent), 4);

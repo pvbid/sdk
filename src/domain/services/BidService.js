@@ -18,7 +18,7 @@ export default class BidService {
     }
 
     moveLineItemToComponent(bid, lineItem, component) {
-        _.each(bid.components(), function(componentToLeave) {
+        _.each(bid.entities.components(), function(componentToLeave) {
             if (componentToLeave.config.component_group_id === component.config.component_group_id) {
                 if (_.includes(componentToLeave.config.line_items, lineItem.id)) {
                     _.pull(componentToLeave.config.line_items, lineItem.id);

@@ -127,7 +127,7 @@ export default class Field extends BidEntity {
         if (this.bid.isAssessable()) {
             for (let dependencyContract of Object.values(this.config.dependencies)) {
                 if (!_.isEmpty(dependencyContract)) {
-                    const dependency = this.bid.relations.getDependency(dependencyContract);
+                    const dependency = this.bid.entities.getDependency(dependencyContract);
                     if (dependency) {
                         dependency.on("updated", `field.${this.id}`, () => this.assess());
                     }
@@ -138,7 +138,7 @@ export default class Field extends BidEntity {
 
     getDatatable() {
         if (this.fieldType === "list") {
-            return this.bid.datatables(this.config.dependencies.datatable.bid_entity_id);
+            return this.bid.entities.datatables(this.config.dependencies.datatable.bid_entity_id);
         } else return null;
     }
 

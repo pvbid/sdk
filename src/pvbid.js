@@ -6,7 +6,6 @@ import PVBidContext from "./PVBidContext";
 
 /**
   * @param {object} config
-  * @memberof module:PVBid
   */
 export const createContext = function(config) {
     return new PVBidContext(config);

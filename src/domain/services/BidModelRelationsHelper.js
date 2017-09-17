@@ -6,6 +6,82 @@ export default class BidModelRelationsHelper {
         this.bid = bid;
     }
 
+    fields(id) {
+        return id ? this.getBidEntity("field", id) : this.bid._data.fields;
+    }
+
+    fieldGroups(id) {
+        return id ? this.getBidEntity("field_group", id) : this.bid._data.field_groups;
+    }
+
+    metrics(id) {
+        return id ? this.getBidEntity("metric", id) : this.bid._data.metrics;
+    }
+
+    lineItems(id) {
+        return id ? this.getBidEntity("line_item", id) : this.bid._data.line_items;
+    }
+
+    datatables(id) {
+        return id ? this.getBidEntity("datatable", id) : this.bid._data.datatables;
+    }
+
+    assemblies(id) {
+        return id ? this.getBidEntity("assembly", id) : this.bid._data.assemblies;
+    }
+
+    /**
+     * Gets a bid variable entity by id.  If no id is passed, will return an object of keyed bid variables by their id.
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "xyg4" : <BidVariable>,
+     *    "burden" : <BidVariable>
+     * }
+     * 
+     * @param {number} [id] - The id of the component to retrieve.
+     * @returns {(Component|Object.<string, Component>|null)}
+     */
+    variables(id) {
+        return id ? this.getBidEntity("bid_variable", id) : this.bid._data.variables;
+    }
+
+    /**
+     * Gets a component entity by id.  If no id is passed, will return an object of keyed components by their id.
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Component>,
+     *    "103" : <Component>
+     * }
+     * 
+     * @param {number} [id] - The id of the component to retrieve.
+     * @returns {(Component|Object.<string, Component>|null)}
+     */
+    components(id) {
+        return id ? this.getBidEntity("component", id) : this.bid._data.components;
+    }
+
+    /**
+     * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <ComponentGroup>,
+     *    "103" : <ComponentGroup>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
+     */
+    componentGroups(id) {
+        return id ? this.getBidEntity("component_group", id) : this.bid._data.component_groups;
+    }
+
+    assemblyMaps(id) {
+        return id ? this.getBidEntity("assembly_map", id) : this.bid._data.assembly_maps;
+    }
+
     getDependency(dependencyContract) {
         if (!_.isUndefined(dependencyContract) && !_.isUndefined(dependencyContract.type)) {
             switch (dependencyContract.type) {
@@ -102,7 +178,7 @@ export default class BidModelRelationsHelper {
 
     getCollection(type) {
         if (type === "bid_variables") {
-            return this._variables;
+            return this.bid._variables;
         } else if (!_.isUndefined(this.bid._data[type])) {
             return this.bid._data[type];
         } else throw `Bid entity collection ${type} does not exist`;
@@ -110,7 +186,7 @@ export default class BidModelRelationsHelper {
 
     getComponentByDefId(defId) {
         if (_.isUndefined(this._componentsKeyedByDefinitionId)) {
-            this._componentsKeyedByDefinitionId = _.keyBy(this.bid.components(), "definitionId");
+            this._componentsKeyedByDefinitionId = _.keyBy(this.bid.entities.components(), "definitionId");
         }
         return !_.isUndefined(this._componentsKeyedByDefinitionId[defId])
             ? this._componentsKeyedByDefinitionId[defId]
@@ -178,7 +254,7 @@ export default class BidModelRelationsHelper {
      * @param {string} query 
      * @returns {BidEntity[]}
      */
-    findByTitle(type, query) {
+    searchByTitle(type, query) {
         let collection = this.getCollection(type);
         return _.filter(collection, item => {
             return item.title.toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;

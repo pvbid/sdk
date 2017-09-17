@@ -11,7 +11,7 @@ export default class IndicativePricingHelper {
      */
     getMarginOfError() {
         if (_.isUndefined(this._marginOfErrorMetric) || _.isNull(this._marginOfErrorMetric)) {
-            this._marginOfErrorMetric = _.find(this.bid.metrics(), function(el) {
+            this._marginOfErrorMetric = _.find(this.bid.entities.metrics(), function(el) {
                 return el.title.toLowerCase() === "margin of error";
             });
             this._marginOfErrorMetric = _.isUndefined(this._marginOfErrorMetric)
@@ -44,7 +44,7 @@ export default class IndicativePricingHelper {
      */
     isIndicativePricing() {
         if (_.isUndefined(this._indicativePricingField) || _.isNull(this._indicativePricingField)) {
-            this._indicativePricingField = _.find(this.bid.fields(), function(el) {
+            this._indicativePricingField = _.find(this.bid.entities.fields(), function(el) {
                 return el.title.toLowerCase() === "indicative pricing";
             });
             this._indicativePricingField = _.isUndefined(this._indicativePricingField)

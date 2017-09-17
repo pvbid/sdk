@@ -4,3 +4,4 @@ node_modules
 jsdocs
 docs
 esdocs
+.env

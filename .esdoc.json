@@ -6,17 +6,22 @@
             "name": "esdoc-standard-plugin",
             "option": {
                 "lint": { "enable": true },
-                "coverage": { "enable": true },
+                "coverage": { "enable": false },
                 "accessor": { "access": ["public", "protected"], "autoPrivate": true },
                 "undocumentIdentifier": { "enable": true },
                 "unexportedIdentifier": { "enable": false },
-                "typeInference": { "enable": true }
+                "typeInference": { "enable": true },
+                "manual": {
+                    "asset": "./manual/asset",
+                    "files": ["./manual/getting_started.md", "./manual/repositories.md", "./LICENSE.md"]
+                }
             }
         },
+        { "name": "esdoc-exclude-source-plugin" },
         {
             "name": "esdoc-coverage-plugin",
             "option": {
-                "enable": true,
+                "enable": false,
                 "kind": ["class", "method", "member", "get", "set", "constructor", "function"]
             }
         }

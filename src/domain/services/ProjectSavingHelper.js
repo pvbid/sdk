@@ -18,35 +18,35 @@ export default class ProjectSavingHelper {
             if (bid.isUpdateable()) {
                 if (bid.isDirty()) extracted.bids[bid.id] = bid.exportData();
 
-                _.each(bid.lineItems(), item => {
+                _.each(bid.entities.lineItems(), item => {
                     if (item.isDirty()) extracted.line_items[item.id] = item.exportData();
                 });
 
-                _.each(bid.fields(), item => {
+                _.each(bid.entities.fields(), item => {
                     if (item.isDirty()) extracted.fields[item.id] = item.exportData();
                 });
 
-                _.each(bid.components(), item => {
+                _.each(bid.entities.components(), item => {
                     if (item.isDirty()) extracted.components[item.id] = item.exportData();
                 });
 
-                _.each(bid.metrics(), item => {
+                _.each(bid.entities.metrics(), item => {
                     if (item.isDirty()) extracted.metrics[item.id] = item.exportData();
                 });
 
-                _.each(bid.assemblies(), item => {
+                _.each(bid.entities.assemblies(), item => {
                     if (item.isDirty()) extracted.assemblies[item.id] = item.exportData();
                 });
 
-                _.each(bid.fieldGroups(), item => {
+                _.each(bid.entities.fieldGroups(), item => {
                     if (item.isDirty()) extracted.field_groups[item.id] = item.exportData();
                 });
 
-                _.each(bid.componentGroups(), item => {
+                _.each(bid.entities.componentGroups(), item => {
                     if (item.isDirty()) extracted.component_groups[item.id] = item.exportData();
                 });
 
-                _.each(bid.datatables(), item => {
+                _.each(bid.entities.datatables(), item => {
                     if (item.isDirty()) extracted.datatables[item.id] = item.exportData();
                 });
             }

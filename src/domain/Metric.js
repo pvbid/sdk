@@ -72,7 +72,7 @@ export default class Metric extends BidEntity {
 
         if (!_.isUndefined(this.config.formula)) {
             _.each(this.config.dependencies, (dependencyContract, key) => {
-                valueMap[key] = Helpers.confirmNumber(this.bid.relations.getDependencyValue(dependencyContract), 0);
+                valueMap[key] = Helpers.confirmNumber(this.bid.entities.getDependencyValue(dependencyContract), 0);
             });
 
             var results = Helpers.calculateFormula(this.config.formula, valueMap);
@@ -100,7 +100,7 @@ export default class Metric extends BidEntity {
 
         if (!_.isUndefined(metricManipulation.formula)) {
             _.each(metricManipulation.dependencies, (dependencyContract, key) => {
-                valueMap[key] = Helpers.confirmNumber(this.bid.relations.getDependencyValue(dependencyContract), 0);
+                valueMap[key] = Helpers.confirmNumber(this.bid.entities.getDependencyValue(dependencyContract), 0);
             });
 
             var results = Helpers.calculateFormula(metricManipulation.formula, valueMap);
@@ -151,7 +151,7 @@ export default class Metric extends BidEntity {
         if (this.bid.isAssessable()) {
             for (let dependencyContract of Object.values(this.config.dependencies)) {
                 if (!_.isEmpty(dependencyContract)) {
-                    const dependency = this.bid.relations.getDependency(dependencyContract);
+                    const dependency = this.bid.entities.getDependency(dependencyContract);
                     if (dependency && dependency.on) {
                         dependency.on("updated", "metric." + this.id, () => this.assess());
                     } else {
@@ -164,7 +164,7 @@ export default class Metric extends BidEntity {
                 for (let manipulation of Object.values(this.config.manipulations)) {
                     for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
                         if (!_.isEmpty(manipulationDepCtrct)) {
-                            const dependency = this.bid.relations.getDependency(manipulationDepCtrct);
+                            const dependency = this.bid.entities.getDependency(manipulationDepCtrct);
                             dependency.on("updated", "metric-contract." + this.id, () => this.assess());
                         }
                     }

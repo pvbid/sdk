@@ -462,7 +462,7 @@ export default class Component extends BidEntity {
     bind() {
         if (this.bid.isAssessable()) {
             for (let lineItemId of this.config.line_items) {
-                const lineItem = this.bid.lineItems(lineItemId);
+                const lineItem = this.bid.entities.lineItems(lineItemId);
 
                 lineItem.on("updated", `component.${this.id}`, requesterId => {
                     waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.lineItem.${requesterId}`);
@@ -486,7 +486,7 @@ export default class Component extends BidEntity {
         var components = [];
 
         _.each(this.config.components, subComponentId => {
-            components.push(this.bid.components(subComponentId));
+            components.push(this.bid.entities.components(subComponentId));
         });
 
         return components;
@@ -499,7 +499,7 @@ export default class Component extends BidEntity {
      */
     getParent() {
         if (this.config.is_nested) {
-            return this.bid.components(this.config.parent_component_id);
+            return this.bid.entities.components(this.config.parent_component_id);
         } else return null;
     }
 
@@ -536,7 +536,7 @@ export default class Component extends BidEntity {
         let lines = [];
 
         for (let lineItemId of this.config.line_items) {
-            var lineItem = this.bid.relations.getBidEntity("line_item", lineItemId);
+            var lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
 
             if (!_.isNull(lineItem)) {
                 lines.push(lineItem);
@@ -545,7 +545,7 @@ export default class Component extends BidEntity {
 
         if (includeSubComponents) {
             for (let subComponentId of this.config.components) {
-                let subComponent = this.bid.components(subComponentId);
+                let subComponent = this.bid.entities.components(subComponentId);
                 lines = lines.concat(subComponent.getLineItems(includeSubComponents));
             }
         }

@@ -37,7 +37,7 @@ export default class BidValidator {
     }
 
     _runLineItemTests() {
-        _.each(this._bid.lineItems(), lineItem => {
+        _.each(this._bid.entities.lineItems(), lineItem => {
             try {
                 this._baseEntityTest(lineItem);
                 this._testLineItemScalarFormulaReferences(lineItem);
@@ -68,7 +68,7 @@ export default class BidValidator {
     }
 
     _runFieldTests() {
-        _.each(this._bid.fields(), field => {
+        _.each(this._bid.entities.fields(), field => {
             try {
                 this._baseEntityTest(field);
                 this._testIsFieldAssignedToGroup(field);
@@ -79,7 +79,7 @@ export default class BidValidator {
     }
 
     _runFieldGroupTests() {
-        _.each(this._bid.fieldGroups(), fieldGroup => {
+        _.each(this._bid.entities.fieldGroups(), fieldGroup => {
             try {
                 this._baseEntityTest(fieldGroup);
                 this._testFieldGroupReferences(fieldGroup);
@@ -90,7 +90,7 @@ export default class BidValidator {
     }
 
     _runMetricTests() {
-        _.each(this._bid.metrics(), metric => {
+        _.each(this._bid.entities.metrics(), metric => {
             try {
                 this._baseEntityTest(metric);
                 this._testMetricFormulaReferences(metric);
@@ -102,7 +102,7 @@ export default class BidValidator {
     }
 
     _runComponentTests() {
-        _.each(this._bid.components(), component => {
+        _.each(this._bid.entities.components(), component => {
             try {
                 this._baseEntityTest(component);
                 this._testComponentReferences(component);
@@ -113,10 +113,10 @@ export default class BidValidator {
     }
 
     _runAssemblyTest() {
-        _.each(this._bid.assemblies(), assembly => {
+        _.each(this._bid.entities.assemblies(), assembly => {
             try {
                 _.each(assembly.config.line_items, id => {
-                    var entity = this._bid.lineItems(id);
+                    var entity = this._bid.entities.lineItems(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "line_item",
@@ -126,7 +126,7 @@ export default class BidValidator {
                 });
 
                 _.each(assembly.config.components, id => {
-                    var entity = this._bid.components(id);
+                    var entity = this._bid.entities.components(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "component",
@@ -136,7 +136,7 @@ export default class BidValidator {
                 });
 
                 _.each(assembly.config.metrics, id => {
-                    var entity = this._bid.metrics(id);
+                    var entity = this._bid.entities.metrics(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_reference", assembly, null, {
                             dependency_type: "metric",
@@ -146,7 +146,7 @@ export default class BidValidator {
                 });
 
                 _.each(assembly.config.fields, id => {
-                    var entity = this._bid.fields(id);
+                    var entity = this._bid.entities.fields(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_reference", assembly, null, {
                             dependency_type: "field",
@@ -156,7 +156,7 @@ export default class BidValidator {
                 });
 
                 _.each(assembly.config.field_groups, id => {
-                    var entity = this._bid.fieldGroups(id);
+                    var entity = this._bid.entities.fieldGroups(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "field_group",
@@ -165,7 +165,7 @@ export default class BidValidator {
                     }
                 });
                 _.each(assembly.config.manipulated_metrics, id => {
-                    var entity = this._bid.metrics(id);
+                    var entity = this._bid.entities.metrics(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "maniipulated_metric",
@@ -190,7 +190,7 @@ export default class BidValidator {
 
     _testIsFieldAssignedToGroup(sourceBidEntity) {
         var isIncluded = false;
-        _.each(this._bid.fieldGroups(), fieldGroup => {
+        _.each(this._bid.entities.fieldGroups(), fieldGroup => {
             if (!isIncluded) {
                 isIncluded = _.includes(fieldGroup.config.fields, sourceBidEntity.id);
             } else return false;
@@ -217,7 +217,7 @@ export default class BidValidator {
     _testMetricManipulations(sourceBidEntity) {
         _.each(sourceBidEntity.config.manipulations, metricManipulation => {
             //First test to ensure metric manipultion has a valid assembly.
-            var metricManipulationAssembly = this._bid.assemblies(metricManipulation.assembly_id);
+            var metricManipulationAssembly = this._bid.entities.assemblies(metricManipulation.assembly_id);
 
             if (_.isUndefined(metricManipulationAssembly || _.isNull(metricManipulationAssembly))) {
                 this._logIssue("invalid_metric_manipulation_assembly_reference", sourceBidEntity, null, {
@@ -233,7 +233,7 @@ export default class BidValidator {
                 params[key] = 1;
             });
             if (!Helpers.validateFormula(metricManipulation.formula, params)) {
-                var metric = this._bid.metrics(metricManipulation.id);
+                var metric = this._bid.entities.metrics(metricManipulation.id);
 
                 this._logIssue("invalid_metric_manipulation_formula_dependency", sourceBidEntity, null, {
                     manipulation_metric_title: metric.title,
@@ -265,7 +265,7 @@ export default class BidValidator {
                 _.isUndefined(rule.activate_on);
 
             if (!isIncomplete) {
-                isIncomplete = !this._bid.relations.dependencyExists(rule.dependencies.toggle_field);
+                isIncomplete = !this._bid.entities.dependencyExists(rule.dependencies.toggle_field);
             }
         }
 
@@ -307,7 +307,7 @@ export default class BidValidator {
         });
 
         //Due to upgrading to multi reference scalars, the original scalar is simply x.
-        if (this._bid.relations.dependencyExists(sourceBidEntity.config.dependencies.scalar)) {
+        if (this._bid.entities.dependencyExists(sourceBidEntity.config.dependencies.scalar)) {
             scalarContracts.x = sourceBidEntity.config.dependencies.scalar;
             params.x = 1;
         }
@@ -328,7 +328,7 @@ export default class BidValidator {
 
     _testDependencyExistance(sourceBidEntity, dependencyContract, dependencyKey) {
         if (dependencyContract.type !== "bid") {
-            if (!this._bid.relations.dependencyExists(dependencyContract)) {
+            if (!this._bid.entities.dependencyExists(dependencyContract)) {
                 this._logIssue("invalid_dependency", sourceBidEntity, dependencyContract, {
                     source_bid_entity_dependency_key: dependencyKey
                 });
@@ -338,7 +338,7 @@ export default class BidValidator {
 
     _testAssemblyExistance(sourceBidEntity) {
         if (!_.isUndefined(sourceBidEntity.config.assembly_id) && sourceBidEntity.config.assembly_id) {
-            var assembly = this._bid.relations.bidEntityExists("assembly", sourceBidEntity.config.assembly_id);
+            var assembly = this._bid.entities.bidEntityExists("assembly", sourceBidEntity.config.assembly_id);
             if (_.isUndefined(assembly) || _.isNull(assembly)) {
                 this._logIssue("assembly_does_not_exist", sourceBidEntity);
             }
@@ -347,7 +347,7 @@ export default class BidValidator {
 
     _testDependencyAssemblySafeGuard(sourceBidEntity, dependencyContract, dependencyKey) {
         if (dependencyContract.type !== "bid" && dependencyContract.type !== "bid_variable") {
-            var dependency = this._bid.relations.getDependency(dependencyContract);
+            var dependency = this._bid.entities.getDependency(dependencyContract);
 
             if (dependency) {
                 if (dependency.config.assembly_id) {
@@ -370,7 +370,7 @@ export default class BidValidator {
 
     _testComponentReferences(sourceBidEntity) {
         _.each(sourceBidEntity.config.line_items, lineItemId => {
-            var bidLineItem = this._bid.lineItems(lineItemId);
+            var bidLineItem = this._bid.entities.lineItems(lineItemId);
 
             if (_.isUndefined(bidLineItem) || _.isNull(bidLineItem)) {
                 this._logIssue("invalid_component_line_item_reference", sourceBidEntity);
@@ -378,7 +378,7 @@ export default class BidValidator {
         });
 
         _.each(sourceBidEntity.config.components, componentId => {
-            var bidComponent = this._bid.components(componentId);
+            var bidComponent = this._bid.entities.components(componentId);
 
             if (_.isUndefined(bidComponent) || _.isNull(bidComponent)) {
                 this._logIssue("invalid_component_sub_component_reference", sourceBidEntity);
@@ -386,14 +386,14 @@ export default class BidValidator {
         });
 
         if (sourceBidEntity.config.parent_component_id) {
-            var parentComponent = this._bid.components(sourceBidEntity.config.parent_component_id);
+            var parentComponent = this._bid.entities.components(sourceBidEntity.config.parent_component_id);
 
             if (_.isUndefined(parentComponent) || _.isNull(parentComponent)) {
                 logIssue("invalid_parent_component_reference", sourceBidEntity);
             }
         }
 
-        var componentGroup = this._bid.componentGroups(sourceBidEntity.config.component_group_id);
+        var componentGroup = this._bid.entities.componentGroups(sourceBidEntity.config.component_group_id);
 
         if (_.isUndefined(componentGroup) || _.isNull(componentGroup)) {
             logIssue("invalid_component_group_reference", sourceBidEntity);
@@ -402,7 +402,7 @@ export default class BidValidator {
 
     _testFieldGroupReferences(sourceBidEntity) {
         _.each(sourceBidEntity.config.fields, fieldId => {
-            var bidField = this._bid.fields(fieldId);
+            var bidField = this._bid.entities.fields(fieldId);
 
             if (_.isUndefined(bidField) || _.isNull(bidField)) {
                 this._logIssue("invalid_field_group_reference", sourceBidEntity);
@@ -412,11 +412,11 @@ export default class BidValidator {
 
     _testLineItemDatatableLink(sourceBidEntity, dependencyContract, dependencyKey) {
         if (sourceBidEntity.type === "line_item" && dependencyContract.type === "field") {
-            var fieldDependency = this._bid.relations.getDependency(dependencyContract);
+            var fieldDependency = this._bid.entities.getDependency(dependencyContract);
 
             if (!_.isUndefined(fieldDependency) && !_.isNull(fieldDependency)) {
                 if (fieldDependency.config.type === "list") {
-                    var datatable = this._bid.relations.getDependency(fieldDependency.config.dependencies.datatable);
+                    var datatable = this._bid.entities.getDependency(fieldDependency.config.dependencies.datatable);
 
                     var datatableColumnKeys = _.map(datatable.config.columns, c => {
                         return c.id;
@@ -445,7 +445,7 @@ export default class BidValidator {
 
     _testDatatableKey(sourceBidEntity, dependencyContract, dependencyKey) {
         if (sourceBidEntity.type === "line_item" && dependencyContract.type === "field") {
-            var fieldDef = this._bid.fields(dependencyContract.bid_entity_id);
+            var fieldDef = this._bid.entities.fields(dependencyContract.bid_entity_id);
             if (!_.isUndefined(fieldDef) && !_.isNull(fieldDef)) {
                 if (fieldDef.config.type === "list") {
                     var datatableId = fieldDef.config.dependencies.datatable.bid_entity_id;
@@ -465,7 +465,7 @@ export default class BidValidator {
     }
 
     _isValidDatatableKey(datatableId, key, isColumn) {
-        var datatable = this._bid.datatables(datatableId);
+        var datatable = this._bid.entities.datatables(datatableId);
 
         function getColumnKeys(datatable) {
             return _.map(datatable.config.columns, c => {

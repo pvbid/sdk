@@ -35,12 +35,12 @@ export default class LineItemRuleService {
             b: 0
         };
         valueMap.a = Helpers.confirmNumber(
-            lineItem.bid.relations.getDependencyValue(lineItemRule.dependencies.a),
+            lineItem.bid.entities.getDependencyValue(lineItemRule.dependencies.a),
             0,
             true
         );
         valueMap.b = Helpers.confirmNumber(
-            lineItem.bid.relations.getDependencyValue(lineItemRule.dependencies.b),
+            lineItem.bid.entities.getDependencyValue(lineItemRule.dependencies.b),
             0,
             true
         );
@@ -53,7 +53,7 @@ export default class LineItemRuleService {
     }
 
     _evalToggleFieldRule(lineItemRule, lineItem) {
-        var toggleValue = lineItem.bid.relations.getDependencyValue(lineItemRule.dependencies.toggle_field);
+        var toggleValue = lineItem.bid.entities.getDependencyValue(lineItemRule.dependencies.toggle_field);
         toggleValue = _.isUndefined(toggleValue) || _.isNull(toggleValue) ? false : toggleValue;
         toggleValue = toggleValue === "0" || toggleValue === "1" ? Boolean(parseInt(toggleValue)) : toggleValue;
 
@@ -63,7 +63,7 @@ export default class LineItemRuleService {
     }
 
     _evalListSelectRule(lineItemRule, lineItem) {
-        var listField = lineItem.bid.relations.getDependency(lineItemRule.dependencies.list_field);
+        var listField = lineItem.bid.entities.getDependency(lineItemRule.dependencies.list_field);
 
         var hasSelected = false;
 

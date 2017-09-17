@@ -1,0 +1,9 @@
+src/**
+npm-debug.log
+webpack.config.js
+manual/**
+.esdoc.json
+.eslintrc.js
+dist/**
+!dist/*.js
+.env

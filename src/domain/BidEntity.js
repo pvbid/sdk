@@ -79,7 +79,11 @@ export default class BidEntity extends AdvanceEventEmitter {
      */
     dirty() {
         this._is_dirty = true;
-        this.emit("changed");
+        try {
+            this.emit("changed");
+        } catch (error) {
+            console.log(error);
+        }
     }
 
     /**

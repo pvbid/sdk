@@ -25,7 +25,7 @@ export default class Bid extends BidEntity {
         this._data = bidData;
         this._bidService = bidService;
         this.maxEvents = 25;
-        this.relations = new BidModelRelationsHelper(this);
+        this.entities = new BidModelRelationsHelper(this);
         this._indicativePricingHelper = new IndicativePricingHelper(this);
         this._wattMetricDef = null;
         this.on("assessing", `bid.${this.id}`, () => {
@@ -144,7 +144,7 @@ export default class Bid extends BidEntity {
             const oldValue = Helpers.confirmNumber(this._data.markup);
             const changePercent = 1 + (newValue - oldValue) / oldValue;
 
-            _.each(this.lineItems(), lineItem => {
+            _.each(this.entities.lineItems(), lineItem => {
                 if (lineItem.isIncluded && lineItem.price > 0) {
                     lineItem.markupPercent = lineItem.markupPercent * changePercent;
                 }
@@ -203,7 +203,7 @@ export default class Bid extends BidEntity {
             const newPrice = Helpers.confirmNumber(val);
             const changePercent = (newPrice - oldPrice) / oldPrice;
 
-            _.each(this.lineItems(), lineItem => {
+            _.each(this.entities.lineItems(), lineItem => {
                 if (lineItem.isIncluded && lineItem.price > 0) {
                     lineItem.price = lineItem.price * (1 + changePercent);
                 }
@@ -266,82 +266,6 @@ export default class Bid extends BidEntity {
         return this._data.watts;
     }
 
-    fields(id) {
-        return id ? this.relations.getBidEntity("field", id) : this._data.fields;
-    }
-
-    fieldGroups(id) {
-        return id ? this.relations.getBidEntity("field_group", id) : this._data.field_groups;
-    }
-
-    metrics(id) {
-        return id ? this.relations.getBidEntity("metric", id) : this._data.metrics;
-    }
-
-    lineItems(id) {
-        return id ? this.relations.getBidEntity("line_item", id) : this._data.line_items;
-    }
-
-    datatables(id) {
-        return id ? this.relations.getBidEntity("datatable", id) : this._data.datatables;
-    }
-
-    assemblies(id) {
-        return id ? this.relations.getBidEntity("assembly", id) : this._data.assemblies;
-    }
-
-    /**
-     * Gets a bid variable entity by id.  If no id is passed, will return an object of keyed bid variables by their id.
-     * 
-     * @example <caption>Example of returned keyed object.</caption>
-     * {
-     *    "xyg4" : <BidVariable>,
-     *    "burden" : <BidVariable>
-     * }
-     * 
-     * @param {number} [id] - The id of the component to retrieve.
-     * @returns {(Component|Object.<string, Component>|null)}
-     */
-    variables(id) {
-        return id ? this.relations.getBidEntity("bid_variable", id) : this._data.variables;
-    }
-
-    /**
-     * Gets a component entity by id.  If no id is passed, will return an object of keyed components by their id.
-     * 
-     * @example <caption>Example of returned keyed object.</caption>
-     * {
-     *    "92" : <Component>,
-     *    "103" : <Component>
-     * }
-     * 
-     * @param {number} [id] - The id of the component to retrieve.
-     * @returns {(Component|Object.<string, Component>|null)}
-     */
-    components(id) {
-        return id ? this.relations.getBidEntity("component", id) : this._data.components;
-    }
-
-    /**
-     * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups by their id..
-     * 
-     * @example <caption>Example of returned keyed object.</caption>
-     * {
-     *    "92" : <ComponentGroup>,
-     *    "103" : <ComponentGroup>
-     * }
-     * 
-     * @param {number} id 
-     * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
-     */
-    componentGroups(id) {
-        return id ? this.relations.getBidEntity("component_group", id) : this._data.component_groups;
-    }
-
-    assemblyMaps(id) {
-        return id ? this.relations.getBidEntity("assembly_map", id) : this._data.assembly_maps;
-    }
-
     /**
      * Gets all the uncategorized Line Items by component group.
      * 
@@ -352,13 +276,13 @@ export default class Bid extends BidEntity {
         var categorizedLineItemIds = [];
         var uncategorizedLineItems = [];
 
-        _.each(this.components(), component => {
+        _.each(this.entities.components(), component => {
             if (component.config.component_group_id === componentGroupId) {
                 categorizedLineItemIds = _.concat(categorizedLineItemIds, component.config.line_items);
             }
         });
 
-        _.each(this.lineItems(), lineItem => {
+        _.each(this.entities.lineItems(), lineItem => {
             if (categorizedLineItemIds.indexOf(lineItem.id) < 0) {
                 uncategorizedLineItems.push(lineItem);
             }
@@ -381,7 +305,7 @@ export default class Bid extends BidEntity {
      */
     _getTotalWatts() {
         if (_.isNull(this._wattMetricDef)) {
-            this._wattMetricDef = _.find(this.metrics(), function(el) {
+            this._wattMetricDef = _.find(this.entities.metrics(), function(el) {
                 return el.title.toLowerCase() === "watt" || el.title.toLowerCase() === "watts" ? true : false;
             });
 
@@ -402,7 +326,7 @@ export default class Bid extends BidEntity {
     }
 
     includeTaxInMarkup() {
-        return this.variables().markup_strategy && this.variables().markup_strategy.value === true;
+        return this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true;
     }
 
     _applyMarginPercentage(newMarginPercent) {
@@ -416,7 +340,7 @@ export default class Bid extends BidEntity {
 
             var markupChangePercent = oldMarkup !== 0 ? newMarkup / oldMarkup : 1;
 
-            _.each(this.lineItems(), lineItem => {
+            _.each(this.entities.lineItems(), lineItem => {
                 if (lineItem.isIncluded && lineItem.cost > 0) {
                     lineItem.markupPercent = lineItem.markupPercent * markupChangePercent;
                 }
@@ -430,18 +354,18 @@ export default class Bid extends BidEntity {
     _resetSubMargins() {
         var totalSubMargins = 0;
 
-        if (!_.isUndefined(this.variables.sub_margins)) {
-            _.each(this.variables().sub_margins.value, function(subMargin) {
+        if (!_.isUndefined(this.entities.variables().sub_margins)) {
+            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
                 totalSubMargins += Helpers.confirmNumber(subMargin.value);
             });
 
             var bidMarginPercent = this.getMarginPercent();
 
-            _.each(this.variables().sub_margins.value, function(subMargin) {
+            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
                 if (totalSubMargins > 0) {
                     subMargin.value = bidMarginPercent * Helpers.confirmNumber(subMargin.value) / totalSubMargins;
                 } else {
-                    subMargin.value = bidMarginPercent / this.variables().sub_margins.value.length;
+                    subMargin.value = bidMarginPercent / this.entities.variables().sub_margins.value.length;
                 }
             });
         }
@@ -449,7 +373,7 @@ export default class Bid extends BidEntity {
 
     resetMarkup() {
         if (this.isAssessable()) {
-            _.each(this.lineItems(), lineItem => {
+            _.each(this.entities.lineItems(), lineItem => {
                 lineItem.resetMarkup();
             });
         }
@@ -458,7 +382,7 @@ export default class Bid extends BidEntity {
     applySubMarginChange() {
         if (this.isAssessable()) {
             let totalSubMargins = 0;
-            _.each(this.variables().sub_margins.value, subMargin => {
+            _.each(this.entities.variables().sub_margins.value, subMargin => {
                 totalSubMargins += Heleprs.confirmNumber(subMargin.value);
             });
             this.marginPercent = totalSubMargins;
@@ -490,7 +414,7 @@ export default class Bid extends BidEntity {
                 watts: 0
             };
 
-            _.each(this.lineItems(), li => {
+            _.each(this.entities.lineItems(), li => {
                 if (li.isIncluded) {
                     bidValues.cost += li.cost;
                     bidValues.price += li.price;
@@ -543,13 +467,13 @@ export default class Bid extends BidEntity {
             if (forceReassessment || this.needsReassessment()) {
                 console.log("Start Bid  Reassessment", "Bid: ", this.id);
 
-                for (let f of Object.values(this.fields())) {
+                for (let f of Object.values(this.entities.fields())) {
                     f.assess();
                 }
-                for (let m of Object.values(this.metrics())) {
+                for (let m of Object.values(this.entities.metrics())) {
                     m.assess();
                 }
-                for (let li of Object.values(this.lineItems())) {
+                for (let li of Object.values(this.entities.lineItems())) {
                     li.assess();
                 }
             }
@@ -562,7 +486,7 @@ export default class Bid extends BidEntity {
             needsReassesment = this.price === 0 ? true : false;
 
         if (!needsReassesment) {
-            _.each(this.components(), (c, k) => {
+            _.each(this.entities.components(), (c, k) => {
                 if (!needsReassesment) {
                     needsReassesment = this._componentNeedsReassessment(c);
                 } else return false;
@@ -570,7 +494,7 @@ export default class Bid extends BidEntity {
         }
 
         if (!needsReassesment) {
-            _.each(this.lineItems(), lineItem => {
+            _.each(this.entities.lineItems(), lineItem => {
                 if (lineItem.isIncluded) {
                     totalLineItemCosts += lineItem.cost;
                     totalLineItemPrice += lineItem.price;
@@ -618,16 +542,16 @@ export default class Bid extends BidEntity {
     clearAllBindings() {
         this.removeAllListeners();
 
-        for (let f of Object.values(this.fields())) {
+        for (let f of Object.values(this.entities.fields())) {
             f.removeAllListeners();
         }
-        for (let m of Object.values(this.metrics())) {
+        for (let m of Object.values(this.entities.metrics())) {
             m.removeAllListeners();
         }
-        for (let li of Object.values(this.lineItems())) {
+        for (let li of Object.values(this.entities.lineItems())) {
             li.removeAllListeners();
         }
-        for (let c of Object.values(this.components())) {
+        for (let c of Object.values(this.entities.components())) {
             c.removeAllListeners();
         }
     }
@@ -637,22 +561,22 @@ export default class Bid extends BidEntity {
      */
     bind() {
         if (this.isAssessable()) {
-            for (let f of Object.values(this.fields())) {
+            for (let f of Object.values(this.entities.fields())) {
                 f.bind();
                 f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
             }
-            for (let m of Object.values(this.metrics())) {
+            for (let m of Object.values(this.entities.metrics())) {
                 m.bind();
                 m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
             }
-            for (let li of Object.values(this.lineItems())) {
+            for (let li of Object.values(this.entities.lineItems())) {
                 li.bind();
                 li.on("updated", "line_item." + li.id, () => {
                     waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
                 });
                 li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
             }
-            for (let c of Object.values(this.components())) {
+            for (let c of Object.values(this.entities.components())) {
                 c.bind();
                 c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
             }
@@ -747,7 +671,7 @@ export default class Bid extends BidEntity {
         delete bid.field_groups;
         delete bid.datatables;
 
-        _.each(this.variables(), (value, key) => {
+        _.each(this.entities.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
         });
 
@@ -771,7 +695,7 @@ export default class Bid extends BidEntity {
         ];
 
         _.each(properties, prop => {
-            _.each(this[prop](), item => {
+            _.each(this.entities[prop](), item => {
                 item.pristine();
             });
         });

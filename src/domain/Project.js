@@ -170,7 +170,7 @@ export default class Project extends BidEntity {
         this._data.components = {};
 
         _.each(this.bids, bid => {
-            _.each(bid.components(), component => {
+            _.each(bid.entities.components(), component => {
                 if (!component.config.is_nested) {
                     component.ppw = bid.watts > 0 ? component.price / bid.watts : 0;
                     component.cpw = bid.watts > 0 ? component.cost / bid.watts : 0;
@@ -237,7 +237,7 @@ export default class Project extends BidEntity {
             this.emit("assessing");
         });
 
-        bid.on("changed", () => this.dirty());
+        bid.on("changed", `project.${this.id}.bid-changed`, () => this.dirty());
 
         bid.onDelay("assessed", 200, `project.${this.id}.assessed`, () => {
             //console.log("assess Cost/Price", this.cost, this.price);

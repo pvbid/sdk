@@ -1,44 +1,24 @@
-PVBid SDK
----------
-Version: 1.0.0
+# PVBid SDK
 
-Documentation: http://www.pvbid.com/docs/sdk/v1.0.0
-
-### Important Notice
-In the upcoming months, we are planning to change the id's of, line items, metrics, fields, components, datatables, assemblies, component groups, and field groups. The id's will switch to UUID format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Project and Bid id's are expected to remain as an integer and unchanged. All legacy bid data in our system will be updated. Breaking changes will be minimal, but are expected.
+PVBid is a cost estimating platform geared towards the solar industry. This SDK allows for secure access to PVBid's servers, with tools to programatically manipulate a bid. 
 
 
-### Example
-The following demonstrates how to set up an authorized context, loading a project, making changes, and saving.
+## Installation
+**NPM**
+```
+npm i pvbid-sdk --save
+```
 
-##### Create a context with an authorization token.
+**CDN**
+~120kB gzipped
 
-	const config = { token: "your auth token" };
-    const context = PVBid.createContext(config);
+https://unpkg.com/pvbid-sdk@0.6/dist/pvbid.min.js
 
+## Documentation
+Docs are included in the npm package. Our most recent docs are also hosted at http://www.pvbid.com/docs/sdk
 
-##### Load a self assessing Project instance. 
-    
-    let project = await context.getProject(projectId);
+## License
+Copyright (C) PVBid, Inc - All Rights Reserved.
 
-##### Setup autosave
-
-    project.onDelay("changed", 1500, "requesterId", () => project.save());
-
-##### Choose a bid to modify.
-Project instances contain a list of their child bids.
-
-    let bid = project.bids["bidId"];
-
-##### Making changes to the bid's properties
-Many properties will trigger the bid to self assesses. For example setting the `bid.cost` property will fire its `assessing` event.  `bid.title` will not assess, but will flag the bid as dirty.
-
-    bid.title = "New Title";
-    bid.cost = 155555.99;
-
-##### Manually save the bid and parent project
-
-    project.save();
-    // OR
-    project.once("assessed", () => project.save());
+See LICENSE
 
