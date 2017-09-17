@@ -55,6 +55,19 @@ export default class BidFactory {
         return bid;
     }
 
+    reload(bid, bidData) {
+        bid.clearEntityBindings();
+        this._keyBidEntities(bidData);
+        bid._data = bidData;
+        bid._original = _.cloneDeep(bidData);
+        this._createBidEntities(bid, bidData);
+
+        if (bid.isAssessable()) {
+            bid.bind();
+            bid.reassessAll(true);
+        }
+    }
+
     /**
      * Keys all bid entities  by their id.
      * 

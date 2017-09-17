@@ -133,7 +133,7 @@ export default class Metric extends BidEntity {
                 var oldValue = this._data.value ? _.round(this._data.value, 4) : 0;
 
                 if (oldValue !== _.round(finalValue, 4)) {
-                    this._data.value = finalValue;
+                    this._data.value = _.round(finalValue, 7);
                     this.dirty();
 
                     this.emit("updated");

@@ -12,6 +12,7 @@
                 "unexportedIdentifier": { "enable": false },
                 "typeInference": { "enable": true },
                 "manual": {
+                    "index": "./manual/getting_started.md",
                     "asset": "./manual/asset",
                     "files": ["./manual/getting_started.md", "./manual/repositories.md", "./LICENSE.md"]
                 }

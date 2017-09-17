@@ -476,6 +476,9 @@ export default class Bid extends BidEntity {
                 for (let li of Object.values(this.entities.lineItems())) {
                     li.assess();
                 }
+                for (let c of Object.values(this.entities.components())) {
+                    c.assess();
+                }
             }
         }
     }
@@ -539,9 +542,7 @@ export default class Bid extends BidEntity {
             : false;
     }
 
-    clearAllBindings() {
-        this.removeAllListeners();
-
+    clearEntityBindings() {
         for (let f of Object.values(this.entities.fields())) {
             f.removeAllListeners();
         }
@@ -571,7 +572,7 @@ export default class Bid extends BidEntity {
             }
             for (let li of Object.values(this.entities.lineItems())) {
                 li.bind();
-                li.on("updated", "line_item." + li.id, () => {
+                li.on("assessed", "line_item." + li.id, () => {
                     waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
                 });
                 li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
@@ -755,17 +756,40 @@ export default class Bid extends BidEntity {
         return this.isLocked() || !_.isNull(this.project.closedAt);
     }
 
+    /**
+     * Determines if the bid is locked.
+     * 
+     * @returns {boolean} 
+     */
     isLocked() {
         return this._data.is_locked;
     }
 
+    /**
+     * Determines if bid can be locked by user.
+     * 
+     * @returns {boolean} 
+     */
     canLock() {
         // TODO: needs additional logic for user permissions.
         return !this.isLocked();
     }
+
+    /**
+     * Determines if bid can be unlocked by user.
+     * 
+     * @returns {boolean} 
+     */
     canUnlock() {
         return this.isLocked();
     }
+
+    /**
+     * Locks bid, forcing read-only mode for everyone.  Bid must be unlocked before it can be modified again.
+     * This function immediately saves the bid.
+     * 
+     * @returns {Promise<null>}
+     */
     async lock() {
         if (this.canLock()) {
             this._data.is_locked = true;
@@ -773,12 +797,54 @@ export default class Bid extends BidEntity {
             return this.project.save();
         }
     }
+
+    /**
+     * Unlocks bid, making it writable for those with permission.
+     * This function immediately saves the bid.
+     * 
+     * @returns {Promise<null>}
+     */
     async unlock() {
         if (this.canUnlock()) {
             this._data.is_locked = false;
             this.dirty();
             return this.project.save();
         }
+    }
+
+    /**
+     * Removes assembly from a bid. A wrapper function for {@link BidService.removeAssembly}
+     * 
+     * @param {number} assemblyId 
+     * @returns {Promise<null>}
+     */
+    async removeAssembly(assemblyId) {
+        return this._bidService.removeAssembly(this, assemblyId);
+    }
+
+    /**
+     * Adds assemblies to bid. A wrapper function for {@link BidService.addAssemblies}
+     * 
+     * @param {number[]} assemblyMapIds An array of assembly mapping ids to add.
+     * @returns {Promise<null>}
+     */
+    async addAssemblies(assemblyMapIds) {
+        return this._bidService.addAssemblies(this, assemblyMapIds);
+    }
+
+    /**
+     * Recovers bid to previous snapshot. An auto snapshot of the current state will be created.
+     * This is a wrapper function for {@link BidService.recoverBid}
+     * 
+     * @param {number} snapshotId 
+     * @returns {Promise<null>} 
+     */
+    async recover(snapshotId) {
+        return this._bidService.recoverBid(this, snapshotId);
+    }
+
+    async clone() {
+        return this._bidService.clone(this);
     }
 
     /**

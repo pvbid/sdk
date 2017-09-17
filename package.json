@@ -8,15 +8,9 @@
         "build-node": "PLATFORM=node webpack",
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
-        "docs": "./node_modules/.bin/esdoc"
+        "docs": "./node_modules/.bin/esdoc && open docs/index.html"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {

@@ -13,8 +13,20 @@ export default class BidService {
         this.repositories = repositories;
     }
 
+    /**
+     * Clones bid returning an initialized {@link Bid}
+     * 
+     * @param {Bid} bid 
+     * @returns {Promise<Bid>}
+     */
     async clone(bid) {
-        throw "bid cloning not implemented.";
+        await bid.project.save();
+        const res = await this.repositories.bids.clone(bid.id);
+        const bidObject = await this.repositories.bids.findById(res.id, true);
+        const clonedBid = new BidFactory().create(bidObject, this.repositories, bid.project);
+        bid.project.attachBid(clonedBid);
+        bid.project.assess();
+        return clonedBid;
     }
 
     moveLineItemToComponent(bid, lineItem, component) {
@@ -62,12 +74,71 @@ export default class BidService {
     }
 
     /**
-     * Validates bid structure.
+     * Validates bid structure and references.
      * 
      * @param {Bid} bid 
-     * @returns {object[]} Returns and array of objects.
+     * @returns {object[]} Returns an array of validation errors.
      */
     validate(bid) {
         return new BidValidator().validate(bid);
+    }
+
+    /**
+     * Removes assembly from a bid.
+     * 
+     * @param {any} bid 
+     * @param {number} assemblyId 
+     * @returns {Promise<null>}
+     */
+    async removeAssembly(bid, assemblyId) {
+        try {
+            await bid.project.save();
+            await this.repositories.assemblies.delete(bid.id, assemblyId);
+            const bidObject = await this.repositories.bids.findById(bid.id, true);
+            new BidFactory().reload(bid, bidObject);
+            return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Adds assemblies to bid. 
+     * 
+     * @param {Bid} bid 
+     * @param {number[]} assemblyMapIds An array of assembly mapping ids to add.
+     * @returns {Promise<null>}
+     */
+    async addAssemblies(bid, assemblyMapIds) {
+        try {
+            await bid.project.save();
+            for (let aId of assemblyMapIds) {
+                await this.repositories.assemblies.implement(bid.id, aId);
+            }
+            const bidObject = await this.repositories.bids.findById(bid.id, true);
+            new BidFactory().reload(bid, bidObject);
+            return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    /**
+     * Recovers a bid from a snapshot. An auto snapshot of the current state will be created.
+     * 
+     * @param {Bid} bid 
+     * @param {number} snapshotId 
+     * @returns  {Promise<null>} 
+     */
+    async recoverBid(bid, snapshotId) {
+        try {
+            await bid.project.save();
+            await this.repositories.snapshots.recover(bid.id, snapshotId);
+            const bidObject = await this.repositories.bids.findById(bid.id, true);
+            new BidFactory().reload(bid, bidObject);
+            return;
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 }

@@ -1,9 +1,11 @@
 # PVBid SDK
 
-PVBid is a cost estimating platform geared towards the solar industry. This SDK allows for secure access to PVBid's servers, with tools to programatically manipulate a bid. 
+PVBid is an estimating platform designed for the solar industry. This SDK allows for secure access to PVBid's servers, with tools to programatically manipulate a bid. 
 
 
 ## Installation
+There are 2 compiled files. `pvbid.node.js` should be used for any node.js applications. Using our npm package, `const pvbid = require("pvbid-sdk");` will point to the correct file.  There is also a `pvbid.min.js` file that should be for any web application.
+
 **NPM**
 ```
 npm i pvbid-sdk --save
@@ -15,7 +17,7 @@ npm i pvbid-sdk --save
 https://unpkg.com/pvbid-sdk@0.6/dist/pvbid.min.js
 
 ## Documentation
-Docs are included in the npm package. Our most recent docs are also hosted at http://www.pvbid.com/docs/sdk
+Our most recent docs are hosted at http://sdk.pvbid.com. Docs are also included in the npm package.  Code examples are included under the manual section.
 
 ## License
 Copyright (C) PVBid, Inc - All Rights Reserved.

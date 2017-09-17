@@ -1,6 +1,5 @@
 import Project from "./domain/Project";
 import BidFactory from "./domain/factories/BidFactory";
-import BidService from "./domain/services/BidService";
 import ProjectService from "./domain/services/ProjectService";
 
 export default class ProjectLoader {

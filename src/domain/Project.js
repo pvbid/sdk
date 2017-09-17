@@ -213,11 +213,6 @@ export default class Project extends BidEntity {
         });
     }
 
-    clearAllBindings() {
-        this.removeAllListeners();
-        _.each(this.bids, bid => bid.clearAllBindings());
-    }
-
     /**
      * Binds the "updated" event for all dependant bids.
      */

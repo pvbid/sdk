@@ -1,14 +1,14 @@
 # Repositories
-Included in the SDK are multiple repositories to easily access data from the server. The repositories are initialized within the PVBidContext.
+Included in the SDK are multiple repositories to easily access data from the server. The repositories are initialized within the [PVBidContext].
 
 **Available Repositories**
-* `context.repositories.bids` See [BidRepository] 
-* `context.repositories.projects` See [ProjectRepository]
-* `context.repositories.projectStatuses` See [ProjectStatusRepository]
-* `context.repositories.tags` See [TagRepository]
-* `context.repositories.snapshots` See [SnapshotRepository]
-* `context.repositories.assemblies` See [AssemblyRepository]
-* `context.repositories.users` See [UserRepository]
+* `pvbid.repositories.bids` See [BidRepository] 
+* `pvbid.repositories.projects` See [ProjectRepository]
+* `pvbid.repositories.projectStatuses` See [ProjectStatusRepository]
+* `pvbid.repositories.tags` See [TagRepository]
+* `pvbid.repositories.snapshots` See [SnapshotRepository]
+* `pvbid.repositories.assemblies` See [AssemblyRepository]
+* `pvbid.repositories.users` See [UserRepository]
 
 ### Code Examples
 
@@ -21,7 +21,7 @@ let params = {
 }
 
 try {
-    let projects = await context.repositories.projects.get(params);
+    let projects = await pvbid.repositories.projects.get(params);
     console.log(projects) //prints an array of project data.
 } catch(error) {
     //handle error;
@@ -36,3 +36,4 @@ try {
 [SnapshotRepository]: ../class/src/repositories/SnapshotRepository.js~SnapshotRepository.html
 [AssemblyRepository]: ../class/src/repositories/AssemblyRepository.js~AssemblyRepository.html
 [UserRepository]: ../class/src/repositories/UserRepository.js~UserRepository.html
+[PVBidContext]: class/src/PVBidContext.js~PVBidContext.html
