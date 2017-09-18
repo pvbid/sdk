@@ -28,6 +28,20 @@ export default class PVBidContext {
         this._token = config.token;
 
         this._httpConfig.base_uri = this._httpConfig.base_uri ? this._httpConfig.base_uri : "http://api.pvbid.com/v2";
+
+        /**
+         * A property that provides quick access to initialized repositories.
+         * 
+         * @type {object}
+         * @param {ProjectRepository} projects
+         * @param {BidRepository} bids
+         * @param {ProjectStatusRepository} projectStatuses
+         * @param {SnapshotRepository} snapshots
+         * @param {AssemblyRepository} assemblies
+         * @param {TagRepository} tags
+         * @param {UserRepository} users
+         * @param {LineItemRepository} lineItems
+         */
         this.repositories = {
             projects: new ProjectRepository(this._httpConfig),
             bids: new BidRepository(this._httpConfig),

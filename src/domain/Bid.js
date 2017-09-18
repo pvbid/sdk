@@ -107,8 +107,7 @@ export default class Bid extends BidEntity {
     /**
      * Tax Property
      * 
-     * @instance
-     * @memberof Bid
+     * @type {number}
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -122,6 +121,10 @@ export default class Bid extends BidEntity {
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
     }
+
+    /**
+     * @type {number}
+     */
     set taxPercent(val) {
         if (Helpers.isNumber(val) && !this.isReadOnly()) {
             this._data.tax_percent = val;
@@ -138,6 +141,10 @@ export default class Bid extends BidEntity {
     get markup() {
         return this._data.markup;
     }
+
+    /**
+     * @type {number}
+     */
     set markup(val) {
         if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             const newValue = Helpers.confirmNumber(val);
@@ -194,6 +201,7 @@ export default class Bid extends BidEntity {
     get price() {
         return Helpers.confirmNumber(this._data.price);
     }
+
     /**
      * @type {number}
      */
@@ -221,6 +229,7 @@ export default class Bid extends BidEntity {
     get actualCost() {
         return this._data.actual_cost;
     }
+
     /**
      * @type {number}
      */
@@ -236,6 +245,7 @@ export default class Bid extends BidEntity {
     get actualHours() {
         return this._data.actual_hours;
     }
+
     /**
      * @type {number}
      */
@@ -325,6 +335,11 @@ export default class Bid extends BidEntity {
         return percent;
     }
 
+    /**
+     * Determines if markup should also be assessed on the tax.
+     * 
+     * @returns {boolean}
+     */
     includeTaxInMarkup() {
         return this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true;
     }
@@ -371,6 +386,9 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * Globally resets markup on all line items in the bid.
+     */
     resetMarkup() {
         if (this.isAssessable()) {
             _.each(this.entities.lineItems(), lineItem => {
@@ -462,6 +480,13 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * Reassess all {@link LineItem}s, {@link Fields}s, {@link Metrics}s, and {@ linkComponents}s.
+     * This function checks {@link Bid.needsReassessment} first, to determine if reassessment is necessary.
+     * Use the force flag to reasses reguardless of necessity.
+     * 
+     * @param {boolean} forceReassessment 
+     */
     reassessAll(forceReassessment) {
         if (this.isAssessable()) {
             if (forceReassessment || this.needsReassessment()) {
@@ -483,6 +508,12 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * Analyzes line items and components calculations.  If the sum up correctly 
+     * to match the bid, reassessment is considered unnecessary. 
+     * 
+     * @returns {boolean}
+     */
     needsReassessment() {
         let totalLineItemCosts = 0,
             totalLineItemPrice = 0,
@@ -542,6 +573,10 @@ export default class Bid extends BidEntity {
             : false;
     }
 
+    /**
+     * Removes all event listeners for the bid entities in a bid.
+     * It does not remove any event listeners for the bid itself.
+     */
     clearEntityBindings() {
         for (let f of Object.values(this.entities.fields())) {
             f.removeAllListeners();
@@ -719,6 +754,12 @@ export default class Bid extends BidEntity {
         return this._bidService.createSnapshot(this, title, description);
     }
 
+    /**
+     * Determines if bid is in an "assessable" state. Factors include if the bid is as shell bid, 
+     * if the bid is in read only mode, and if the bid has no validation issues.
+     * 
+     * @returns {boolean} 
+     */
     isAssessable() {
         return !this.isShell() && !this.isReadOnly() && this.isValid();
     }

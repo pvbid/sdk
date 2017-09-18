@@ -12,7 +12,7 @@ import ComponentGroup from "../ComponentGroup";
 import BidService from "../services/BidService";
 
 /**
- * Factory class to generate a Bid object.
+ * Factory class to generate a {@link Bid} instance with internal bid entities.
  * 
  * @class BidFactory
  */
@@ -55,6 +55,12 @@ export default class BidFactory {
         return bid;
     }
 
+    /**
+     * Reloads a bids internal settings while keeping the Bid instance.
+     * 
+     * @param {Bid} bid 
+     * @param {object} bidData 
+     */
     reload(bid, bidData) {
         bid.clearEntityBindings();
         this._keyBidEntities(bidData);

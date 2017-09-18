@@ -2,7 +2,16 @@ import Project from "./domain/Project";
 import BidFactory from "./domain/factories/BidFactory";
 import ProjectService from "./domain/services/ProjectService";
 
+/**
+ * This class serves to quickly load a {@link Project} instance with included {@link Bid}s
+ * 
+ * @class ProjectLoader
+ */
 export default class ProjectLoader {
+    /**
+     * Creates an instance of ProjectLoader.
+     * @param {object} repositories 
+     */
     constructor(repositories) {
         this._repos = repositories;
     }

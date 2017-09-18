@@ -26,16 +26,23 @@ export default class Project extends BidEntity {
         this.onDelay("property.updated", 5, "self", this.assess);
     }
 
+    /**
+     * @type {string}
+     */
     get type() {
         return "project";
     }
 
+    /**
+     * @type {object} A keyed object of bids by the bid id.
+     */
     get bids() {
         return this._bids;
     }
 
     /**
      * Labor Hours Property
+     * @type {number}
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -43,6 +50,7 @@ export default class Project extends BidEntity {
 
     /**
      * Cost Property
+     * @type {number}
      */
     get cost() {
         return this._data.cost;
@@ -50,6 +58,7 @@ export default class Project extends BidEntity {
 
     /**
      * Tax Property
+     * @type {number}
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -57,6 +66,7 @@ export default class Project extends BidEntity {
 
     /**
      * Tax Percent Property
+     * @type {number}
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -64,6 +74,7 @@ export default class Project extends BidEntity {
 
     /**
      * Markup Property
+     * @type {number}
      */
     get markup() {
         return this._data.markup;
@@ -71,6 +82,7 @@ export default class Project extends BidEntity {
 
     /**
      * Margin Property
+     * @type {number}
      */
     get margin() {
         return this._data.margin;
@@ -78,6 +90,7 @@ export default class Project extends BidEntity {
 
     /**
      * Markup Percent Property
+     * @type {number}
      */
     get markupPercent() {
         return Helpers.confirmNumber(this._data.markup_percent);
@@ -85,27 +98,43 @@ export default class Project extends BidEntity {
 
     /**
      * Price Property
+     * @type {number}
      */
     get price() {
         return Helpers.confirmNumber(this._data.price);
     }
 
+    /**
+     * @type {string}
+     */
     get createdAt() {
         return this._data.created_at;
     }
 
+    /**
+     * @type {string}
+     */
     get updatedAt() {
         return this._data.updated_at;
     }
 
+    /**
+     * @type {string}
+     */
     get closedAt() {
         return this._data.closed_at;
     }
 
+    /**
+     * @type {string}
+     */
     get reconciledAt() {
         return this._data.reconciled_at;
     }
 
+    /**
+     * @type {number}
+     */
     get watts() {
         return this._data.watts;
     }

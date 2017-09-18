@@ -1,12 +1,26 @@
 import _ from "lodash";
 import Helpers from "../../utils/Helpers";
 
+/**
+ * Validates a bid structure and dependencies.
+ * 
+ * @class BidValidator
+ */
 export default class BidValidator {
+    /**
+     * Creates an instance of BidValidator.
+     */
     constructor() {
         this._bid = null;
         this._testResults = [];
     }
 
+    /**
+     * Validates a bid return an array of issues, if any exists.
+     * 
+     * @param {Bid} bid 
+     * @returns {object[]} Returns an array of validation errors.
+     */
     validate(bid) {
         this._bid = bid;
         this._testResults = [];
