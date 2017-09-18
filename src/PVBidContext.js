@@ -7,6 +7,7 @@ import ProjectStatusRepository from "./repositories/ProjectStatusRepository";
 import AssemblyRepository from "./repositories/AssemblyRepository";
 import TagRepository from "./repositories/TagRepository";
 import UserRepository from "./repositories/UserRepository";
+import LineItemRepository from "./repositories/LineItemRepository";
 
 /**
  * 
@@ -34,12 +35,13 @@ export default class PVBidContext {
             snapshots: new SnapshotRepository(this._httpConfig),
             assemblies: new AssemblyRepository(this._httpConfig),
             tags: new TagRepository(this._httpConfig),
-            users: new UserRepository(this._httpConfig)
+            users: new UserRepository(this._httpConfig),
+            lineItems: new LineItemRepository(this._httpConfig)
         };
     }
 
     /**
-     * Gets an initiated Project instance witn included Bids.
+     * Gets an initiated {@link Project} instance witn included bids.
      * 
      * @param {number} projectId The project id in which to retrieve.
      * @param {boolean} forceReload Flags system to skip cache.

@@ -876,4 +876,15 @@ export default class Bid extends BidEntity {
     async delete() {
         return this._bidService.deleteBid(this);
     }
+
+    /**
+     * Adds a new line item to the bid.  The added line item is uncategorized in all component groups.
+     * This is a wrapper function for {@link BidService.addLineItem}
+     * 
+     * @param {string} [title=New Line Item] 
+     * @returns {Promise<LineItem>}
+     */
+    async addLineItem(title) {
+        return this._bidService.addLineItem(this, title);
+    }
 }

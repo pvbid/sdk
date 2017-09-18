@@ -127,8 +127,8 @@ export default class FieldAutoPopulateService {
         }
 
         if (isChanged) {
-            this._field.emit("updated");
             this._field.config.is_auto_selected = true;
+            this._field.emit("updated");
             this._field.dirty();
         }
     }

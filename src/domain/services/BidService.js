@@ -1,6 +1,8 @@
 import BidFactory from "../factories/BidFactory";
 import BidValidator from "./BidValidator";
-
+import { waitForFinalEvent } from "../../utils/WaitForFinalEvent";
+import LineItemScaffolding from "../scaffolding/LineItemScaffolding";
+import LineItem from "../LineItem";
 /**
  * @class BidService
  */
@@ -29,24 +31,24 @@ export default class BidService {
         return clonedBid;
     }
 
-    moveLineItemToComponent(bid, lineItem, component) {
-        _.each(bid.entities.components(), function(componentToLeave) {
-            if (componentToLeave.config.component_group_id === component.config.component_group_id) {
-                if (_.includes(componentToLeave.config.line_items, lineItem.id)) {
-                    _.pull(componentToLeave.config.line_items, lineItem.id);
-
-                    componentToLeave.assess();
-                }
-            }
+    /**
+     * Adds a new line item to the bid.  The added line item is uncategorized in all component groups.
+     * 
+     * @param {Bid} bid 
+     * @param {string} [title=New Line Item] 
+     * @returns {Promise<LineItem>}
+     */
+    async addLineItem(bid, title) {
+        const scaffolding = LineItemScaffolding.create(bid.id, title);
+        const lineItemObject = await this.repositories.lineItems.create(bid.id, scaffolding);
+        const lineItem = new LineItem(lineItemObject, bid);
+        bid._data.line_items[lineItem.id] = lineItem;
+        lineItem.bind();
+        lineItem.on("assessed", "line_item." + lineItem.id, () => {
+            waitForFinalEvent(() => bid.assess(), 15, `bid.${bid.id}.line_item`);
         });
-
-        component.config.line_items.push(lineItem.id);
-        lineItem.onDelay("updated", 5, `component.${component.id}`, () => component.assess());
-        component.assess();
-    }
-
-    addLineItem(bid, title) {
-        throw "addLineItem not implemented.";
+        lineItem.on("assessed", `bid.${bid.id}`, () => bid._handleAssessmentCompleteEvent());
+        return lineItem;
     }
 
     /**

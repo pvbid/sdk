@@ -5,13 +5,13 @@ import LineItemRuleService from "./services/LineItemRuleService";
 
 /**
  * Represents line item data.
- * @export
- * @class LineItem
- * @param {object} entityData 
- * @param {Bid} bid 
- * 
  */
 export default class LineItem extends BidEntity {
+    /**
+     * Creates an instance of LineItem.
+     * @param {object} entityData 
+     * @param {Bid} bid 
+     */
     constructor(entityData, bid) {
         super();
         /**
@@ -418,11 +418,11 @@ export default class LineItem extends BidEntity {
             isChanged = this._applyProperty("per_quantity", this._getPerQuantityValue()) || isChanged;
             isChanged = this._applyProperty("escalator", this._getEscalatorValue()) || isChanged;
             isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
-            isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
-            isChanged = this._applyProperty("markup_percent", this._getMarkupPercentValue()) || isChanged;
+            isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
             isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
             isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
-            isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
+            isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
+            isChanged = this._applyProperty("markup_percent", this._getMarkupPercentValue()) || isChanged;
             isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
             isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
 
@@ -802,5 +802,26 @@ export default class LineItem extends BidEntity {
         if (_.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
+    }
+
+    /**
+     * Moves line item to a new component and self removes from original component in the same {@link ComponentGroup}
+     * 
+     * @param {Component} component 
+     */
+    moveToComponent(component) {
+        _.each(this.bid.entities.components(), componentToLeave => {
+            if (componentToLeave.config.component_group_id === component.config.component_group_id) {
+                if (_.includes(componentToLeave.config.line_items, this.id)) {
+                    _.pull(componentToLeave.config.line_items, this.id);
+
+                    componentToLeave.assess();
+                }
+            }
+        });
+
+        component.config.line_items.push(this.id);
+        this.onDelay("updated", 5, `component.${component.id}`, () => component.assess());
+        component.assess();
     }
 }
