@@ -15,16 +15,26 @@ math.import(require("mathjs/lib/constants"));
 
 export default class Helpers {
     constructor() {}
-    static confirmNumber(val, dflt, convertBoolean) {
+
+    /**
+     * Converts any value to a finite number.  If the value can not
+     * be converted it will use the default value.  Booleans are converted to 1 or 0.
+     * 
+     * @static
+     * @param {any} val 
+     * @param {number} [dflt=0]
+     * @returns {number}
+     */
+    static confirmNumber(val, dflt) {
         if (_.isFinite(val)) return val;
+
         dflt = _.isUndefined(dflt) || _.isNull(dflt) ? 0 : dflt;
         if (_.isUndefined(val) || _.isNull(val)) return dflt;
 
-        if (convertBoolean) {
-            if (_.isBoolean(val) || val === "true" || val === "false") {
-                val = val === true || val == "true" ? 1 : 0;
-            }
+        if (_.isBoolean(val) || val === "true" || val === "false") {
+            return val === true || val == "true" ? 1 : 0;
         }
+
         if (_.isNaN(val)) return dflt;
 
         val = _.replace(val, new RegExp(",", "g"), "");

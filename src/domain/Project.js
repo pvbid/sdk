@@ -220,6 +220,8 @@ export default class Project extends BidEntity {
                         this._data.components[component.definitionId] = {
                             definition_id: component.definitionId,
                             title: component.title,
+                            order_index: component.config.order_index,
+                            component_group_id: component.config.component_group_id,
                             price: 0,
                             cost: 0,
                             markup: 0,
