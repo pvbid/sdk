@@ -14,7 +14,7 @@ export default class ProjectService {
     }
 
     /**
-     * 
+     * Saves project and underlying bids.
      * 
      * @param {Project} project 
      * @returns {Promise<null>}
@@ -22,20 +22,13 @@ export default class ProjectService {
     async save(project) {
         const exported = this._savingHelper.extract(project);
         console.log("saved project data", exported);
-        return this.repositories.projects
-            .batchUpdate(project.id, exported)
-            .then(() => {
-                _.each(project.bids, bid => {
-                    bid.pristine();
-                });
-                project.pristine();
-                return;
-            })
-            .catch(err => console.log(err));
-    }
-
-    async reconcile(project) {
-        throw "reconciliation is not implemented";
+        return this.repositories.projects.batchUpdate(project.id, exported).then(() => {
+            _.each(project.bids, bid => {
+                bid.pristine();
+            });
+            project.pristine();
+            return;
+        });
     }
 
     /**
@@ -43,7 +36,7 @@ export default class ProjectService {
      * 
      * @param {Project} project
      * @param {string} [title=New Bid] 
-     * @returns {Promise<Project}
+     * @returns {Promise<Project>}
      */
     async createBid(project, title) {
         try {

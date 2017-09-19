@@ -16,7 +16,7 @@ import IndicativePricingHelper from "./services/IndicativePricingHelper";
 export default class Bid extends BidEntity {
     /**
      * Creates an instance of Bid.
-     * @param {any} bidData 
+     * @param {object} bidData 
      * @param {BidService} bidService 
      */
     constructor(bidData, bidService) {

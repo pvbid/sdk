@@ -53,27 +53,27 @@ export default class LineItemScaffolding {
                     quantity: {},
                     per_quantity: {},
                     wage: {
-                        definition_id: "bid_variable",
+                        bid_entity_id: "bid_variable",
                         type: "bid_variable",
                         field: "wage"
                     },
                     burden: {
-                        definition_id: "bid_variable",
+                        bid_entity_id: "bid_variable",
                         type: "bid_variable",
                         field: "burden"
                     },
                     escalator: {
-                        definition_id: "bid_variable",
+                        bid_entity_id: "bid_variable",
                         type: "bid_variable",
                         field: "escalator"
                     },
                     tax: {
-                        definition_id: "bid_variable",
+                        bid_entity_id: "bid_variable",
                         type: "bid_variable",
                         field: "tax"
                     },
                     markup: {
-                        definition_id: "bid_variable",
+                        bid_entity_id: "bid_variable",
                         type: "bid_variable",
                         field: "markup"
                     }

@@ -5,7 +5,9 @@ import Helpers from "../utils/Helpers";
 import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
- * Project Class
+ * A Project contains multiple {@link Bid}s and summations 
+ * of the bid results. Projects also have statuses 
+ * (ie. open/closed/win/loss), and can have assigned users
  */
 export default class Project extends BidEntity {
     /**
@@ -145,6 +147,10 @@ export default class Project extends BidEntity {
 
     /**
      * ProjectStatus Property
+     * @type {object}
+     * @property {string} title
+     * @property {string} core_status
+     * @property {boolean} is_won
      */
     get projectStatus() {
         return this._data.project_status;
@@ -170,6 +176,12 @@ export default class Project extends BidEntity {
         }
     }
 
+    /**
+     * Assess project values by summing all active bids.
+     * @emits {assessing}
+     * @emits {assessed}
+     * @emits {updated}
+     */
     assess() {
         this.emit("assessing");
         this._clearPortfolio();
@@ -269,6 +281,11 @@ export default class Project extends BidEntity {
         });
     }
 
+    /**
+     * Attaches a {@link Bid} to the project and binds necessary events.
+     * 
+     * @param {Bidany} bid 
+     */
     attachBid(bid) {
         if (this.bids[bid.id]) {
             throw "Bid is already attached.";
@@ -281,6 +298,11 @@ export default class Project extends BidEntity {
         this._bindToBid(this._bids[bid.id]);
     }
 
+    /**
+     * Removes a {@link Bid} from the project and removes all bid event listeners.
+     * 
+     * @param {Bid} bid 
+     */
     detachBid(bid) {
         if (_.isUndefined(this.bids[bid.id])) {
             throw "Bid is not attached.";
@@ -293,6 +315,12 @@ export default class Project extends BidEntity {
         this.assess();
     }
 
+    /**
+     * Creates a new bid and attaches and attaches it to the project.
+     * This is a wrapper function for {@link ProjectService.createBid}
+     * @param {string} title 
+     * @returns {Promise<Bid>} 
+     */
     async createBid(title) {
         return this._projectService.createBid(this, title);
     }

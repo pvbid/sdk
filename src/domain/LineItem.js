@@ -38,6 +38,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val)) {
             this._data.base = Helpers.confirmNumber(val);
             this.override("base", true);
+            this.isIncluded = true;            
             this.dirty();
             this.emit("property.updated");
         }
@@ -53,6 +54,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val)) {
             this._data.wage = Helpers.confirmNumber(val);
             this.override("wage", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -83,6 +85,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val)) {
             this._data.labor_hours = Helpers.confirmNumber(val);
             this.override("labor_hours", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -98,6 +101,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.burden != Helpers.confirmNumber(val)) {
             this._data.burden = Helpers.confirmNumber(val);
             this.override("burden", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -136,6 +140,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.per_quantity != Helpers.confirmNumber(val)) {
             this._data.per_quantity = Helpers.confirmNumber(val);
             this.override("per_quantity", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -151,6 +156,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.escalator != Helpers.confirmNumber(val)) {
             this._data.escalator = Helpers.confirmNumber(val);
             setOverride("escalator", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -166,6 +172,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.quantity != Helpers.confirmNumber(val)) {
             this._data.quantity = Helpers.confirmNumber(val);
             this.override("quantity", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -180,6 +187,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.multiplier != Helpers.confirmNumber(val)) {
             this._data.multiplier = Helpers.confirmNumber(val);
             this.override("multiplier", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -196,6 +204,7 @@ export default class LineItem extends BidEntity {
             this._data.escalator = 1;
             this.override("cost", true);
             this.override("escalator", true);
+            this.isIncluded = true;
             this.dirty();
             this._applyCostChange();
             this.emit("property.updated");
@@ -213,6 +222,7 @@ export default class LineItem extends BidEntity {
             this._data.tax = Helpers.confirmNumber(val);
             this.override("tax", true);
             this.override("tax_percent", true);
+            this.isIncluded = true;
             this.dirty();
 
             this._data.tax_percent = this.cost > 0 ? Helpers.confirmNumber(this.tax / this.cost) * 100 : 0;
@@ -234,6 +244,7 @@ export default class LineItem extends BidEntity {
             this._data.tax_percent = Helpers.confirmNumber(val);
             this.override("tax_percent", true);
             this._applyTaxPercentChange();
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -250,6 +261,7 @@ export default class LineItem extends BidEntity {
             this._data.markup = _.round(Helpers.confirmNumber(val), 4);
             this.override("markup", true);
             this._applyMarkupChange();
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -265,6 +277,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.markup_percent != Helpers.confirmNumber(val)) {
             this._data.markup_percent = _.round(Helpers.confirmNumber(val), 4);
             this.override("markup_percent", true);
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -281,6 +294,7 @@ export default class LineItem extends BidEntity {
             this._data.price = Helpers.confirmNumber(val);
             this.override("price", true);
             this._applyPriceChange();
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
