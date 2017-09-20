@@ -195,7 +195,6 @@ export default class Project extends BidEntity {
         });
 
         this._data.margin = this._calculateMargin();
-        this._calculateComponents();
 
         this.dirty();
         this.emit("updated");
@@ -207,61 +206,10 @@ export default class Project extends BidEntity {
         return confirmNumber(_.round(margin, 4));
     }
 
-    _calculateComponents() {
-        this._data.components = {};
-
-        _.each(this.bids, bid => {
-            _.each(bid.entities.components(), component => {
-                if (!component.config.is_nested) {
-                    component.ppw = bid.watts > 0 ? component.price / bid.watts : 0;
-                    component.cpw = bid.watts > 0 ? component.cost / bid.watts : 0;
-
-                    if (_.isUndefined(this._data.components[component.definitionId])) {
-                        this._data.components[component.definitionId] = {
-                            definition_id: component.definitionId,
-                            title: component.title,
-                            order_index: component.config.order_index,
-                            component_group_id: component.config.component_group_id,
-                            price: 0,
-                            cost: 0,
-                            markup: 0,
-                            tax: 0,
-                            labor_hours: 0,
-                            labor_cost: 0,
-                            quantity: 0,
-                            cpw: 0,
-                            ppw: 0
-                        };
-                    }
-
-                    if (bid.isActive) {
-                        this._data.components[component.definitionId].labor_cost += component.laborCost;
-                        this._data.components[component.definitionId].price += component.price;
-                        this._data.components[component.definitionId].cost += component.cost;
-                        this._data.components[component.definitionId].markup += component.markup;
-                        this._data.components[component.definitionId].tax += component.tax;
-                        this._data.components[component.definitionId].labor_hours += component.laborHours;
-
-                        this._data.components[component.definitionId].cpw =
-                            this._data.watts > 0
-                                ? this._data.components[component.definitionId].cost / this._data.watts
-                                : 0;
-                        this._data.components[component.definitionId].ppw =
-                            this._data.watts > 0
-                                ? this._data.components[component.definitionId].price / this._data.watts
-                                : 0;
-                    }
-                }
-            });
-        });
-    }
-
     /**
      * Binds the "updated" event for all dependant bids.
      */
     bind() {
-        //_.each(this.bids, bid => this._bindToBid(bid));
-
         this.on("assessed", `project.${this.id}.final`, () => {
             this._perf_end = now();
             console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
@@ -286,7 +234,7 @@ export default class Project extends BidEntity {
     /**
      * Attaches a {@link Bid} to the project and binds necessary events.
      * 
-     * @param {Bidany} bid 
+     * @param {Bid} bid 
      */
     attachBid(bid) {
         if (this.bids[bid.id]) {

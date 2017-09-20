@@ -23,6 +23,8 @@ export default class Datatable extends BidEntity {
          * @type {object}
          */
         this._data = datatableData;
+
+        this._original = _.cloneDeep(datatableData);
     }
 
     /**
@@ -72,5 +74,25 @@ export default class Datatable extends BidEntity {
         });
 
         return options;
+    }
+
+    /**
+     * Determines if the datatable is has changed for it's original data.
+     * 
+     * @returns {boolean} 
+     */
+    isDirty() {
+        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
+    }
+
+    /**
+     * Exports datatable to core structure.
+     */
+
+    exportData() {
+        let data = _.cloneDeep(this._data);
+        if (_.isEqual(data.config, this._original.config)) delete data.config;
+
+        return data;
     }
 }

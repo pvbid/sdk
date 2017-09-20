@@ -18,7 +18,7 @@ export default class PVBidContext {
      * Creates an instance of PVBidContext.
      * @param {object} config 
      * @param {string} config.token The auth token to access account data..
-     * @param {string} [config.base_uri=http://api.pvbid.com/v2] 
+     * @param {string} [config.base_uri=https://api.pvbid.com/v2] 
      */
     constructor(config) {
         if (_.isUndefined(config) || _.isUndefined(config.token)) {

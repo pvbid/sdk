@@ -17,7 +17,7 @@ npm i pvbid-sdk --save
 https://unpkg.com/pvbid-sdk@0.6/dist/pvbid.min.js
 
 ## Documentation
-Our most recent docs are hosted at http://sdk.pvbid.com. Docs are also included in the npm package.  Code examples are included under the manual section.
+Our most recent docs are hosted at http://sdk.pvbid.com. Code examples are included under the [Manual](http://sdk.pvbid.com/manual) section. The docs are also included in the npm package.  
 
 ## License
 Copyright (C) PVBid, Inc - All Rights Reserved.

@@ -1,7 +1,7 @@
 # Getting Started
 
 ### Important Notice
-In the upcoming months, we are planning to change the id's of, line items, metrics, fields, components, datatables, assemblies, component groups, and field groups. The id's will switch to UUID format: `xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx`. Project and Bid id's are expected to remain as an integer and unchanged. All legacy bid data in our system will be updated. Breaking changes will be minimal, but are expected.
+In the upcoming months, we are planning to change the IDs of, line items, metrics, fields, components, datatables, assemblies, component groups, and field groups. The IDs will switch to an alpha-numerical format. Project and Bid IDs are expected to remain as an integer and unchanged. All legacy bid data in our system will be updated. Breaking changes will be minimal, but are expected.
 
 ### Concepts
 A [Project] contains multiple [Bids] and summations of the bid results. Projects also have statuses (ie. open/closed/win/loss), and can have assigned users.

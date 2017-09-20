@@ -38,7 +38,7 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val)) {
             this._data.base = Helpers.confirmNumber(val);
             this.override("base", true);
-            this.isIncluded = true;            
+            this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
         }
@@ -450,6 +450,15 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Determines if the line item is has changed for it's original data.
+     * 
+     * @returns {boolean} 
+     */
+    isDirty() {
+        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
+    }
+
+    /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
@@ -469,6 +478,15 @@ export default class LineItem extends BidEntity {
                 let dependency = this.bid.entities.getDependency(dependencyContract);
                 if (dependency) {
                     dependency.on("updated", `line_item.${this.id}`, () => this.assess());
+
+                    if (dependency.type === "field" && dependency.config.type === "list") {
+                        _.each(dependency.config.dependencies, fieldDependencyContract => {
+                            const fieldDependency = this.bid.entities.getDependency(fieldDependencyContract);
+                            if (fieldDependency) {
+                                fieldDependency.on("updated", `line_item.${this.id}`, () => this.assess());
+                            }
+                        });
+                    }
                 }
             }
         }
