@@ -853,7 +853,7 @@ export default class LineItem extends BidEntity {
         });
 
         component.config.line_items.push(this.id);
-        this.onDelay("updated", 5, `component.${component.id}`, () => component.assess());
+        component.bind();
         component.assess();
     }
 }

@@ -8,15 +8,16 @@
         "build-node": "PLATFORM=node webpack",
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
-        "docs": "./node_modules/.bin/esdoc && open docs/index.html"
+        "docs": "./node_modules/.bin/esdoc && open docs/index.html",
+        "size": "size-limit"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
+    "size-limit": [
+        {
+            "path": "src/pvbid.js",
+            "limit": "120 KB"
+        }
     ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {
@@ -50,6 +51,7 @@
         "lodash-webpack-plugin": "^0.11.4",
         "minami": "^1.2.3",
         "path": "^0.12.7",
+        "size-limit": "^0.11.4",
         "webpack": "^3.5.5",
         "webpack-s3-plugin": "^1.0.0-rc.0"
     },
