@@ -38,6 +38,9 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val)) {
             this._data.base = Helpers.confirmNumber(val);
             this.override("base", true);
+            this.override("cost", false);
+            this.override("multiplier", false);
+            this.multiplier = 1;
             this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
@@ -140,6 +143,9 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.per_quantity != Helpers.confirmNumber(val)) {
             this._data.per_quantity = Helpers.confirmNumber(val);
             this.override("per_quantity", true);
+            this.override("cost", false);
+            this.override("multiplier", false);
+            this.multiplier = 1;
             this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
@@ -172,6 +178,9 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.quantity != Helpers.confirmNumber(val)) {
             this._data.quantity = Helpers.confirmNumber(val);
             this.override("quantity", true);
+            this.override("cost", false);
+            this.override("multiplier", false);
+            this.multiplier = 1;
             this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
@@ -613,20 +622,8 @@ export default class LineItem extends BidEntity {
         var lineItemSubtotal = this.subtotal;
 
         if (lineItemSubtotal > 0) {
-            if (this.isLabor()) {
-                var laborHours = this._reverseComputeLaborHours(this.cost, this.wage, this.burden);
-                this._data.multiplier = Helpers.confirmNumber(laborHours / lineItemSubtotal, 1);
-            } else {
-                this._data.multiplier = Helpers.confirmNumber(parseFloat(this.cost) / lineItemSubtotal, 1);
-            }
+            this._data.multiplier = this.cost / this.subtotal;
         } else {
-            //If original subtotal was zero, simply apply the  intended total to the base.
-            if (this.isLabor()) {
-                this.base = this._reverseComputeLaborHours(this.cost, this.wage, this.burden);
-            } else {
-                this.base = this.cost;
-            }
-
             this._data.multiplier = 1;
         }
     }
