@@ -4,6 +4,17 @@ import Helpers from "../../utils/Helpers";
 export default class BidModelRelationsHelper {
     constructor(bid) {
         this.bid = bid;
+        this._types = [
+            "line_item",
+            "metric",
+            "variable",
+            "field",
+            "field_group",
+            "component",
+            "component_group",
+            "assembly",
+            "datatable"
+        ];
     }
 
     fields(id) {
@@ -159,6 +170,34 @@ export default class BidModelRelationsHelper {
                 definition_id: defId
             });
         }
+    }
+
+    /**
+     * Gets all the dependants for a bid bid entity.
+     * 
+     * @param {string} type The type of bid enity. IE. line_item, field, metric, component, etc.
+     * @param {int} id The id of the bid entity.
+     * @returns [array]
+     */
+    getDependants(type, id) {
+        let dependants = [];
+        try {
+            _.each(this._types, entityType => {
+                const typeKey = entityType === "assembly" ? "assemblies" : entityType + "s";
+                const entities = this.getCollection(typeKey);
+                _.each(entities, entity => {
+                    _.each(entity.dependencies(), dependency => {
+                        if (dependency.type === type && dependency.id === id) {
+                            dependants.push(entity);
+                        }
+                    });
+                });
+            });
+        } catch (error) {
+            console.log(error, type, typeKey, entity);
+        }
+
+        return dependants;
     }
 
     getBidEntity(type, id) {

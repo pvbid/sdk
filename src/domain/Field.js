@@ -138,10 +138,34 @@ export default class Field extends BidEntity {
         }
     }
 
+    dependencies() {
+        let contracts = Object.values(this.config.dependencies);
+        let dependencies = [];
+
+        _.each(contracts, ctrct => {
+            const dependency = this.bid.entities.getDependency(ctrct);
+            if (dependency) {
+                dependencies.push(dependency);
+            }
+        });
+
+        return dependencies;
+    }
+
+    dependants() {
+        let d = this.bid.entities.getDependants("field", this.id);
+        return d;
+    }
+
     getDatatable() {
         if (this.fieldType === "list") {
             return this.bid.entities.datatables(this.config.dependencies.datatable.bid_entity_id);
         } else return null;
+    }
+
+    getListOptions() {
+        const dt = this.getDatatable();
+        return dt ? dt.getOptions() : [];
     }
 
     getSelectedOption() {

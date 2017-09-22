@@ -51,4 +51,8 @@ export default class BidVariable extends BidEntity {
         this.dirty();
         this.emit("updated");
     }
+
+    dependants() {
+        return this.bid.entities.getDependants("bid_variable", this.id);
+    }
 }

@@ -121,6 +121,32 @@ export default class Metric extends BidEntity {
         console.log("Metric Compare: ", this._original.value, this._data.value);
     }
 
+    dependencies() {
+        let contracts = [];
+        let dependencies = [];
+
+        contracts = contracts.concat(Object.values(this.config.dependencies));
+
+        if (!_.isUndefined(this.config.manipulations)) {
+            for (let manipulation of Object.values(this.config.manipulations)) {
+                contracts = contracts.concat(Object.values(manipulation.dependencies));
+            }
+        }
+
+        _.each(contracts, ctrct => {
+            const dependency = this.bid.entities.getDependency(ctrct);
+            if (dependency) {
+                dependencies.push(dependency);
+            }
+        });
+
+        return dependencies;
+    }
+
+    dependants() {
+        return this.bid.entities.getDependants("metric", this.id);
+    }
+
     assess() {
         if (this.bid.isAssessable()) {
             if (!this.config.override) {

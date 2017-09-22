@@ -1,6 +1,6 @@
 import _ from "lodash";
-import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
+import Helpers from "../utils/Helpers";
 import LineItemRuleService from "./services/LineItemRuleService";
 
 /**
@@ -467,6 +467,31 @@ export default class LineItem extends BidEntity {
             this._bindLineItemRuleDependencies();
             this._bindLineItemPredictionDependencies();
         }
+    }
+
+    dependencies() {
+        let dependencies = [];
+        let contracts = [];
+        contracts = contracts.concat(Object.values(this.config.dependencies));
+
+        for (let rule of Object.values(this.config.rules)) {
+            if (rule.dependencies) {
+                contracts = contracts.concat(Object.values(rule.dependencies));
+            }
+        }
+
+        _.each(contracts, ctrct => {
+            const dependency = this.bid.entities.getDependency(ctrct);
+            if (dependency) {
+                dependencies.push(dependency);
+            }
+        });
+
+        return dependencies;
+    }
+
+    dependants() {
+        return this.bid.entities.getDependants("line_item", this.id);
     }
 
     /**

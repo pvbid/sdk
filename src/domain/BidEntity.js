@@ -101,6 +101,14 @@ export default class BidEntity extends AdvanceEventEmitter {
         return _.cloneDeep(this._data);
     }
 
+    dependencies() {
+        return [];
+    }
+
+    dependants() {
+        return [];
+    }
+
     /**
      * Assesses bid entity. 
      * 

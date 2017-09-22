@@ -456,6 +456,10 @@ export default class Component extends BidEntity {
         }
     }
 
+    dependants() {
+        return this.bid.entities.getDependants("component", this.id);
+    }
+
     /**
      * Binds the "updated" event for all dependant bid entities.
      */

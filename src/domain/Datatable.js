@@ -76,6 +76,10 @@ export default class Datatable extends BidEntity {
         return options;
     }
 
+    dependants() {
+        return this.bid.entities.getDependants("datatable", this.id);
+    }
+
     /**
      * Determines if the datatable is has changed for it's original data.
      * 
