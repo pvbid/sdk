@@ -1,6 +1,6 @@
 {
     "name": "pvbid-sdk",
-    "version": "0.6.13",
+    "version": "0.6.14",
     "description": "",
     "main": "dist/pvbid.node.js",
     "scripts": {
@@ -17,7 +17,13 @@
             "limit": "120 KB"
         }
     ],
-    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
+    "keywords": [
+        "pvbid",
+        "solar",
+        "javascript",
+        "estimating",
+        "bidding"
+    ],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {
