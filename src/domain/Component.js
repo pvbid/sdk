@@ -461,6 +461,17 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Removes a line item from the component.
+     * 
+     * @param {number} lineItemId 
+     */
+    removeLineItem(lineItemId) {
+        _.pull(this.config.line_items, lineItemId);
+        this.dirty();
+        this.assess();
+    }
+
+    /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {

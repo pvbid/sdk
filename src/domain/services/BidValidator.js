@@ -152,7 +152,7 @@ export default class BidValidator {
                 _.each(assembly.config.metrics, id => {
                     var entity = this._bid.entities.metrics(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
-                        this._logIssue("invalid_assembly_reference", assembly, null, {
+                        this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "metric",
                             dependency_id: id
                         });
@@ -162,7 +162,7 @@ export default class BidValidator {
                 _.each(assembly.config.fields, id => {
                     var entity = this._bid.entities.fields(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
-                        this._logIssue("invalid_assembly_reference", assembly, null, {
+                        this._logIssue("invalid_assembly_entity_reference", assembly, null, {
                             dependency_type: "field",
                             dependency_id: id
                         });
@@ -182,7 +182,7 @@ export default class BidValidator {
                     var entity = this._bid.entities.metrics(id);
                     if (_.isUndefined(entity) || _.isNull(entity)) {
                         this._logIssue("invalid_assembly_entity_reference", assembly, null, {
-                            dependency_type: "maniipulated_metric",
+                            dependency_type: "manipulated_metric",
                             dependency_id: id
                         });
                     }
@@ -387,7 +387,10 @@ export default class BidValidator {
             var bidLineItem = this._bid.entities.lineItems(lineItemId);
 
             if (_.isUndefined(bidLineItem) || _.isNull(bidLineItem)) {
-                this._logIssue("invalid_component_line_item_reference", sourceBidEntity);
+                this._logIssue("invalid_component_line_item_reference", sourceBidEntity, {
+                    type: "line_item",
+                    bid_entity_id: lineItemId
+                });
             }
         });
 

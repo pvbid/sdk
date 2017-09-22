@@ -321,4 +321,8 @@ export default class Project extends BidEntity {
         delete project.components;
         return project;
     }
+
+    async clone() {
+        return this.repositories.projects.clone(this.id);
+    }
 }

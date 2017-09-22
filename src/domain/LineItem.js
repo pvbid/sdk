@@ -878,4 +878,31 @@ export default class LineItem extends BidEntity {
         component.bind();
         component.assess();
     }
+
+    components() {
+        let components = [];
+        _.each(this.bid.entities.components(), component => {
+            if (_.includes(component.config.line_items, this.id)) components.push(component);
+        });
+        return components;
+    }
+
+    async delete() {
+        if (this.dependants().length === 0) {
+            await this.bid._bidService.repositories.lineItems.delete(this.bid.id, this.id);
+            _.each(this.components(), c => {
+                c.removeLineItem(this.id);
+            });
+
+            if (this.config.assembly_id) {
+                const assembly = this.bid.entities.assemblies(this.config.assembly_id);
+                assembly.removeBidEntity(this.type, this.id);
+            }
+
+            delete this.bid._data.line_items[this.id];
+            this.removeAllListeners();
+            this.bid.assess();
+            return;
+        } else Promise.reject({ message: "Line item has dependants." });
+    }
 }

@@ -41,4 +41,10 @@ export default class ProjectRepository extends BaseRepository {
             return response.data.data;
         });
     }
+
+    async clone(projectId) {
+        return this.http.post(this.endpoint + projectId + "/clone").then(function(response) {
+            return response.data.data.project;
+        });
+    }
 }

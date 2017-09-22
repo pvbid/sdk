@@ -19,6 +19,12 @@ export default class Assembly extends BidEntity {
         this._data = assemblyData;
     }
 
+    removeBidEntity(type, id) {
+        const typeKey = type + "s";
+        _.pull(this._data.config[typeKey], id);
+        this.dirty();
+    }
+
     /**
      * @type {object}
      */
