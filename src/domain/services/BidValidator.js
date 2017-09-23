@@ -1,4 +1,5 @@
 import _ from "lodash";
+import BidEntity from "../BidEntity";
 import Helpers from "../../utils/Helpers";
 
 /**
@@ -38,11 +39,15 @@ export default class BidValidator {
         if (!_.isUndefined(bidEntity.config.dependencies)) {
             _.each(bidEntity.config.dependencies, (dependencyContract, key) => {
                 if (!_.isEmpty(dependencyContract) && !_.isNull(dependencyContract.type)) {
-                    this._testDependencyExistance(bidEntity, dependencyContract, key);
-                    this._testDatatableKey(bidEntity, dependencyContract, key);
-                    this._testEmptyField(bidEntity, dependencyContract, key);
-                    this._testLineItemDatatableLink(bidEntity, dependencyContract, key);
-                    this._testDependencyAssemblySafeGuard(bidEntity, dependencyContract, key);
+                    try {
+                        this._testDependencyExistance(bidEntity, dependencyContract, key);
+                        this._testDatatableKey(bidEntity, dependencyContract, key);
+                        this._testEmptyField(bidEntity, dependencyContract, key);
+                        this._testLineItemDatatableLink(bidEntity, dependencyContract, key);
+                        this._testDependencyAssemblySafeGuard(bidEntity, dependencyContract, key);
+                    } catch (error) {
+                        throw "Base test failure";
+                    }
                 }
             });
 
@@ -67,8 +72,14 @@ export default class BidValidator {
 
                     if (!_.isUndefined(rule.dependencies)) {
                         _.each(rule.dependencies, (dependencyContract, ruleKey) => {
+                            this._testUnconvertedRuleDefinitionId(lineItem, dependencyContract, ruleKey, rule);
                             if (!_.isEmpty(dependencyContract) && !_.isNull(dependencyContract.type)) {
-                                this._testDependencyExistance(lineItem, dependencyContract, ruleKey);
+                                try {
+                                    this._testDependencyExistance(lineItem, dependencyContract, ruleKey);
+                                } catch (error) {
+                                    throw "rule test failure";
+                                }
+
                                 this._testDependencyAssemblySafeGuard(lineItem, dependencyContract, ruleKey);
                                 this._testEmptyField(lineItem, dependencyContract, ruleKey);
                             }
@@ -359,26 +370,40 @@ export default class BidValidator {
         }
     }
 
+    _testUnconvertedRuleDefinitionId(lineItem, dependencyContract, dependencyKey, rule) {
+        if (dependencyContract.definition_id) {
+            this._logIssue("unconverted_rule_dependency_def_id", lineItem, dependencyContract, {
+                source_bid_entity_dependency_key: dependencyKey,
+                rule: rule,
+                line_item: lineItem
+            });
+        }
+    }
+
     _testDependencyAssemblySafeGuard(sourceBidEntity, dependencyContract, dependencyKey) {
-        if (dependencyContract.type !== "bid" && dependencyContract.type !== "bid_variable") {
-            var dependency = this._bid.entities.getDependency(dependencyContract);
+        try {
+            if (dependencyContract.type !== "bid" && dependencyContract.type !== "bid_variable") {
+                var dependency = this._bid.entities.getDependency(dependencyContract);
 
-            if (dependency) {
-                if (dependency.config.assembly_id) {
-                    var sourceAssemblyId =
-                        sourceBidEntity.type === "assembly"
-                            ? sourceBidEntity.id
-                            : _.isUndefined(sourceBidEntity.config.assembly_id)
-                              ? null
-                              : sourceBidEntity.config.assembly_id;
+                if (dependency) {
+                    if (dependency.config.assembly_id) {
+                        var sourceAssemblyId =
+                            sourceBidEntity.type === "assembly"
+                                ? sourceBidEntity.id
+                                : _.isUndefined(sourceBidEntity.config.assembly_id)
+                                  ? null
+                                  : sourceBidEntity.config.assembly_id;
 
-                    if (dependency.config.assembly_id !== sourceAssemblyId) {
-                        this._logIssue("invalid_assembly_reference", sourceBidEntity, dependencyContract, {
-                            source_bid_entity_dependency_key: dependencyKey
-                        });
+                        if (dependency.config.assembly_id !== sourceAssemblyId) {
+                            this._logIssue("invalid_assembly_reference", sourceBidEntity, dependencyContract, {
+                                source_bid_entity_dependency_key: dependencyKey
+                            });
+                        }
                     }
                 }
             }
+        } catch (error) {
+            throw error;
         }
     }
 
@@ -422,7 +447,7 @@ export default class BidValidator {
             var bidField = this._bid.entities.fields(fieldId);
 
             if (_.isUndefined(bidField) || _.isNull(bidField)) {
-                this._logIssue("invalid_field_group_reference", sourceBidEntity);
+                this._logIssue("invalid_field_group_reference", sourceBidEntity, null, { dependency_id: fieldId });
             }
         });
     }
