@@ -1,3 +1,4 @@
+import _ from "lodash";
 import Project from "./domain/Project";
 import BidFactory from "./domain/factories/BidFactory";
 import ProjectService from "./domain/services/ProjectService";

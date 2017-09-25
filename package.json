@@ -9,7 +9,8 @@
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
         "docs": "./node_modules/.bin/esdoc && open docs/index.html",
-        "size": "size-limit"
+        "size": "size-limit",
+        "test": "./node_modules/.bin/jest -i --forceExit"
     },
     "size-limit": [
         {
@@ -17,18 +18,20 @@
             "limit": "120 KB"
         }
     ],
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "jest": {
+        "testRegex": "(/tests/.*|(\\.|/)(test|spec))\\.js?$",
+        "verbose": true,
+        "browser": false,
+        "testEnvironment": "node"
+    },
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {
+        "axios-mock-adapter": "^1.9.0",
         "babel-core": "^6.26.0",
         "babel-eslint": "^7.2.3",
+        "babel-jest": "^21.0.2",
         "babel-loader": "^7.1.2",
         "babel-minify-webpack-plugin": "^0.2.0",
         "babel-plugin-lodash": "^3.2.11",
@@ -52,8 +55,10 @@
         "eslint-plugin-promise": "^3.5.0",
         "eslint-plugin-standard": "^3.0.1",
         "happypack": "^4.0.0",
-        "jest": "^20.0.4",
+        "jest": "^21.1.0",
+        "jest-environment-node-debug": "^2.0.0",
         "jsdoc-template": "github:braintree/jsdoc-template",
+        "jsonfile": "^4.0.0",
         "lodash-webpack-plugin": "^0.11.4",
         "minami": "^1.2.3",
         "path": "^0.12.7",

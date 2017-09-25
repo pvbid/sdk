@@ -490,7 +490,7 @@ export default class Bid extends BidEntity {
     reassessAll(forceReassessment) {
         if (this.isAssessable()) {
             if (forceReassessment || this.needsReassessment()) {
-                console.log("Start Bid  Reassessment", "Bid: ", this.id);
+                //console.log("Start Bid  Reassessment", "Bid: ", this.id);
 
                 for (let f of Object.values(this.entities.fields())) {
                     f.assess();
@@ -629,8 +629,8 @@ export default class Bid extends BidEntity {
             () => {
                 this._perf_end = now();
 
-                console.log(`Bid Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
-                console.log("Maxed events used", this._calcRounds);
+                //console.log(`Bid Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
+                //console.log("Maxed events used", this._calcRounds);
                 this._calcRounds = 0;
 
                 this._perf_start = null;

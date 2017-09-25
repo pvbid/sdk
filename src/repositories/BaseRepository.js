@@ -97,7 +97,7 @@ export default class BaseRepository {
                     }
                     configuration.params.impersonate_id = this.httpConfig.impersonate_id;
                 }
-                return configuration;
+                return Promise.resolve(configuration);
             },
             function(error) {
                 return Promise.reject(error);

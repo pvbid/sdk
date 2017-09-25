@@ -203,7 +203,7 @@ export default class Project extends BidEntity {
 
     _calculateMargin() {
         var margin = this._data.price > 0 ? parseFloat(this._data.markup) / this._data.price * 100 : 0;
-        return confirmNumber(_.round(margin, 4));
+        return Helpers.confirmNumber(_.round(margin, 4));
     }
 
     /**
@@ -212,8 +212,8 @@ export default class Project extends BidEntity {
     bind() {
         this.on("assessed", `project.${this.id}.final`, () => {
             this._perf_end = now();
-            console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
-            console.log("Project Cost/Price", this.cost, this.price);
+            //console.log(`Project Assessment Time (id ${this.id})`, (this._perf_start - this._perf_end).toFixed(3)); // ~ 0.002 on my system
+            //console.log("Project Cost/Price", this.cost, this.price);
             this._perf_start = null;
         });
     }
