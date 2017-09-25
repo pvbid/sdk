@@ -8,3 +8,6 @@ dist/**
 !dist/*.js
 .env
 coverage/**
+.babelrc
+tests/**
+.vscode/**
