@@ -7,3 +7,4 @@ manual/**
 dist/**
 !dist/*.js
 .env
+coverage/**
