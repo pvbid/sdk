@@ -862,7 +862,7 @@ export default class Bid extends BidEntity {
     async removeAssembly(assemblyId) {
         return this._bidService.removeAssembly(this, assemblyId);
     }
-
+    
     /**
      * Adds assemblies to bid. A wrapper function for {@link BidService.addAssemblies}
      * 
