@@ -86,8 +86,8 @@ export default class Project extends BidEntity {
      * Margin Property
      * @type {number}
      */
-    get margin() {
-        return this._data.margin;
+    get marginPercent() {
+        return this._data.margin_percent;
     }
 
     /**
@@ -194,7 +194,7 @@ export default class Project extends BidEntity {
             }
         });
 
-        this._data.margin = this._calculateMargin();
+        this._data.margin_percent = this._calculateMargin();
 
         this.dirty();
         this.emit("updated");

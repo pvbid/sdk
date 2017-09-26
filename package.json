@@ -4,7 +4,7 @@
     "description": "",
     "main": "dist/pvbid.node.js",
     "scripts": {
-        "build": "npm run docs && PLATFORM=node webpack && PLATFORM=web DOCS=true webpack",
+        "build": "npm run test && npm run docs && PLATFORM=node webpack && PLATFORM=web DOCS=true webpack",
         "build-node": "PLATFORM=node webpack",
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
@@ -24,13 +24,7 @@
         "browser": false,
         "testEnvironment": "node"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {

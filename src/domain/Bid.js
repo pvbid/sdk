@@ -188,7 +188,7 @@ export default class Bid extends BidEntity {
      * @type {number}
      */
     set markupPercent(val) {
-        if (Helpers.isNumber(val) && this._data.margin_percent != Helpers.confirmNumber(val) && !this.isReadOnly()) {
+        if (Helpers.isNumber(val) && this._data.markup_percent != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             this._data.markup_percent = Helpers.confirmNumber(val);
             this.dirty();
             this.emit("property.updated");

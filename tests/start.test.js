@@ -58,11 +58,7 @@ async function init() {
     });
 }
 
-test("dumb test", () => {
-    expect(1).toBe(1);
-});
-
-test("trial test", () => {
+test("confirm test data", () => {
     expect(_.round(project.cost)).toBe(78347);
 });
 
