@@ -4,11 +4,12 @@
     "description": "",
     "main": "dist/pvbid.node.js",
     "scripts": {
-        "build": "npm run test && npm run docs && PLATFORM=node webpack && PLATFORM=web DOCS=true webpack",
+        "build": "npm run test && npm run docs && PLATFORM=node webpack && PLATFORM=web webpack",
         "build-node": "PLATFORM=node webpack",
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
         "docs": "./node_modules/.bin/esdoc && open docs/index.html",
+        "publish-docs": "npm run test && npm run docs && PLATFORM=web DOCS=true webpack",
         "size": "size-limit",
         "test": "./node_modules/.bin/jest -i --forceExit"
     },
@@ -24,13 +25,7 @@
         "browser": false,
         "testEnvironment": "node"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {
