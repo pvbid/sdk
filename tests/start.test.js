@@ -8,10 +8,7 @@ const PVBid = require("../src/pvbid.js");
 var MockAdapter = require("axios-mock-adapter");
 import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
 
-const token =
-    "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6ImEzN2MzNTdjZWQ1MGFjYTM1ZWRmM2ZjZjdjMThkYzk4NzQxMWExYjE3YTUxYTBhZjExYTUzMmRkMTNiZjc3NjY4MzBmNjljNDlkYTQ2YmViIn0.eyJhdWQiOiIyIiwianRpIjoiYTM3YzM1N2NlZDUwYWNhMzVlZGYzZmNmN2MxOGRjOTg3NDExYTFiMTdhNTFhMGFmMTFhNTMyZGQxM2JmNzc2NjgzMGY2OWM0OWRhNDZiZWIiLCJpYXQiOjE1MDYyOTE0NjMsIm5iZiI6MTUwNjI5MTQ2MywiZXhwIjoxNTM3ODI3NDYzLCJzdWIiOiIzIiwic2NvcGVzIjpbIm1hbmFnZS1hY2NvdW50IiwibWFuYWdlLWRlZmluaXRpb25zIiwibWFuYWdlLWJpZHMiLCJzeXN0ZW0tYWRtaW4iXX0.j8LWOljtj-L4DOE_fc-4MJ7qVTV2E64eYPAceqldfFpi8GAtINYNhKegGK9NdI5t7KD9UR7p6KpQtjFL3WVLst4hbcBqctzWMdXpudJaQGsisxE3WI3BmcvWXFyrJAGLERT_vEe5wU-ES8cOkWHCLDlnn7euVZBlIivRIZKAGluRVijTgwGxklqB6A-mks4F7ctoUFAuGXeNLlrB5m2LzGwuSI4eUeKBFsFM8vEqJL5uAKk3Jhe-5p6JLc6fk69MOJlz8kjZnzDYAn3PyTi6gX9JSZ39Nms8qMddx2mmE65X48rAB4Se3Jx-ISArGA_KJzV17yBki3n3YofM4WetsnLyztGNcUXTYoISnspNtTuEKbMpSevuGPlWwxy-N2ztD6Iks81giw8yXMFhbNsKdiWzyiPt7pjl59xKZAjyf90Kzqlp9xZm2YGOZe8lZXc1d-x_MOyGAbgV_v187oburBVBZYat1CrcMF24UexvD7kPJmdSBoFaSaD3SKlXaKv5HU7zeaxT88PD1Yzf0MpdIYn-JMucw65pNFm7IPZURPkXxswPqTAIrs-LSdA_SgQkjkV3u1EWEegDk5W8SOqrSNlC64weQaNt7IK_W7q93ICbFEarekZYzfQANISYOXztY8AP3IJ0ti8kSqzJ81y2gDmLFqpeXhjX4kqzKUT64MA";
-
-let context = PVBid.createContext({ token: token, base_uri: "http://api.pvbid.local/v2" });
+let context = PVBid.createContext({ token: "Bearer Token", base_uri: "http://api.pvbid.local/v2" });
 let project;
 let bid;
 let lineItem;
@@ -111,7 +108,7 @@ test(
 
                 resolve();
             });
-            lineItem.cost = 10;
+            lineItem.cost = "10";
         });
     },
     20000
@@ -155,7 +152,7 @@ test(
 
                 resolve();
             });
-            lineItem.price = 15;
+            lineItem.price = "15";
         });
     },
     20000
@@ -200,9 +197,9 @@ test(
 
                 resolve();
             });
-            lineItem.quantity = 1;
-            lineItem.perQuantity = 10;
-            lineItem.base = 5;
+            lineItem.quantity = "1";
+            lineItem.perQuantity = "10";
+            lineItem.base = "5";
         });
     },
     20000
@@ -294,7 +291,7 @@ test(
 
                 resolve();
             });
-            lineItem.markupPercent = 50;
+            lineItem.markupPercent = "50";
         });
     },
     20000
@@ -340,7 +337,7 @@ test(
 
                 resolve();
             });
-            lineItem.taxPercent = 10;
+            lineItem.taxPercent = "10";
         });
     },
     20000
@@ -387,7 +384,7 @@ test("change line item escalator", () => {
         lineItem.override("price", true); // set to true to check if it resets to false;
         expect(lineItem.isOverridden("price")).toBe(true); //verify
 
-        lineItem.escalator = 1.5;
+        lineItem.escalator = "1.5";
     });
 });
 
@@ -433,7 +430,7 @@ test("reset line item", () => {
     });
 });
 
-test("reset line item", () => {
+test("test multiplier", () => {
     expect.assertions(25);
 
     return new Promise(resolve => {
@@ -472,9 +469,152 @@ test("reset line item", () => {
 
             resolve();
         });
-        lineItem.base = 5;
-        lineItem.cost = 15;
+        lineItem.base = "5";
+        lineItem.cost = "15";
         lineItem.override("price", true);
-        lineItem.multiplier = 2;
+        lineItem.multiplier = "2";
+    });
+});
+
+test("test markup not including tax", () => {
+    expect.assertions(25);
+
+    return new Promise(resolve => {
+        lineItem.onDelay("assessed", 200, "test escalator", () => {
+            expect(lineItem.isOverridden("cost")).toBe(true);
+            expect(lineItem.isOverridden("price")).toBe(false);
+            expect(lineItem.isOverridden("markup")).toBe(false);
+            expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden("tax")).toBe(false);
+            expect(lineItem.isOverridden("tax_percent")).toBe(false);
+            expect(lineItem.isOverridden("base")).toBe(false);
+            expect(lineItem.isOverridden("escalator")).toBe(true);
+            expect(lineItem.isOverridden("quantity")).toBe(false);
+            expect(lineItem.isOverridden("per_quantity")).toBe(false);
+
+            expect(_.round(lineItem.base, 2)).toBe(0);
+            expect(_.round(lineItem.quantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.subtotal, 2)).toBe(0);
+
+            expect(_.round(lineItem.laborHours, 2)).toBe(0);
+            expect(_.round(lineItem.wage, 2)).toBe(0);
+            expect(_.round(lineItem.burden, 2)).toBe(0);
+
+            expect(_.round(lineItem.multiplier, 2)).toBe(1);
+            expect(_.round(lineItem.escalator, 2)).toBe(1);
+            expect(_.round(lineItem.cost, 2)).toBe(10);
+
+            expect(_.round(lineItem.tax, 2)).toBe(0.8);
+            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+
+            expect(_.round(lineItem.markup, 2)).toBe(1.8);
+            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+
+            expect(_.round(lineItem.price, 2)).toBe(12.6);
+
+            resolve();
+        });
+        let strategy = lineItem.bid.entities.variables("markup_strategy");
+        strategy.value = false;
+        lineItem.reset();
+        lineItem.cost = "10";
+    });
+});
+
+test("test markup not including tax", () => {
+    expect.assertions(27);
+
+    return new Promise(resolve => {
+        lineItem.onDelay("assessed", 200, "test escalator", () => {
+            expect(lineItem.isOverridden("cost")).toBe(false);
+            expect(lineItem.isOverridden("price")).toBe(false);
+            expect(lineItem.isOverridden("markup")).toBe(false);
+            expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden("tax")).toBe(false);
+            expect(lineItem.isOverridden("tax_percent")).toBe(false);
+            expect(lineItem.isOverridden("base")).toBe(true);
+            expect(lineItem.isOverridden("escalator")).toBe(false);
+            expect(lineItem.isOverridden("quantity")).toBe(false);
+            expect(lineItem.isOverridden("per_quantity")).toBe(false);
+            expect(lineItem.isOverridden("wage")).toBe(true);
+            expect(lineItem.isOverridden("burden")).toBe(true);
+
+            expect(_.round(lineItem.base, 2)).toBe(5);
+            expect(_.round(lineItem.quantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.subtotal, 2)).toBe(5);
+
+            expect(_.round(lineItem.laborHours, 2)).toBe(5);
+            expect(_.round(lineItem.wage, 2)).toBe(15);
+            expect(_.round(lineItem.burden, 2)).toBe(5);
+
+            expect(_.round(lineItem.multiplier, 2)).toBe(1);
+            expect(_.round(lineItem.escalator, 2)).toBe(1);
+            expect(_.round(lineItem.cost, 2)).toBe(100);
+
+            expect(_.round(lineItem.tax, 2)).toBe(0);
+            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+
+            expect(_.round(lineItem.markup, 2)).toBe(18);
+            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+
+            expect(_.round(lineItem.price, 2)).toBe(118.0);
+
+            resolve();
+        });
+
+        lineItem.config.type = "labor";
+        lineItem.reset();
+        lineItem.wage = "15";
+        lineItem.burden = "5";
+        lineItem.base = "5";
+    });
+});
+
+test("test labor hours override", () => {
+    expect.assertions(28);
+
+    return new Promise(resolve => {
+        lineItem.onDelay("assessed", 200, "test escalator", () => {
+            expect(lineItem.isOverridden("cost")).toBe(false);
+            expect(lineItem.isOverridden("price")).toBe(false);
+            expect(lineItem.isOverridden("markup")).toBe(false);
+            expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden("tax")).toBe(false);
+            expect(lineItem.isOverridden("tax_percent")).toBe(false);
+            expect(lineItem.isOverridden("base")).toBe(true);
+            expect(lineItem.isOverridden("escalator")).toBe(false);
+            expect(lineItem.isOverridden("quantity")).toBe(false);
+            expect(lineItem.isOverridden("per_quantity")).toBe(false);
+            expect(lineItem.isOverridden("wage")).toBe(true);
+            expect(lineItem.isOverridden("burden")).toBe(true);
+            expect(lineItem.isOverridden("labor_hours")).toBe(true);
+
+            expect(_.round(lineItem.base, 2)).toBe(5);
+            expect(_.round(lineItem.quantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.subtotal, 2)).toBe(5);
+
+            expect(_.round(lineItem.laborHours, 2)).toBe(10);
+            expect(_.round(lineItem.wage, 2)).toBe(15);
+            expect(_.round(lineItem.burden, 2)).toBe(5);
+
+            expect(_.round(lineItem.multiplier, 2)).toBe(1);
+            expect(_.round(lineItem.escalator, 2)).toBe(1);
+            expect(_.round(lineItem.cost, 2)).toBe(200);
+
+            expect(_.round(lineItem.tax, 2)).toBe(0);
+            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+
+            expect(_.round(lineItem.markup, 2)).toBe(36);
+            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+
+            expect(_.round(lineItem.price, 2)).toBe(236.0);
+
+            resolve();
+        });
+
+        lineItem.laborHours = "10";
     });
 });

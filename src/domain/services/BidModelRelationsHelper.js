@@ -50,7 +50,7 @@ export default class BidModelRelationsHelper {
      *    "burden" : <BidVariable>
      * }
      * 
-     * @param {number} [id] - The id of the component to retrieve.
+     * @param {string} [id] - The id of the component to retrieve.
      * @returns {(Component|Object.<string, Component>|null)}
      */
     variables(id) {
@@ -217,7 +217,7 @@ export default class BidModelRelationsHelper {
 
     getCollection(type) {
         if (type === "bid_variables") {
-            return this.bid._variables;
+            return this.bid._data.variables;
         } else if (!_.isUndefined(this.bid._data[type])) {
             return this.bid._data[type];
         } else throw `Bid entity collection ${type} does not exist`;

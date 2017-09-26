@@ -870,6 +870,7 @@ export default class Bid extends BidEntity {
      * @returns {Promise<null>}
      */
     async addAssemblies(assemblyMapIds) {
+        this._wattMetricDef = null; //clears cached reference due to bug.
         return this._bidService.addAssemblies(this, assemblyMapIds);
     }
 
