@@ -515,12 +515,24 @@ export default class BidValidator {
         } else return false;
     }
 
+    _getAssemblyTitle(assemblyId) {
+        const assembly = this._bid.entities.assemblies(assemblyId);
+        return assembly ? assembly.title : null;
+    }
+
     _logIssue(type, sourceBidEntity, dependencyContract, meta) {
         this._testResults.push({
             type: type,
             source_bid_entity_type: sourceBidEntity.type,
             source_bid_entity_id: sourceBidEntity.id,
             source_bid_entity_title: sourceBidEntity.title,
+            source_bid_entity_assembly_id: sourceBidEntity.config.assembly_id
+                ? sourceBidEntity.config.assembly_id
+                : null,
+            source_bid_entity_assembly_title: sourceBidEntity.config.assembly_id
+                ? this._getAssemblyTitle(sourceBidEntity.config.assembly_id)
+                : null,
+
             dependency_type: dependencyContract ? dependencyContract.type : null,
             dependency_id: dependencyContract ? dependencyContract.bid_entity_id : null,
             meta: meta ? meta : null

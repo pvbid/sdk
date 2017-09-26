@@ -347,7 +347,7 @@ export default class Bid extends BidEntity {
     _applyMarginPercentage(newMarginPercent) {
         let bidCost = this.cost + this.tax,
             oldMarkup = parseFloat(this.markup),
-            newPrice = parseFloat(bidCost) / (1 - Heleprs.confirmNumber(newMarginPercent) / 100);
+            newPrice = parseFloat(bidCost) / (1 - Helpers.confirmNumber(newMarginPercent) / 100);
         var newMarkup = newPrice - bidCost;
 
         if (newMarginPercent < 100) {
@@ -862,7 +862,7 @@ export default class Bid extends BidEntity {
     async removeAssembly(assemblyId) {
         return this._bidService.removeAssembly(this, assemblyId);
     }
-    
+
     /**
      * Adds assemblies to bid. A wrapper function for {@link BidService.addAssemblies}
      * 
