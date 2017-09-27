@@ -33,6 +33,10 @@ export default class LineItem extends BidEntity {
     get base() {
         return Helpers.confirmNumber(this._data.base);
     }
+
+    /**
+     * @type {number}
+     */
     set base(val) {
         if (Helpers.isNumber(val)) {
             this._data.base = Helpers.confirmNumber(val);
@@ -55,6 +59,10 @@ export default class LineItem extends BidEntity {
     get wage() {
         return Helpers.confirmNumber(this._data.wage);
     }
+
+    /**
+     * @type {number}
+     */
     set wage(val) {
         if (Helpers.isNumber(val)) {
             this._data.wage = Helpers.confirmNumber(val);
@@ -72,6 +80,10 @@ export default class LineItem extends BidEntity {
     get isIncluded() {
         return this._data.is_included;
     }
+
+    /**
+     * @type {boolean}
+     */
     set isIncluded(val) {
         if (_.isBoolean(val) && this._data.is_included != val) {
             this._data.is_included = val;
@@ -88,6 +100,10 @@ export default class LineItem extends BidEntity {
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
     }
+
+    /**
+     * @type {number}
+     */
     set laborHours(val) {
         if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val)) {
             this._data.labor_hours = Helpers.confirmNumber(val);
@@ -105,6 +121,10 @@ export default class LineItem extends BidEntity {
     get burden() {
         return Helpers.confirmNumber(this._data.burden);
     }
+
+    /**
+     * @type {number}
+     */
     set burden(val) {
         if (Helpers.isNumber(val) && this._data.burden != Helpers.confirmNumber(val)) {
             this._data.burden = Helpers.confirmNumber(val);
@@ -146,6 +166,10 @@ export default class LineItem extends BidEntity {
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
     }
+
+    /**
+     * @type {number}
+     */
     set perQuantity(val) {
         if (Helpers.isNumber(val) && this._data.per_quantity != Helpers.confirmNumber(val)) {
             this._data.per_quantity = Helpers.confirmNumber(val);
@@ -169,6 +193,10 @@ export default class LineItem extends BidEntity {
     get escalator() {
         return Helpers.confirmNumber(this._data.escalator, 1);
     }
+
+    /**
+     * @type {number}
+     */
     set escalator(val) {
         if (Helpers.isNumber(val) && this._data.escalator != Helpers.confirmNumber(val)) {
             this._data.escalator = Helpers.confirmNumber(val);
@@ -188,6 +216,10 @@ export default class LineItem extends BidEntity {
     get quantity() {
         return Helpers.confirmNumber(this._data.quantity);
     }
+
+    /**
+     * @type {number}
+     */
     set quantity(val) {
         if (Helpers.isNumber(val) && this._data.quantity != Helpers.confirmNumber(val)) {
             this._data.quantity = Helpers.confirmNumber(val);
@@ -210,6 +242,10 @@ export default class LineItem extends BidEntity {
     get multiplier() {
         return this._data.multiplier;
     }
+
+    /**
+     * @type {number}
+     */
     set multiplier(val) {
         if (Helpers.isNumber(val) && this._data.multiplier != Helpers.confirmNumber(val)) {
             this._data.multiplier = Helpers.confirmNumber(val);
@@ -228,6 +264,10 @@ export default class LineItem extends BidEntity {
     get cost() {
         return Helpers.confirmNumber(this._data.cost);
     }
+
+    /**
+     * @type {number}
+     */
     set cost(val) {
         if (Helpers.isNumber(val) && this._data.cost != Helpers.confirmNumber(val)) {
             this._data.cost = Helpers.confirmNumber(val);
@@ -249,6 +289,10 @@ export default class LineItem extends BidEntity {
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
     }
+
+    /**
+     * @type {number}
+     */
     set tax(val) {
         if (Helpers.isNumber(val) && this._data.tax != Helpers.confirmNumber(val)) {
             this._data.tax = Helpers.confirmNumber(val);
@@ -273,6 +317,10 @@ export default class LineItem extends BidEntity {
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
     }
+
+    /**
+     * @type {number}
+     */
     set taxPercent(val) {
         if (Helpers.isNumber(val) && this._data.tax_percent != Helpers.confirmNumber(val)) {
             this._data.tax_percent = Helpers.confirmNumber(val);
@@ -293,6 +341,10 @@ export default class LineItem extends BidEntity {
     get markup() {
         return this._data.markup;
     }
+
+    /**
+     * @type {number}
+     */
     set markup(val) {
         if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val)) {
             this._data.markup = _.round(Helpers.confirmNumber(val), 4);
@@ -312,6 +364,10 @@ export default class LineItem extends BidEntity {
     get markupPercent() {
         return _.round(Helpers.confirmNumber(this._data.markup_percent), 4);
     }
+
+    /**
+     * @type {number}
+     */
     set markupPercent(val) {
         if (Helpers.isNumber(val) && this._data.markup_percent != Helpers.confirmNumber(val)) {
             this._data.markup_percent = _.round(Helpers.confirmNumber(val), 4);
@@ -331,6 +387,10 @@ export default class LineItem extends BidEntity {
     get price() {
         return _.round(Helpers.confirmNumber(this._data.price), 4);
     }
+
+    /**
+     * @type {number}
+     */
     set price(val) {
         if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val)) {
             this._data.price = Helpers.confirmNumber(val);
@@ -358,9 +418,6 @@ export default class LineItem extends BidEntity {
      */
     get config() {
         return this._data.config;
-    }
-    set config(val) {
-        throw "Setting line item config is not permitted";
     }
 
     /**
@@ -450,6 +507,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Determines if the line item represents labor costs.
      * 
      * @returns {boolean}
      */
@@ -458,6 +516,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Assess line item for changes.
      * 
      * @emits {assessing} fires event before assessement.
      * @emits {assessed}

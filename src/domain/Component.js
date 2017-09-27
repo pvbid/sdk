@@ -171,7 +171,7 @@ export default class Component extends BidEntity {
 
     /**
      * Price Property
-     * 
+     * @type {number}
      */
     get price() {
         return this._data.price;
@@ -456,6 +456,11 @@ export default class Component extends BidEntity {
         }
     }
 
+    /**
+     * Gets a list of bid entities that relies on the component instance.
+     * 
+     * @returns {BidEntity[]} 
+     */
     dependants() {
         return this.bid.entities.getDependants("component", this.id);
     }

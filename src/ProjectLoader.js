@@ -18,9 +18,10 @@ export default class ProjectLoader {
     }
 
     /**
+     * Loads a project and bid instances.
      * 
      * @param {number} projectId 
-     * @param {boolean} forceReload Forces underlying system to skeip the cache.
+     * @param {boolean} forceReload Forces underlying system to skip the cache.
      * @returns {Promise<Project>}
      */
     async load(projectId, forceReload) {
@@ -56,6 +57,7 @@ export default class ProjectLoader {
     }
 
     /**
+     * Loads all bid instances for a project.
      * 
      * @param {array} bidIds 
      * @param {Project} project 

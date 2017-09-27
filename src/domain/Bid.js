@@ -40,7 +40,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Persistent id of the bid.
-     * NOTE: id will soon be in UUID format
+     * NOTE: id will soon be in alpha-numerical format
      * 
      * @type {number}
      */
@@ -896,6 +896,11 @@ export default class Bid extends BidEntity {
         return this._bidService.recoverBid(this, snapshotId);
     }
 
+    /**
+     * Clones the current bid and returns the cloned bid.  The cloned bid is also added to the project automatically.
+     * 
+     * @returns {Promise<Bid>}
+     */
     async clone() {
         return this._bidService.clone(this);
     }

@@ -141,6 +141,11 @@ export default class Project extends BidEntity {
         return this._data.watts;
     }
 
+    /**
+     * @private
+     * @todo This should be removed.
+     * @readonly
+     */
     get components() {
         return this._data.components;
     }
@@ -156,6 +161,9 @@ export default class Project extends BidEntity {
         return this._data.project_status;
     }
 
+    /**
+     * @type {{id:number, title:string, core_status:string, is_won:boolean}}
+     */
     set projectStatus(val) {
         if (!_.isUndefined(val.id) && !_.isUndefined(val.core_status)) {
             const oldValue = _.cloneDeep(this._data.project_status);

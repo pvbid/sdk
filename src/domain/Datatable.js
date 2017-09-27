@@ -77,6 +77,11 @@ export default class Datatable extends BidEntity {
         return options;
     }
 
+    /**
+     * Gets a list of bid entities that relies on the datatable instance.
+     * 
+     * @returns {BidEntity[]} 
+     */
     dependants() {
         return this.bid.entities.getDependants("datatable", this.id);
     }
@@ -126,6 +131,8 @@ export default class Datatable extends BidEntity {
 
     /**
      * Exports datatable to core structure.
+     * 
+     * @returns {object}
      */
     exportData() {
         let data = _.cloneDeep(this._data);

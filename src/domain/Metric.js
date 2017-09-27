@@ -33,6 +33,10 @@ export default class Metric extends BidEntity {
     get value() {
         return this._data.value;
     }
+
+    /**
+     * @type {number}
+     */
     set value(val) {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.value && !this.bid.isReadOnly()) {
             this.config.override = true;
@@ -48,6 +52,10 @@ export default class Metric extends BidEntity {
     get actualValue() {
         return this._data.actual_value;
     }
+
+    /**
+     * @type {number}
+     */
     set actualValue(val) {
         if (Helpers.confirmNumber(val, false) && !this.bid.isReadOnly()) {
             this._data.actual_value = val;
@@ -60,9 +68,6 @@ export default class Metric extends BidEntity {
      */
     get config() {
         return this._data.config;
-    }
-    set config(val) {
-        throw "Setting metric config is not permitted.";
     }
 
     /**
@@ -166,6 +171,13 @@ export default class Metric extends BidEntity {
         return this.bid.entities.getDependants("metric", this.id);
     }
 
+    /**
+     * Assess metric for changes.
+     * 
+     * @emits {assessing} fires event before assessement.
+     * @emits {assessed} fires after assessment is complete.
+     * @emits {updated} fires only if there has been a change.
+     */
     assess() {
         if (this.bid.isAssessable()) {
             if (!this.config.override) {
