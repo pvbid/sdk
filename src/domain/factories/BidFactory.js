@@ -17,6 +17,9 @@ import BidService from "../services/BidService";
  * @class BidFactory
  */
 export default class BidFactory {
+    /**
+     * Creates an instance of BidFactory.
+     */
     constructor() {
         this._entities = [
             "fields",

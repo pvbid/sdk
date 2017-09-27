@@ -628,6 +628,11 @@ export default class Component extends BidEntity {
         }
     }
 
+    /**
+     * Exports component internal data structure.
+     * 
+     * @returns {object} 
+     */
     exportData() {
         let data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;

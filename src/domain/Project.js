@@ -322,6 +322,12 @@ export default class Project extends BidEntity {
         return project;
     }
 
+    /**
+     * Clones project and underlying bids.
+     * 
+     * @returns {Promise<object>}
+     * @property {number} id The id of the new project.
+     */
     async clone() {
         return this.repositories.projects.clone(this.id);
     }

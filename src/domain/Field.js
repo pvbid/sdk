@@ -138,6 +138,11 @@ export default class Field extends BidEntity {
         }
     }
 
+    /**
+     * Returns all the dependencies that the field relies on.
+     * 
+     * @returns {BidEntity[]}
+     */
     dependencies() {
         let contracts = Object.values(this.config.dependencies);
         let dependencies = [];
@@ -152,22 +157,47 @@ export default class Field extends BidEntity {
         return dependencies;
     }
 
+    /**
+     * Gets all the bid entities that relay on the field instance.
+     * 
+     * @returns {BidEntity[]}
+     */
     dependants() {
         let d = this.bid.entities.getDependants("field", this.id);
         return d;
     }
 
+    /**
+     * If the field has a fieldType of "list", getDatatable will return the 
+     * datatable instance that it relies on, otherwise will return null.
+     * 
+     * @returns  {?Datatable}
+     */
     getDatatable() {
         if (this.fieldType === "list") {
             return this.bid.entities.datatables(this.config.dependencies.datatable.bid_entity_id);
         } else return null;
     }
 
+    /**
+     * Gets a list of options bound to a datatable.
+     * 
+     * @returns {object[]}
+     * @property {string} title
+     * @property {string} row_id - The id of a datatable row. This value should to be applied to the {@link Field.value} to selelect specific row.
+     */
     getListOptions() {
         const dt = this.getDatatable();
         return dt ? dt.getOptions() : [];
     }
 
+    /**
+     * Gets the selected list option.
+     * 
+     * @returns {object}
+     * @property {string} title
+     * @property {string} row_id - The id of a datatable row.
+     */
     getSelectedOption() {
         const datatable = this.getDatatable();
         if (datatable) {
@@ -177,6 +207,24 @@ export default class Field extends BidEntity {
         } else return null;
     }
 
+    /**
+     * Gets the value of the selected field list based on the datatable column id.
+     * 
+     * @param {string} datatableColumnId 
+     * @returns {?(string|number|boolean)}
+     */
+    getSelectedOptionValue(datatableColumnId) {
+        const datatable = this.getDatatable();
+        if (datatableColumnId && datatable) {
+            return datatable.getValue(datatableColumnId, field.value);
+        } else return null;
+    }
+
+    /**
+     * Exports internal data
+     * 
+     * @returns {object}
+     */
     exportData() {
         let data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;
@@ -184,6 +232,11 @@ export default class Field extends BidEntity {
         return data;
     }
 
+    /**
+     * Determines if instance is dirty.
+     * 
+     * @returns {boolean} 
+     */
     isDirty() {
         return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
     }

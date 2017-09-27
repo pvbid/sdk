@@ -1,8 +1,8 @@
-import BidFactory from "../factories/BidFactory";
+import LineItem from "../LineItem";
 import BidValidator from "./BidValidator";
+import BidFactory from "../factories/BidFactory";
 import { waitForFinalEvent } from "../../utils/WaitForFinalEvent";
 import LineItemScaffolding from "../scaffolding/LineItemScaffolding";
-import LineItem from "../LineItem";
 /**
  * @class BidService
  */
@@ -55,8 +55,8 @@ export default class BidService {
      * Creates a snapshot of the current bid.
      * 
      * @param {Bid} bid 
-     * @param {?any} title Title of the snapshot
-     * @param {?any} description Description of the snapshot.
+     * @param {?string} title Title of the snapshot
+     * @param {?string} description Description of the snapshot.
      * @returns {Promise.<object>}
      * @property {number} id The snapshot id.
      * @property {string} title
@@ -88,7 +88,7 @@ export default class BidService {
     /**
      * Removes assembly from a bid.
      * 
-     * @param {any} bid 
+     * @param {Bid} bid 
      * @param {number} assemblyId 
      * @returns {Promise<null>}
      */

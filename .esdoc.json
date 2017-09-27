@@ -14,7 +14,12 @@
                 "manual": {
                     "index": "./manual/getting_started.md",
                     "asset": "./manual/asset",
-                    "files": ["./manual/getting_started.md", "./manual/repositories.md", "./LICENSE.md"]
+                    "files": [
+                        "./manual/getting_started.md",
+                        "./manual/repositories.md",
+                        "./manual/data_models.md",
+                        "./LICENSE.md"
+                    ]
                 }
             }
         },

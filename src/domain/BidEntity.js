@@ -101,10 +101,20 @@ export default class BidEntity extends AdvanceEventEmitter {
         return _.cloneDeep(this._data);
     }
 
+    /**
+     * Gets all the dependencies that the bid entity relies on.
+     * 
+     * @returns {BidEntity[]} Returns an array of bid entities.
+     */
     dependencies() {
         return [];
     }
 
+    /**
+     * Gets an array of depndants that rely on the bid entity.
+     * 
+     * @returns {BidEntity[]} Returns an array of bid entities.
+     */
     dependants() {
         return [];
     }

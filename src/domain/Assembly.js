@@ -19,6 +19,12 @@ export default class Assembly extends BidEntity {
         this._data = assemblyData;
     }
 
+    /**
+     * Removes a bid entity from the assembly.
+     * 
+     * @param {string} type 
+     * @param {(number|string)} id 
+     */
     removeBidEntity(type, id) {
         const typeKey = type + "s";
         _.pull(this._data.config[typeKey], id);

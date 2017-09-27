@@ -1,8 +1,20 @@
 import _ from "lodash";
 import Helpers from "../../utils/Helpers";
 
-export default class BidModelRelationsHelper {
+/**
+ * Helper class to manage all bid entities in a bid.
+ * 
+ * @class BidEntityRelationsHelper
+ */
+export default class BidEntityRelationsHelper {
+    /**
+     * Creates an instance of BidEntityRelationsHelper.
+     * @param {Bid} bid 
+     */
     constructor(bid) {
+        /**
+         * @type {Bid}
+         */
         this.bid = bid;
         this._types = [
             "line_item",
@@ -17,26 +29,98 @@ export default class BidModelRelationsHelper {
         ];
     }
 
+    /**
+     * Gets a field entity by id.  If no id is passed, will return an of object of keyed fields by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Field>,
+     *    "103" : <Field>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(Field|Object.<string, Field>)}
+     */
     fields(id) {
         return id ? this.getBidEntity("field", id) : this.bid._data.fields;
     }
 
+    /**
+     * Gets a field group entity by id.  If no id is passed, will return an of object of keyed field groups by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <FieldGroup>,
+     *    "103" : <FieldGroup>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(FieldGroup|Object.<string, FieldGroup>)}
+     */
     fieldGroups(id) {
         return id ? this.getBidEntity("field_group", id) : this.bid._data.field_groups;
     }
 
+    /**
+     * Gets a metric entity by id.  If no id is passed, will return an of object of keyed metrics by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Metric>,
+     *    "103" : <Metric>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(Metric|Object.<string, Metric>)}
+     */
     metrics(id) {
         return id ? this.getBidEntity("metric", id) : this.bid._data.metrics;
     }
 
+    /**
+     * Gets a line item entity by id.  If no id is passed, will return an of object of keyed line items by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <LineItem>,
+     *    "103" : <LineItem>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(LineItem|Object.<string, LineItem>)}
+     */
     lineItems(id) {
         return id ? this.getBidEntity("line_item", id) : this.bid._data.line_items;
     }
 
+    /**
+     * Gets a datatable entity by id.  If no id is passed, will return an of object of keyed datatables by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Datatable>,
+     *    "103" : <Datatable>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(Datatable|Object.<string, Datatable>)}
+     */
     datatables(id) {
         return id ? this.getBidEntity("datatable", id) : this.bid._data.datatables;
     }
 
+    /**
+     * Gets an assembly entity by id.  If no id is passed, will return an of object of keyed assemblies by their id..
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <Assembly>,
+     *    "103" : <Assembly>
+     * }
+     * 
+     * @param {number} id 
+     * @returns {?(Assembly|Object.<string, Assembly>)}
+     */
     assemblies(id) {
         return id ? this.getBidEntity("assembly", id) : this.bid._data.assemblies;
     }
@@ -51,7 +135,7 @@ export default class BidModelRelationsHelper {
      * }
      * 
      * @param {string} [id] - The id of the component to retrieve.
-     * @returns {(Component|Object.<string, Component>|null)}
+     * @returns {?(Component|Object.<string, Component>)}
      */
     variables(id) {
         return id ? this.getBidEntity("bid_variable", id) : this.bid._data.variables;
@@ -67,7 +151,7 @@ export default class BidModelRelationsHelper {
      * }
      * 
      * @param {number} [id] - The id of the component to retrieve.
-     * @returns {(Component|Object.<string, Component>|null)}
+     * @returns {?(Component|Object.<string, Component>)}
      */
     components(id) {
         return id ? this.getBidEntity("component", id) : this.bid._data.components;
@@ -83,16 +167,44 @@ export default class BidModelRelationsHelper {
      * }
      * 
      * @param {number} id 
-     * @returns {(ComponentGroup|Object.<string, ComponentGroup>|null)}
+     * @returns {?(ComponentGroup|Object.<string, ComponentGroup>)}
      */
     componentGroups(id) {
         return id ? this.getBidEntity("component_group", id) : this.bid._data.component_groups;
     }
 
+    /**
+     * Gets a assembly map entity by id.  If no id is passed, will return an object of keyed assembly maps by their id.
+     * 
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <AssemblyMap>,
+     *    "103" : <AssemblyMap>
+     * }
+     * 
+     * @param {number} [id] - The id of the assembly map to retrieve.
+     * @returns {?(AssemblyMap|Object.<string, AssemblyMap>)}
+     */
     assemblyMaps(id) {
         return id ? this.getBidEntity("assembly_map", id) : this.bid._data.assembly_maps;
     }
 
+    /**
+     * Gets a bid entity by a dependency contract.
+     * 
+     * @example <caption>Example a dependency contract.</caption>
+     * {
+     *    "type" : <string>, 
+     *    "bid_entity_id" : <string>,
+     *    "field" : <string>
+     * }
+     * 
+     * @param {object} dependencyContract 
+     * @param {string} dependencyContract.type - The type of bid entity, ie: line_item, metric, field, component, compnent_group, assembly, etc
+     * @param {string} dependencyContract.bid_entity_id - The id of the bid entity. Note, this will eventual be converted to simply "id".
+     * @param {string} dependencyContract.field - The bid entity property that holds the needed value.
+     * @returns {BidEntity} Returns the bid entity requested determined by the dependency contract.
+     */
     getDependency(dependencyContract) {
         if (!_.isUndefined(dependencyContract) && !_.isUndefined(dependencyContract.type)) {
             switch (dependencyContract.type) {
@@ -113,6 +225,15 @@ export default class BidModelRelationsHelper {
         } else return null;
     }
 
+    /**
+     * Gets the value of a bid entity by a dependency contract.
+     * 
+     * @param {object} dependencyContract 
+     * @param {string} dependencyContract.type - The type of bid entity, ie: line_item, metric, field, component, compnent_group, assembly, etc
+     * @param {string} dependencyContract.bid_entity_id - The id of the bid entity. Note, this will eventual be converted to simply "id".
+     * @param {string} dependencyContract.field - The bid entity property that holds the needed value.
+     * @returns {string|number|boolean} Returns the bid entity value.
+     */
     getDependencyValue(dependencyContract) {
         var bidEntity = this.getDependency(dependencyContract);
 
@@ -134,11 +255,8 @@ export default class BidModelRelationsHelper {
                     } else return null;
                     break;
                 case "datatable":
-                    return this.getDatatableValue(
-                        bidEntity,
-                        dependencyContract.field.column,
-                        dependencyContract.field.row
-                    );
+                    //TODO: This needs a test. I didn't know a dep contract.field could be an object. -Sean
+                    return bidEntity.getValue(dependencyContract.field.column, dependencyContract.field.row);
                 case "metric":
                     return _.isNull(bidEntity.value) ? 0 : Helpers.confirmNumber(bidEntity.value);
                 case "bid":
@@ -155,7 +273,7 @@ export default class BidModelRelationsHelper {
         if (!_.isUndefined(field) && !_.isNull(field.value)) {
             if (field.config.type === "list") {
                 let datatable = this.getBidEntity("datatable", field.config.dependencies.datatable.bid_entity_id);
-                return this.getDatatableValue(datatable, dataColumnId, field.value);
+                return datatable.getValue(dataColumnId, field.value);
             } else return field.value;
         } else return null;
     }
@@ -177,7 +295,7 @@ export default class BidModelRelationsHelper {
      * 
      * @param {string} type The type of bid enity. IE. line_item, field, metric, component, etc.
      * @param {int} id The id of the bid entity.
-     * @returns [array]
+     * @returns [BidEntity[]]
      */
     getDependants(type, id) {
         let dependants = [];
@@ -200,6 +318,13 @@ export default class BidModelRelationsHelper {
         return dependants;
     }
 
+    /**
+     * Gets a bid entity by type and id.
+     * 
+     * @param {string} type 
+     * @param {(number|string)} id 
+     * @returns {BidEntity}
+     */
     getBidEntity(type, id) {
         //make typeKey plural.
         let typeKey = type === "assembly" ? "assemblies" : type + "s";
@@ -215,6 +340,12 @@ export default class BidModelRelationsHelper {
         }
     }
 
+    /**
+     * Returns the full collection of bid entites by type. Returned is a keyed object by the bid entity id.
+     * 
+     * @param {string} type 
+     * @returns {object}
+     */
     getCollection(type) {
         if (type === "bid_variables") {
             return this.bid._data.variables;
@@ -223,6 +354,12 @@ export default class BidModelRelationsHelper {
         } else throw `Bid entity collection ${type} does not exist`;
     }
 
+    /**
+     * Gets a component by their core definition id. Note, this function will be removed once
+     * 
+     * @param {number} defId 
+     * @returns {Component}
+     */
     getComponentByDefId(defId) {
         if (_.isUndefined(this._componentsKeyedByDefinitionId)) {
             this._componentsKeyedByDefinitionId = _.keyBy(this.bid.entities.components(), "definitionId");
@@ -232,43 +369,15 @@ export default class BidModelRelationsHelper {
             : null;
     }
 
-    getDatatableValue(datatable, columnId, rowId) {
-        if (!_.isUndefined(datatable) && !_.isUndefined(columnId)) {
-            if (datatable && columnId && rowId) {
-                var columnIndex = datatable.config.columns.findIndex(c => c.id === columnId);
-                var row = datatable.config.rows.find(r => r.id === rowId);
-
-                return row ? row.values[columnIndex] : null;
-            } else return null;
-        } else throw "Datatable is not defined.";
-    }
-
-    getDatatableColumnRows(datatableId, columnId) {
-        var bidDatatable = this.getBidEntity("datatable", datatableId);
-
-        var keyPlacement = null;
-        bidDatatable.config.columns.forEach(function(column, index) {
-            if (column.id == columnId) {
-                keyPlacement = index;
-                return false;
-            }
-        });
-
-        var options = _.reduce(
-            bidDatatable.config.rows,
-            function(results, row) {
-                results.push({
-                    id: row.id,
-                    value: row.values[keyPlacement]
-                });
-                return results;
-            },
-            []
-        );
-
-        return options;
-    }
-
+    /**
+     * Determines if dependency exists basd on the dependency contract.
+     * 
+     * @param {object} dependencyContract 
+     * @param {string} dependencyContract.type 
+     * @param {string} dependencyContract.bid_entity_id
+     * @param {string} dependencyContract.field 
+     * @returns {boolean}
+     */
     dependencyExists(dependencyContract) {
         var dependency = null;
         try {
@@ -280,6 +389,13 @@ export default class BidModelRelationsHelper {
         return !_.isUndefined(dependency) && !_.isNull(dependency);
     }
 
+    /**
+     * Determines if bid entity exists based on type and id.
+     * 
+     * @param {string} type 
+     * @param {(number|string)} id 
+     * @returns {boolean} 
+     */
     bidEntityExists(type, id) {
         let bidEntity = this.getBidEntity(type, id);
         return bidEntity ? true : false;
@@ -294,7 +410,8 @@ export default class BidModelRelationsHelper {
      * @returns {BidEntity[]}
      */
     searchByTitle(type, query) {
-        let collection = this.getCollection(type);
+        const typeKey = type === "assembly" ? "assemblies" : type + "s";
+        let collection = this.getCollection(typeKey);
         return _.filter(collection, item => {
             return item.title.toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
         });

@@ -8,7 +8,6 @@ math.import(require("mathjs/lib/expression"));
 math.import(require("mathjs/lib/function/arithmetic"));
 math.import(require("mathjs/lib/function/trigonometry"));
 math.import(require("mathjs/lib/function/logical"));
-
 math.import(require("mathjs/lib/function/relational"));
 math.import(require("mathjs/lib/function/statistics"));
 math.import(require("mathjs/lib/constants"));
@@ -21,7 +20,7 @@ export default class Helpers {
      * be converted it will use the default value.  Booleans are converted to 1 or 0.
      * 
      * @static
-     * @param {any} val 
+     * @param {(number|string|boolean)} val 
      * @param {number} [dflt=0]
      * @returns {number}
      */
@@ -42,6 +41,13 @@ export default class Helpers {
         return _.isNumber(val) && _.isFinite(val) ? val : dflt;
     }
 
+    /**
+     * Determines if value is a finite number.
+     * 
+     * @static
+     * @param {(string|number)} val 
+     * @returns {boolean} 
+     */
     static isNumber(val) {
         if (_.isFinite(val)) return true;
         val = _.replace(val, new RegExp(",", "g"), "");

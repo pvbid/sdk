@@ -91,9 +91,42 @@ export default class Datatable extends BidEntity {
     }
 
     /**
+     * Retrieves a cell value.
+     * 
+     * @param {string} columnId
+     * @param {string} rowId 
+     * @returns {?(string|number|boolean)}
+     */
+    getValue(columnId, rowId) {
+        if (columnId && rowId) {
+            var columnIndex = this.config.columns.findIndex(c => c.id === columnId);
+            var row = this.config.rows.find(r => r.id === rowId);
+
+            return row ? row.values[columnIndex] : null;
+        } else return null;
+    }
+
+    /**
+     * Gets a list of column values.
+     * 
+     * @param {string} columnId 
+     * @returns {object[]}
+     * @property {string} id - The row id for the value.
+     * @property {?(string|number|boolean)} value
+     */
+    getColumnValues(columnId) {
+        var columnIndex = this.config.columns.findIndex(c => c.id === columnId);
+
+        let options = this.config.rows.map(row => {
+            return { id: row.id, value: row.values[columnIndex] };
+        });
+
+        return options;
+    }
+
+    /**
      * Exports datatable to core structure.
      */
-
     exportData() {
         let data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;

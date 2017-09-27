@@ -27,6 +27,9 @@ export default class Metric extends BidEntity {
         this._original = _.cloneDeep(metricData);
     }
 
+    /**
+     * @type {number}
+     */
     get value() {
         return this._data.value;
     }
@@ -39,6 +42,9 @@ export default class Metric extends BidEntity {
         }
     }
 
+    /**
+     * @type {number}
+     */
     get actualValue() {
         return this._data.actual_value;
     }
@@ -49,6 +55,9 @@ export default class Metric extends BidEntity {
         }
     }
 
+    /**
+     * @type {object}
+     */
     get config() {
         return this._data.config;
     }
@@ -109,6 +118,10 @@ export default class Metric extends BidEntity {
 
         return manipulatedValue;
     }
+
+    /**
+     * Resets the metric, removing any override value.
+     */
     reset() {
         if (this.bid.isAssessable()) {
             this.dirty();
@@ -117,10 +130,11 @@ export default class Metric extends BidEntity {
         }
     }
 
-    compare() {
-        console.log("Metric Compare: ", this._original.value, this._data.value);
-    }
-
+    /**
+     * Gets an array of bid entities that the metric relies on.
+     * 
+     * @returns {BidEntity[]}
+     */
     dependencies() {
         let contracts = [];
         let dependencies = [];
@@ -143,6 +157,11 @@ export default class Metric extends BidEntity {
         return dependencies;
     }
 
+    /**
+     * Gets an array of bid entities that rely on the metric
+     * 
+     * @returns {BidEntity[]}
+     */
     dependants() {
         return this.bid.entities.getDependants("metric", this.id);
     }
@@ -199,10 +218,20 @@ export default class Metric extends BidEntity {
         }
     }
 
+    /**
+     * Determines if metric instance is dirty.
+     * 
+     * @returns {boolean} 
+     */
     isDirty() {
         return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
     }
 
+    /**
+     * Exports intermal metric data.
+     * 
+     * @returns {object} 
+     */
     exportData() {
         let data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;

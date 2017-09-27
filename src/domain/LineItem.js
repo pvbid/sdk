@@ -28,8 +28,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Base Property
-     * @instance
-     * @memberof LineItem
+     * @type {number}
      */
     get base() {
         return Helpers.confirmNumber(this._data.base);
@@ -51,6 +50,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Wage Property
+     * @type {number}
      */
     get wage() {
         return Helpers.confirmNumber(this._data.wage);
@@ -67,6 +67,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Is Included Property
+     * @type {boolean}
      */
     get isIncluded() {
         return this._data.is_included;
@@ -82,6 +83,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Labor Hours Property
+     * @type {number}
      */
     get laborHours() {
         return Helpers.confirmNumber(this._data.labor_hours);
@@ -98,6 +100,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Burden Property
+     * @type {number}
      */
     get burden() {
         return Helpers.confirmNumber(this._data.burden);
@@ -114,6 +117,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Scalar Property
+     * @type {number}
      */
     get scalar() {
         const scalarContracts = this._getExtraScalarDependencies();
@@ -137,6 +141,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Per Quantity Property
+     * @type {number}
      */
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
@@ -159,6 +164,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Escalator Property
+     * @type {number}
      */
     get escalator() {
         return Helpers.confirmNumber(this._data.escalator, 1);
@@ -177,6 +183,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Quantity Property
+     * @type {number}
      */
     get quantity() {
         return Helpers.confirmNumber(this._data.quantity);
@@ -198,6 +205,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * @type {number}
      */
     get multiplier() {
         return this._data.multiplier;
@@ -215,6 +223,7 @@ export default class LineItem extends BidEntity {
     }
     /**
      * Cost Property
+     * @type {number}  
      */
     get cost() {
         return Helpers.confirmNumber(this._data.cost);
@@ -235,6 +244,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Tax Property
+     * @type {number}
      */
     get tax() {
         return Helpers.confirmNumber(this._data.tax);
@@ -258,6 +268,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Tax Percent Property
+     * @type {number}
      */
     get taxPercent() {
         return Helpers.confirmNumber(this._data.tax_percent);
@@ -277,6 +288,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Markup Property
+     * @type {number}
      */
     get markup() {
         return this._data.markup;
@@ -295,6 +307,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Markup Percent Property
+     * @type {number}
      */
     get markupPercent() {
         return _.round(Helpers.confirmNumber(this._data.markup_percent), 4);
@@ -313,6 +326,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Price Property
+     * @type {number}
      */
     get price() {
         return _.round(Helpers.confirmNumber(this._data.price), 4);
@@ -340,6 +354,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Config Property
+     * @type {object}
      */
     get config() {
         return this._data.config;
@@ -359,8 +374,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * 
-     * @param {any} property 
-     * @param {any} value 
+     * @param {string} property 
+     * @param {(number|string|boolean)} value 
      */
     override(property, value) {
         if (!this.bid.isReadOnly()) {
@@ -397,6 +412,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Resets a specific line item member, remove override value.
      * 
      * @param {string} property 
      */
@@ -413,7 +429,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Resets the markup, removing user override inputs for markup and markup percent.
      */
     resetMarkup() {
         if (this.bid.isAssessable()) {
@@ -423,8 +439,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
-     * 
+     * Resets the line item, removing all user override inputs.
      */
     reset() {
         if (this.bid.isAssessable()) {
@@ -498,6 +513,11 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * Gets a list of bid entities that the line item instance relys on.
+     * 
+     * @returns {BidEntity[]} 
+     */
     dependencies() {
         let dependencies = [];
         let contracts = [];
@@ -519,6 +539,11 @@ export default class LineItem extends BidEntity {
         return dependencies;
     }
 
+    /**
+     * Gets dependant bid entities that rely on line item instance.
+     * 
+     * @returns {BidEntity[]} 
+     */
     dependants() {
         return this.bid.entities.getDependants("line_item", this.id);
     }
@@ -871,7 +896,6 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
      * @return {number}
      */
     _getPriceValue() {
@@ -881,6 +905,11 @@ export default class LineItem extends BidEntity {
         } else return _.round(Helpers.confirmNumber(this._data.price), 4);
     }
 
+    /**
+     * Exports the line item's internal data structure.
+     * 
+     * @returns  
+     */
     exportData() {
         let data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;
@@ -909,6 +938,12 @@ export default class LineItem extends BidEntity {
         component.assess();
     }
 
+    /**
+     * Gets an array of components that the line item is under.
+     * A line item is either uncategorized or under one {@link Component} per {@link ComponentGroup}
+     * 
+     * @returns {Component[]}
+     */
     components() {
         let components = [];
         _.each(this.bid.entities.components(), component => {
@@ -917,6 +952,11 @@ export default class LineItem extends BidEntity {
         return components;
     }
 
+    /**
+     * Deletes line item.
+     * 
+     * @returns {Promise<void>} 
+     */
     async delete() {
         if (this.dependants().length === 0) {
             await this.bid._bidService.repositories.lineItems.delete(this.bid.id, this.id);

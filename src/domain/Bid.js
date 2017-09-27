@@ -3,7 +3,7 @@ import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
 import now from "performance-now";
 import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
-import BidModelRelationsHelper from "./services/BidModelRelationsHelper";
+import BidEntityRelationsHelper from "./services/BidEntityRelationsHelper";
 import IndicativePricingHelper from "./services/IndicativePricingHelper";
 
 /**
@@ -11,7 +11,6 @@ import IndicativePricingHelper from "./services/IndicativePricingHelper";
  * A bid contains collections of the following type of {@link BidEntity}s: 
  * {@link LineItem}, {@link Metric}, {@link Field}, {@link Component}, {@link Datatable}, 
  * {@link Assembly}, {@link FieldGroup}, {@link ComponentGroup}.
- * 
  */
 export default class Bid extends BidEntity {
     /**
@@ -25,7 +24,11 @@ export default class Bid extends BidEntity {
         this._data = bidData;
         this._bidService = bidService;
         this.maxEvents = 25;
-        this.entities = new BidModelRelationsHelper(this);
+
+        /**
+         * @type {BidEntityRelationsHelper}
+         */
+        this.entities = new BidEntityRelationsHelper(this);
         this._indicativePricingHelper = new IndicativePricingHelper(this);
         this._wattMetricDef = null;
         this.on("assessing", `bid.${this.id}`, () => {
@@ -344,6 +347,11 @@ export default class Bid extends BidEntity {
         return this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true;
     }
 
+    /**
+     * Applies a user entered margin, back calcualting all line item markups to meet the margin.
+     * 
+     * @param {number} newMarginPercent 
+     */
     _applyMarginPercentage(newMarginPercent) {
         let bidCost = this.cost + this.tax,
             oldMarkup = parseFloat(this.markup),
@@ -397,6 +405,9 @@ export default class Bid extends BidEntity {
         }
     }
 
+    /**
+     * @deprecated
+     */
     applySubMarginChange() {
         if (this.isAssessable()) {
             let totalSubMargins = 0;
