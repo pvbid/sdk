@@ -47,7 +47,7 @@ export default class ProjectService {
         try {
             title = title ? title : "New Bid";
             const bidData = await this.repositories.bids.create({ title: title, project_id: project.id });
-            const bid = new BidFactory().create(bidData, this.repositories, project);
+            const bid = new BidFactory().create(bidData, this.context, project);
             bid.isActive = true;
             project.attachBid(bid);
             project.assess();

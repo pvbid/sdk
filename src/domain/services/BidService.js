@@ -26,7 +26,7 @@ export default class BidService {
         await bid.project.save();
         const res = await this.repositories.bids.clone(bid.id);
         const bidObject = await this.repositories.bids.findById(res.id, true);
-        const clonedBid = new BidFactory().create(bidObject, this.repositories, bid.project);
+        const clonedBid = new BidFactory().create(bidObject, this.context, bid.project);
         bid.project.attachBid(clonedBid);
         bid.project.assess();
         return clonedBid;
