@@ -678,7 +678,7 @@ export default class LineItem extends BidEntity {
         if (oldValue != newValue) {
             //console.log("li changed", property, oldValue, newValue);
 
-            this._data[property] = _.round(value, 6);
+            this._data[property] = _.isBoolean(value) ? value : _.round(value, 6);
             return true;
         } else return false;
     }

@@ -9,10 +9,11 @@ import LineItemScaffolding from "../scaffolding/LineItemScaffolding";
 export default class BidService {
     /**
      * Creates an instance of BidService.
-     * @param {object} repositories 
+     * @param {PVBidContext} context 
      */
-    constructor(repositories) {
-        this.repositories = repositories;
+    constructor(context) {
+        this.context = context;
+        this.repositories = context.repositories;
     }
 
     /**

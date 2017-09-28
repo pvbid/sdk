@@ -40,7 +40,7 @@ export default class Field extends BidEntity {
      * @type {string}
      */
     set value(val) {
-        if (val != this._data.val && !this.bid.isReadOnly()) {
+        if (val != this._data.value && !this.bid.isReadOnly()) {
             this.config.is_auto_selected = false;
             this._data.value = val;
             this.dirty();
@@ -216,7 +216,7 @@ export default class Field extends BidEntity {
     getSelectedOptionValue(datatableColumnId) {
         const datatable = this.getDatatable();
         if (datatableColumnId && datatable) {
-            return datatable.getValue(datatableColumnId, field.value);
+            return datatable.getValue(datatableColumnId, this.value);
         } else return null;
     }
 

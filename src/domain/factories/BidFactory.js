@@ -39,12 +39,12 @@ export default class BidFactory {
       * Creates a Bid object from bid data.
       * 
       * @param {object} bidData 
-      * @param {object} repositories       
+      * @param {PVBidContext} context       
       * @param {Project} project 
       * @returns  
       */
-    create(bidData, repositories, project) {
-        const bidService = new BidService(repositories);
+    create(bidData, context, project) {
+        const bidService = new BidService(context);
         this._keyBidEntities(bidData);
         let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);

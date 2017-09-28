@@ -51,7 +51,7 @@ export default class Datatable extends BidEntity {
      * Returns an array of the datatable row options based on the datatable key columns.
      * 
      * @returns  {object[]}
-     * @property {string} title - The human readable title for the row.
+     * @property {string} title - The human readable title for the row. The title is concated from all the key columns.
      * @property {string} row_id - Contains the row id.
      */
     getOptions() {

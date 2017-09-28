@@ -11,7 +11,7 @@
         "docs": "./node_modules/.bin/esdoc && open docs/index.html",
         "publish-docs": "npm run test && npm run docs && PLATFORM=web DOCS=true webpack",
         "size": "size-limit",
-        "test": "./node_modules/.bin/jest --forceExit"
+        "test": "./node_modules/.bin/jest"
     },
     "size-limit": [
         {
@@ -25,13 +25,7 @@
         "browser": false,
         "testEnvironment": "node"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {

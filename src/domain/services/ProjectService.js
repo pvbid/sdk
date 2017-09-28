@@ -8,8 +8,13 @@ import ProjectSavingHelper from "./ProjectSavingHelper";
  * @param {BidService} bidService 
  */
 export default class ProjectService {
-    constructor(repositories) {
-        this.repositories = repositories;
+    /**
+     * Creates an instance of ProjectService.
+     * @param {PVBidContext} context 
+     */
+    constructor(context) {
+        this.context = context;
+        this.repositories = context.repositories;
         this._savingHelper = new ProjectSavingHelper();
     }
 

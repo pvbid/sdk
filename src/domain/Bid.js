@@ -805,7 +805,7 @@ export default class Bid extends BidEntity {
      */
     isReadOnly() {
         //TODO: add in user permission logic.
-        return this.isLocked() || !_.isNull(this.project.closedAt);
+        return this.isLocked() || !_.isNull(this.project.closedAt) || !this._bidService.context.user.can("edit-bid");
     }
 
     /**

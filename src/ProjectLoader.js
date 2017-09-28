@@ -11,10 +11,10 @@ import ProjectService from "./domain/services/ProjectService";
 export default class ProjectLoader {
     /**
      * Creates an instance of ProjectLoader.
-     * @param {object} repositories 
+     * @param {PVBidContext} pvbidContext 
      */
-    constructor(repositories) {
-        this._repos = repositories;
+    constructor(pvbidContext) {
+        this.context = pvbidContext;
     }
 
     /**
@@ -26,9 +26,9 @@ export default class ProjectLoader {
      */
     async load(projectId, forceReload) {
         try {
-            const projectData = await this._repos.projects.findById(projectId, forceReload);
+            const projectData = await this.context.repositories.projects.findById(projectId, forceReload);
             const bidIds = projectData.bids.map(b => b.id);
-            const projectService = new ProjectService(this._repos);
+            const projectService = new ProjectService(this.context);
             const project = new Project(projectData, projectService);
             const bids = await this._loadBids(bidIds, project, forceReload);
             _.each(bids, b => project.attachBid(b));
@@ -49,8 +49,8 @@ export default class ProjectLoader {
      */
     async _loadBid(bidId, project, forceReload) {
         try {
-            const bidObject = await this._repos.bids.findById(bidId, forceReload);
-            return new BidFactory().create(bidObject, this._repos, project);
+            const bidObject = await this.context.repositories.bids.findById(bidId, forceReload);
+            return new BidFactory().create(bidObject, this.context, project);
         } catch (error) {
             return Promise.reject(error);
         }
@@ -68,14 +68,14 @@ export default class ProjectLoader {
         let promises = [];
 
         _.each(bidIds, id => {
-            promises.push(this._repos.bids.findById(id, forceReload));
+            promises.push(this.context.repositories.bids.findById(id, forceReload));
         });
 
         return Promise.all(promises)
             .then(bidsJson => {
                 let bids = {};
                 for (let bidObject of bidsJson) {
-                    const bid = new BidFactory().create(bidObject, this._repos, project);
+                    const bid = new BidFactory().create(bidObject, this.context, project);
                     bids[bid.id] = bid;
                 }
 

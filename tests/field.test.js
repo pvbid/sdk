@@ -9,7 +9,7 @@ var MockAdapter = require("axios-mock-adapter");
 import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
 
 let context = PVBid.createContext({ token: "Bearer Token", base_uri: "http://api.pvbid.local/v2" });
-let project, bid, field, lineItem, metric;
+let project, bid, field, datatable;
 
 beforeAll(() => {
     return init();
@@ -28,7 +28,6 @@ async function init() {
             line_item: mockedLineItem
         }
     });
-
     project = await new Promise(resolve => {
         jsonfile.readFile("./tests/simple-test-project.json", (err, data) => {
             mock.onGet("http://api.pvbid.local/v2/projects/461").reply(200, {
@@ -37,7 +36,6 @@ async function init() {
             mock.onGet("http://api.pvbid.local/v2/bids/190").reply(200, {
                 data: { bid: data.bid }
             });
-
             mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                 data: { user: data.user }
             });
@@ -56,54 +54,18 @@ async function init() {
     });
 }
 
-test("test search by title", () => {
-    field = bid.entities.searchByTitle("field", "module type")[0];
-    expect(field.title).toBe("Module Type");
-});
-
-test("test field options", () => {
-    let options = field.getListOptions();
-    expect(options[0].title).toBe("Module 1");
-    expect(options[1].title).toBe("Module 2");
-});
-
-test("field list selection value", () => {
+test("get field value", () => {
+    let field = bid.entities.searchByTitle("field", "module type")[0];
     let options = field.getListOptions();
     field.value = options[0].row_id;
-    let selectedOption = field.getSelectedOption();
-    expect(selectedOption.row_id).toBe(options[0].row_id);
 
+    expect(field.getSelectedOptionValue("clpa")).toBe("450");
+});
+
+test("field selected option", () => {
+    let field = bid.entities.searchByTitle("field", "module type")[0];
+    let options = field.getListOptions();
     field.value = options[1].row_id;
-    selectedOption = field.getSelectedOption();
-    expect(selectedOption.row_id).toBe(options[1].row_id);
-});
 
-test("line item include status with field select v1", () => {
-    expect.assertions(2);
-
-    lineItem = bid.entities.searchByTitle("line_item", "on with module selected")[0];
-    expect(lineItem.isIncluded).toBe(true);
-
-    return new Promise(resolve => {
-        lineItem.once("assessed", () => {
-            expect(lineItem.isIncluded).toBe(false);
-            resolve();
-        });
-        field.value = null;
-    });
-});
-
-test("line item include status with field select v2", () => {
-    expect.assertions(2);
-
-    return new Promise(resolve => {
-        expect(lineItem.isIncluded).toBe(false);
-
-        lineItem.once("assessed", () => {
-            expect(lineItem.isIncluded).toBe(true);
-            resolve();
-        });
-        let options = field.getListOptions();
-        field.value = options[0].row_id;
-    });
+    expect(field.getSelectedOption()).toEqual({ row_id: "be6f", title: "Module 2" });
 });

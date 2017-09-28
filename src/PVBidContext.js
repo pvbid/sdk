@@ -1,4 +1,5 @@
 import _ from "lodash";
+import User from "./domain/User";
 import ProjectLoader from "./ProjectLoader";
 import ProjectRepository from "./repositories/ProjectRepository";
 import SnapshotRepository from "./repositories/SnapshotRepository";
@@ -26,8 +27,8 @@ export default class PVBidContext {
         }
         this._httpConfig = config;
         this._token = config.token;
-
-        this._httpConfig.base_uri = this._httpConfig.base_uri ? this._httpConfig.base_uri : "http://api.pvbid.com/v2";
+        this._httpConfig.base_uri = this._httpConfig.base_uri ? this._httpConfig.base_uri : "https://api.pvbid.com/v2";
+        this.user;
 
         /**
          * A property that provides quick access to initialized repositories.
@@ -62,6 +63,24 @@ export default class PVBidContext {
      * @returns {Promise<Project>}
      */
     async getProject(projectId, forceReload) {
-        return new ProjectLoader(this.repositories).load(projectId, forceReload);
+        try {
+            await this.loadAuthorizedUser();
+            return new ProjectLoader(this).load(projectId, forceReload);
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
+    async loadAuthorizedUser() {
+        try {
+            if (!this.user) {
+                let userData = await this.repositories.users.me();
+                this.user = new User(userData);
+                if (this._httpConfig.impersonate_id) this.user._is_impersonating = true;
+                return this.user;
+            } else return Promise.resolve(this.user);
+        } catch (error) {
+            return Promise.reject(error);
+        }
     }
 }

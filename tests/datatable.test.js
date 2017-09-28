@@ -13,9 +13,7 @@ let project, bid, field, datatable;
 
 beforeAll(() => {
     return init();
-}, 50000);
-
-afterAll(() => setTimeout(() => process.exit(), 1000));
+});
 
 async function init() {
     // This sets the mock adapter on the default instance
@@ -23,23 +21,26 @@ async function init() {
 
     // Mock any GET request to /users
     // arguments for reply are (status, data, headers)
-    let mockedLineItem = LineItemScaffolding.create(179, "The New Line Item");
+    let mockedLineItem = LineItemScaffolding.create(190, "The New Line Item");
     mockedLineItem.id = 1000001;
-    mock.onPost("http://api.pvbid.local/v2/bids/179/line_items/").reply(200, {
+    mock.onPost("http://api.pvbid.local/v2/bids/190/line_items/").reply(200, {
         data: {
             line_item: mockedLineItem
         }
     });
     project = await new Promise(resolve => {
         jsonfile.readFile("./tests/simple-test-project.json", (err, data) => {
-            mock.onGet("http://api.pvbid.local/v2/projects/123").reply(200, {
+            mock.onGet("http://api.pvbid.local/v2/projects/461").reply(200, {
                 data: { project: data.project }
             });
-            mock.onGet("http://api.pvbid.local/v2/bids/179").reply(200, {
+            mock.onGet("http://api.pvbid.local/v2/bids/190").reply(200, {
                 data: { bid: data.bid }
             });
+            mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
+                data: { user: data.user }
+            });
 
-            context.getProject(123).then(p => {
+            context.getProject(461).then(p => {
                 resolve(p);
             });
         });
