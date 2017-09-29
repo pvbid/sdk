@@ -30,7 +30,15 @@ export default class Field extends BidEntity {
      * @type {string} 
      */
     get value() {
-        return this._data.value;
+        let val = this._data.value;
+        if (this.fieldType === "boolean") {
+            if (val === null || val.length === 0) {
+                val = this.config.default_value;
+            }
+
+            val = val == true || val == "1" || val == "true" ? true : false;
+        }
+        return val;
     }
 
     /**
@@ -40,8 +48,18 @@ export default class Field extends BidEntity {
      * @type {string}
      */
     set value(val) {
-        if (val != this._data.value && !this.bid.isReadOnly()) {
+        if (val !== this._data.value && !this.bid.isReadOnly()) {
             this.config.is_auto_selected = false;
+
+            //Check if boolean and manipulate input value to conform to type.
+            if (this.fieldType === "boolean") {
+                if (val === null || val.length === 0) {
+                    val = this.config.default_value;
+                }
+
+                val = val == true || val == "1" || val == "true" ? true : false;
+            }
+
             this._data.value = val;
             this.dirty();
             this.assess();

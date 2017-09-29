@@ -656,3 +656,6 @@ test("test labor hours override", () => {
         lineItem.laborHours = "10";
     });
 });
+
+//TODO: Test to ensuring assessing/assessed events only fire once
+// even after bind() is called multiple times on the instance

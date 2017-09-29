@@ -70,6 +70,109 @@ test("field selected option", () => {
     expect(field.getSelectedOption()).toEqual({ row_id: "be6f", title: "Module 2" });
 });
 
-test("propagation of supporting datatable update event", () => {});
+describe("Field's default value", () => {
+    test("should be true", () => {
+        expect.assertions(1);
+        let field = bid.entities.searchByTitle("field", "boolean field")[0];
+        field.config.default_value = true;
+        return new Promise(resolve => {
+            field.once("assessed", () => {
+                expect(field.value).toBe(true);
+                resolve();
+            });
+            field.assess();
+        });
+    });
+
+    test("should be false", () => {
+        expect.assertions(1);
+        let field = bid.entities.searchByTitle("field", "boolean field")[0];
+        field.value = null;
+        field.config.default_value = false;
+        return new Promise(resolve => {
+            field.once("assessed", () => {
+                expect(field.value).toBe(false);
+                resolve();
+            });
+            field.assess();
+        });
+    });
+});
+
+test("field value inputs should convert to boolean", () => {
+    let field = bid.entities.searchByTitle("field", "boolean field")[0];
+    field.value = "1";
+    expect(field.value).toBe(true);
+    field.value = 1;
+    expect(field.value).toBe(true);
+    field.value = "true";
+    expect(field.value).toBe(true);
+    field.value = true;
+    expect(field.value).toBe(true);
+    field.value = "0";
+    expect(field.value).toBe(false);
+    field.value = 0;
+    expect(field.value).toBe(false);
+    field.value = "false";
+    expect(field.value).toBe(false);
+    field.value = false;
+    expect(field.value).toBe(false);
+
+    field.config.type = "text";
+
+    field.value = 0;
+    expect(field.value).toBe(0);
+    field.value = "0";
+    expect(field.value).toBe("0");
+    field.value = "false";
+    expect(field.value).toBe("false");
+});
+
+describe("Propagation of supporting datatable update event", () => {
+    test("should force field 'update' event even with no changes to the field value.", async () => {
+        expect.assertions(1);
+        let field = bid.entities.searchByTitle("field", "module type")[0];
+        let dt = field.getDatatable();
+
+        await new Promise(resolve => {
+            field.once("updated", () => {
+                expect(true).toBe(true);
+                resolve();
+            });
+            dt.emit("updated");
+        });
+    });
+
+    test("should update line items that depend on field lists.", async () => {
+        expect.assertions(2);
+
+        let field = bid.entities.searchByTitle("field", "module type")[0];
+        let options = field.getListOptions();
+        field.value = options[1].row_id;
+
+        let lineItem = await bid.addLineItem();
+
+        //column id: tp7qn is the unit price column.
+        lineItem.config.dependencies.wage = { type: "field", field: "tp7q", bid_entity_id: field.id };
+        lineItem.bind();
+
+        await new Promise(resolve => {
+            lineItem.once("assessed", resolve);
+            lineItem.assess();
+        });
+
+        expect(lineItem.wage).toBe(300);
+
+        await new Promise(resolve => {
+            lineItem.once("assessed", () => {
+                expect(lineItem.wage).toBe(305);
+                resolve();
+            });
+            let dt = field.getDatatable();
+            dt.config.rows[1].values[1] = 305;
+            dt.emit("updated");
+        });
+    });
+});
 
 // TODO: test firing of "update" event when a field is fieldType of list with a reference to a datatable.
