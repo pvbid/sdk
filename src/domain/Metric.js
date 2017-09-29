@@ -174,11 +174,12 @@ export default class Metric extends BidEntity {
     /**
      * Assess metric for changes.
      * 
+     * @param {?BidEntity} dependency  - The calling dependency.
      * @emits {assessing} fires event before assessement.
      * @emits {assessed} fires after assessment is complete.
      * @emits {updated} fires only if there has been a change.
      */
-    assess() {
+    assess(dependency) {
         if (this.bid.isAssessable()) {
             if (!this.config.override) {
                 var baseValue = 0,
@@ -210,7 +211,7 @@ export default class Metric extends BidEntity {
                 if (!_.isEmpty(dependencyContract)) {
                     const dependency = this.bid.entities.getDependency(dependencyContract);
                     if (dependency && dependency.on) {
-                        dependency.on("updated", "metric." + this.id, () => this.assess());
+                        dependency.on("updated", "metric." + this.id, (requesterId, self) => this.assess(self));
                     } else {
                         console.log("m dep", dependencyContract);
                     }
@@ -222,7 +223,9 @@ export default class Metric extends BidEntity {
                     for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
                         if (!_.isEmpty(manipulationDepCtrct)) {
                             const dependency = this.bid.entities.getDependency(manipulationDepCtrct);
-                            dependency.on("updated", "metric-contract." + this.id, () => this.assess());
+                            dependency.on("updated", "metric-contract." + this.id, (requesterId, self) =>
+                                this.assess(self)
+                            );
                         }
                     }
                 }

@@ -110,12 +110,15 @@ export default class Field extends BidEntity {
      * @emits {assessing} Fires event before assessment.
      * @emits {assessed} Fires event after assessment.
      * @emits {updated} Fires event if the field has been changed during assessment.
+     * @param {?BidEntity} dependency  - The calling dependency.
      */
-    assess() {
+    assess(dependency) {
         if (this.bid.isAssessable()) {
             this.emit("assessing");
             if (this._autoPopulateService.shouldAutoPopulate()) {
                 this._autoPopulateService.autoPopulate();
+            } else if (dependency && dependency.type === "datatable" && this.fieldType === "list") {
+                this.emit("updated");
             }
 
             this.emit("assessed");
@@ -131,7 +134,7 @@ export default class Field extends BidEntity {
                 if (!_.isEmpty(dependencyContract)) {
                     const dependency = this.bid.entities.getDependency(dependencyContract);
                     if (dependency) {
-                        dependency.on("updated", `field.${this.id}`, () => this.assess());
+                        dependency.on("updated", `field.${this.id}`, (requesterId, self) => this.assess(self));
                     }
                 }
             }

@@ -23,7 +23,7 @@ export default class LineItem extends BidEntity {
         this._original = _.cloneDeep(entityData);
         this._data = entityData;
         this._ruleService = new LineItemRuleService(this);
-        this.onDelay("property.updated", 5, "self", () => this.assess(true));
+        this.onDelay("property.updated", 5, "self", () => this.assess(this, true));
     }
 
     /**
@@ -502,7 +502,7 @@ export default class LineItem extends BidEntity {
         if (this.bid.isAssessable()) {
             this.config.overrides = {};
             this._data.multiplier = 1;
-            this.assess(true);
+            this.assess(this, true);
         }
     }
 
@@ -521,9 +521,10 @@ export default class LineItem extends BidEntity {
      * @emits {assessing} fires event before assessement.
      * @emits {assessed}
      * @emits {updated}
-     * @param {boolean} forceUpdate 
+     * @param {?BidEntity} dependency The calling dependency 
+     * @param {?boolean} forceUpdate 
      */
-    assess(forceUpdate) {
+    assess(dependency, forceUpdate) {
         if (this.bid.isAssessable()) {
             this.bid.emit("assessing");
             var isChanged = false;
@@ -615,16 +616,7 @@ export default class LineItem extends BidEntity {
             if (!_.isEmpty(dependencyContract)) {
                 let dependency = this.bid.entities.getDependency(dependencyContract);
                 if (dependency) {
-                    dependency.on("updated", `line_item.${this.id}`, () => this.assess());
-
-                    if (dependency.type === "field" && dependency.config.type === "list") {
-                        _.each(dependency.config.dependencies, fieldDependencyContract => {
-                            const fieldDependency = this.bid.entities.getDependency(fieldDependencyContract);
-                            if (fieldDependency) {
-                                fieldDependency.on("updated", `line_item.${this.id}`, () => this.assess());
-                            }
-                        });
-                    }
+                    dependency.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
                 }
             }
         }
@@ -640,7 +632,7 @@ export default class LineItem extends BidEntity {
                     if (!_.isEmpty(dependencyContract)) {
                         let dependency = this.bid.entities.getDependency(dependencyContract);
                         if (dependency) {
-                            dependency.on("updated", `line_item.${this.id}`, () => this.assess());
+                            dependency.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
                         }
                     }
                 }
@@ -662,7 +654,7 @@ export default class LineItem extends BidEntity {
                 );
 
                 for (let bidEntity of bidEnities) {
-                    bidEntity.on("updated", `line_item.${this.id}`, () => this.assess());
+                    bidEntity.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
                 }
             }
         }

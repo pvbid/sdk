@@ -76,7 +76,7 @@ export default class Bid extends BidEntity {
         if (_.isBoolean(val) && val != this._data.is_active) {
             this._data.is_active = val;
             this.dirty();
-            this.assess(true);
+            this.assess(this, true);
         }
     }
 
@@ -424,10 +424,11 @@ export default class Bid extends BidEntity {
      * @emits {assessing}
      * @emits {assessed}
      * @emits {updated}
-     * @param {boolean} [forceUpdate] - Force fires "update" event and flags bid as dirty.
+     * @param {?BidEntity} dependency  - The calling dependency.
+     * @param {?boolean} [forceUpdate] - Force fires "update" event and flags bid as dirty.
      * @memberof Bid
      */
-    assess(forceUpdate) {
+    assess(dependency, forceUpdate) {
         if (this.isAssessable()) {
             this.emit("assessing");
 

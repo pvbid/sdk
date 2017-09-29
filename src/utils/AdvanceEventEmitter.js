@@ -48,7 +48,7 @@ export default class AdvanceEventEmitter extends EventEmitter {
                 this._waitForFinalEvent(
                     () => {
                         if (this._shouldTrigger(requesterId)) {
-                            callback(requesterId);
+                            callback(requesterId, this);
                         }
                     },
                     ms,
@@ -71,7 +71,7 @@ export default class AdvanceEventEmitter extends EventEmitter {
             eventName,
             () => {
                 if (this._shouldTrigger(requesterId)) {
-                    callback(requesterId);
+                    callback(requesterId, this);
                 }
             },
             requesterId

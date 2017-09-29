@@ -337,8 +337,9 @@ export default class Component extends BidEntity {
      * @emits {assessing}
      * @emits {assessed}
      * @emits {updated}
+     * @param {?BidEntity} dependency  - The calling dependency.
      */
-    assess() {
+    assess(dependency) {
         if (this.bid.isAssessable()) {
             var isChanged = false;
 
@@ -484,14 +485,14 @@ export default class Component extends BidEntity {
             for (let lineItemId of this.config.line_items) {
                 const lineItem = this.bid.entities.lineItems(lineItemId);
 
-                lineItem.on("updated", `component.${this.id}`, requesterId => {
-                    waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.lineItem.${requesterId}`);
+                lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
+                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
                 });
             }
 
             _.each(this.getSubComponents(), c => {
-                c.onDelay("updated", 5, `component.${this.id}`, requesterId => {
-                    waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.${requesterId}`);
+                c.onDelay("updated", 5, `component.${this.id}`, (requesterId, self) => {
+                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.${requesterId}`);
                 });
             });
         }

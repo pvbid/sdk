@@ -69,3 +69,7 @@ test("field selected option", () => {
 
     expect(field.getSelectedOption()).toEqual({ row_id: "be6f", title: "Module 2" });
 });
+
+test("propagation of supporting datatable update event", () => {});
+
+// TODO: test firing of "update" event when a field is fieldType of list with a reference to a datatable.

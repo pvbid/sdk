@@ -126,4 +126,38 @@ describe("Testing Line Item Rules", () => {
             });
         });
     });
+
+    describe("Rule toggle list", () => {
+        test("should exclude line item with no field selection", () => {
+            field = bid.entities.searchByTitle("field", "module type")[0];
+
+            expect.assertions(2);
+
+            lineItem = bid.entities.searchByTitle("line_item", "on with module selected")[0];
+            expect(lineItem.isIncluded).toBe(true);
+
+            return new Promise(resolve => {
+                lineItem.once("assessed", () => {
+                    expect(lineItem.isIncluded).toBe(false);
+                    resolve();
+                });
+                field.value = null;
+            });
+        });
+
+        test("should include line item with field selection", () => {
+            expect.assertions(2);
+
+            return new Promise(resolve => {
+                expect(lineItem.isIncluded).toBe(false);
+
+                lineItem.once("assessed", () => {
+                    expect(lineItem.isIncluded).toBe(true);
+                    resolve();
+                });
+                let options = field.getListOptions();
+                field.value = options[0].row_id;
+            });
+        });
+    });
 });

@@ -125,9 +125,10 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @emits {assessing} Fires as assessment begins.
      * @emits {assessed} Fires when bid entity assessement is completed
      * @emits {updated} Fires when the bid entity has changed.
+     * @param {?BidEntity} dependency  - The calling dependency.
      * @abstract
      */
-    assess() {
+    assess(dependency) {
         throw "Must be implemented by subclass.";
     }
 }
