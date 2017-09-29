@@ -87,14 +87,14 @@ describe("Field's default value", () => {
     test("should be false", () => {
         expect.assertions(1);
         let field = bid.entities.searchByTitle("field", "boolean field")[0];
-        field.value = null;
         field.config.default_value = false;
+
         return new Promise(resolve => {
             field.once("assessed", () => {
                 expect(field.value).toBe(false);
                 resolve();
             });
-            field.assess();
+            field.value = null;
         });
     });
 });
