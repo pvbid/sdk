@@ -55,7 +55,38 @@ describe("Testing Line Item Rules", () => {
         });
     }
 
-    describe("Rule expression", () => {
+    test("line item should be excluded when no rules are available", async () => {
+        expect.assertions(1);
+
+        return new Promise(resolve => {
+            let lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+            lineItem.once("assessed", () => {
+                expect(lineItem.isIncluded).toBe(false);
+                resolve();
+            });
+            lineItem.config.rules = [];
+            lineItem.assess();
+        });
+    });
+
+    describe("Rule type 'always_include'", async () => {
+        test("should always include when enabled.", () => {
+            expect.assertions(3);
+            // line item should have no rules due to previous test.
+            let lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+            expect(lineItem.config.rules).toEqual([]);
+            return new Promise(resolve => {
+                lineItem.once("assessed", () => {
+                    expect(lineItem.config.rules[0].type).toBe("always_include");
+                    expect(lineItem.isIncluded).toBe(true);
+                    resolve();
+                });
+                lineItem.config.rules.push({ title: "Always Include", type: "always_include" });
+                lineItem.assess();
+            });
+        });
+    });
+    describe("Rule type expression", () => {
         test("should include line item when (a > b)", async () => {
             expect.assertions(5);
 

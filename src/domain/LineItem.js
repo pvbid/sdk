@@ -492,6 +492,7 @@ export default class LineItem extends BidEntity {
         if (this.bid.isAssessable()) {
             this.resetProperty("markup");
             this.resetProperty("markup_percent");
+            this.resetProperty("price");
         }
     }
 

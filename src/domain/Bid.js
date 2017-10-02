@@ -155,7 +155,7 @@ export default class Bid extends BidEntity {
             const changePercent = 1 + (newValue - oldValue) / oldValue;
 
             _.each(this.entities.lineItems(), lineItem => {
-                if (lineItem.isIncluded && lineItem.price > 0) {
+                if (lineItem.isIncluded) {
                     lineItem.markupPercent = lineItem.markupPercent * changePercent;
                 }
             });
@@ -364,7 +364,7 @@ export default class Bid extends BidEntity {
             var markupChangePercent = oldMarkup !== 0 ? newMarkup / oldMarkup : 1;
 
             _.each(this.entities.lineItems(), lineItem => {
-                if (lineItem.isIncluded && lineItem.cost > 0) {
+                if (lineItem.isIncluded) {
                     lineItem.markupPercent = lineItem.markupPercent * markupChangePercent;
                 }
             });

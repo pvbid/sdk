@@ -28,6 +28,17 @@ export default class Project extends BidEntity {
         this.onDelay("property.updated", 5, "self", this.assess);
     }
 
+    get title() {
+        return this._data.title;
+    }
+
+    set title(val) {
+        if (val && typeof val === "string" && val.length > 0) {
+            this._data.title = val;
+            this.dirty();
+        }
+    }
+
     /**
      * @type {string}
      */
@@ -293,9 +304,14 @@ export default class Project extends BidEntity {
      * Saves project and underlying bids.
      * 
      * @returns {Promise<null>}
+     * @emits saving
+     * @emits saved
      */
     async save() {
-        return this._projectService.save(this);
+        this.emit("saving");
+        let response = await this._projectService.save(this);
+        this.emit("saved");
+        return response;
     }
 
     /**
@@ -338,5 +354,18 @@ export default class Project extends BidEntity {
      */
     async clone() {
         return this.repositories.projects.clone(this.id);
+    }
+
+    /**
+     * Enables auto saving after project or bid changes occur.
+     * 
+     * @param {number} [delay=5000] - The number of milliseconds to delay auto save.  Minimum is 1000ms.
+     * @emits saving
+     * @emits saved
+     */
+    enableAutoSave(delay) {
+        delay = delay && typeof delay === "number" ? Math.max(delay, 1000) : 5000;
+        this.onDelay("assessed", delay, `project.${this.id}`, () => this.save());
+        this.onDelay("changed", delay, `project.${this.id}`, () => this.save());
     }
 }

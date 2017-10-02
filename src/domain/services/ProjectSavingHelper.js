@@ -49,6 +49,12 @@ export default class ProjectSavingHelper {
                 _.each(bid.entities.datatables(), item => {
                     if (item.isDirty()) extracted.datatables[item.id] = item.exportData();
                 });
+            } else if (bid.isLocked() && bid.isDirty()) {
+                extracted.bids[bid.id] = {
+                    title: bid.title,
+                    account_id: bid._data.account_id,
+                    is_locked: bid.isLocked()
+                };
             }
         });
 

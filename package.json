@@ -25,13 +25,7 @@
         "browser": false,
         "testEnvironment": "node"
     },
-    "keywords": [
-        "pvbid",
-        "solar",
-        "javascript",
-        "estimating",
-        "bidding"
-    ],
+    "keywords": ["pvbid", "solar", "javascript", "estimating", "bidding"],
     "author": "PVBid, Inc",
     "license": "LicenseRef-LICENSE",
     "devDependencies": {

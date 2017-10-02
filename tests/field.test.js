@@ -175,4 +175,3 @@ describe("Propagation of supporting datatable update event", () => {
     });
 });
 
-// TODO: test firing of "update" event when a field is fieldType of list with a reference to a datatable.

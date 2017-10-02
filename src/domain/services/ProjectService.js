@@ -26,7 +26,7 @@ export default class ProjectService {
      */
     async save(project) {
         const exported = this._savingHelper.extract(project);
-        console.log("saved project data", exported);
+
         return this.repositories.projects.batchUpdate(project.id, exported).then(() => {
             _.each(project.bids, bid => {
                 bid.pristine();
