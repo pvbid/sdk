@@ -147,13 +147,11 @@ export default class Field extends BidEntity {
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        if (this.bid.isAssessable()) {
-            for (let dependencyContract of Object.values(this.config.dependencies)) {
-                if (!_.isEmpty(dependencyContract)) {
-                    const dependency = this.bid.entities.getDependency(dependencyContract);
-                    if (dependency) {
-                        dependency.on("updated", `field.${this.id}`, (requesterId, self) => this.assess(self));
-                    }
+        for (let dependencyContract of Object.values(this.config.dependencies)) {
+            if (!_.isEmpty(dependencyContract)) {
+                const dependency = this.bid.entities.getDependency(dependencyContract);
+                if (dependency) {
+                    dependency.on("updated", `field.${this.id}`, (requesterId, self) => this.assess(self));
                 }
             }
         }

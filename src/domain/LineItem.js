@@ -567,11 +567,9 @@ export default class LineItem extends BidEntity {
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        if (this.bid.isAssessable()) {
-            this._bindLineItemDependencies();
-            this._bindLineItemRuleDependencies();
-            this._bindLineItemPredictionDependencies();
-        }
+        this._bindLineItemDependencies();
+        this._bindLineItemRuleDependencies();
+        this._bindLineItemPredictionDependencies();
     }
 
     /**

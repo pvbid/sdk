@@ -206,27 +206,25 @@ export default class Metric extends BidEntity {
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        if (this.bid.isAssessable()) {
-            for (let dependencyContract of Object.values(this.config.dependencies)) {
-                if (!_.isEmpty(dependencyContract)) {
-                    const dependency = this.bid.entities.getDependency(dependencyContract);
-                    if (dependency && dependency.on) {
-                        dependency.on("updated", "metric." + this.id, (requesterId, self) => this.assess(self));
-                    } else {
-                        console.log("m dep", dependencyContract);
-                    }
+        for (let dependencyContract of Object.values(this.config.dependencies)) {
+            if (!_.isEmpty(dependencyContract)) {
+                const dependency = this.bid.entities.getDependency(dependencyContract);
+                if (dependency && dependency.on) {
+                    dependency.on("updated", "metric." + this.id, (requesterId, self) => this.assess(self));
+                } else {
+                    console.log("m dep", dependencyContract);
                 }
             }
+        }
 
-            if (!_.isUndefined(this.config.manipulations)) {
-                for (let manipulation of Object.values(this.config.manipulations)) {
-                    for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
-                        if (!_.isEmpty(manipulationDepCtrct)) {
-                            const dependency = this.bid.entities.getDependency(manipulationDepCtrct);
-                            dependency.on("updated", "metric-contract." + this.id, (requesterId, self) =>
-                                this.assess(self)
-                            );
-                        }
+        if (!_.isUndefined(this.config.manipulations)) {
+            for (let manipulation of Object.values(this.config.manipulations)) {
+                for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
+                    if (!_.isEmpty(manipulationDepCtrct)) {
+                        const dependency = this.bid.entities.getDependency(manipulationDepCtrct);
+                        dependency.on("updated", "metric-contract." + this.id, (requesterId, self) =>
+                            this.assess(self)
+                        );
                     }
                 }
             }

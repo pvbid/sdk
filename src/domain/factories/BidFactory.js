@@ -49,9 +49,9 @@ export default class BidFactory {
         let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);
         bid.project = project;
+        bid.bind();
 
         if (bid.isAssessable()) {
-            bid.bind();
             bid.reassessAll();
         }
 
@@ -70,9 +70,9 @@ export default class BidFactory {
         bid._data = bidData;
         bid._original = _.cloneDeep(bidData);
         this._createBidEntities(bid, bidData);
+        bid.bind();
 
         if (bid.isAssessable()) {
-            bid.bind();
             bid.reassessAll(true);
         }
     }

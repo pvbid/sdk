@@ -481,21 +481,19 @@ export default class Component extends BidEntity {
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        if (this.bid.isAssessable()) {
-            for (let lineItemId of this.config.line_items) {
-                const lineItem = this.bid.entities.lineItems(lineItemId);
+        for (let lineItemId of this.config.line_items) {
+            const lineItem = this.bid.entities.lineItems(lineItemId);
 
-                lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
-                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
-                });
-            }
-
-            _.each(this.getSubComponents(), c => {
-                c.onDelay("updated", 5, `component.${this.id}`, (requesterId, self) => {
-                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.${requesterId}`);
-                });
+            lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
+                waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
             });
         }
+
+        _.each(this.getSubComponents(), c => {
+            c.onDelay("updated", 5, `component.${this.id}`, (requesterId, self) => {
+                waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.${requesterId}`);
+            });
+        });
     }
 
     /**
