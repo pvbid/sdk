@@ -146,6 +146,16 @@ export default class Project extends BidEntity {
     }
 
     /**
+     * @type {Object[]}
+     * @property {number} id
+     * @property {string} name
+     * @property {string} timezone
+     */
+    get users() {
+        return this._data.users;
+    }
+
+    /**
      * @type {number}
      */
     get watts() {
@@ -248,6 +258,16 @@ export default class Project extends BidEntity {
             //console.log("assess Cost/Price", this.cost, this.price);
             waitForFinalEvent(() => this.assess(), 400, `project.${this.id}.assessments.completed`);
         });
+    }
+
+    /**
+     * Determines if user is assigned to project
+     * 
+     * @param {number} userId 
+     * @returns {boolean} 
+     */
+    hasUser(userId) {
+        return this.users.filter(u => u.id === userId).length === 1;
     }
 
     /**
@@ -365,7 +385,6 @@ export default class Project extends BidEntity {
      */
     enableAutoSave(delay) {
         delay = delay && typeof delay === "number" ? Math.max(delay, 1000) : 5000;
-        this.onDelay("assessed", delay, `project.${this.id}`, () => this.save());
         this.onDelay("changed", delay, `project.${this.id}`, () => this.save());
     }
 }

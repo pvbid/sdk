@@ -824,8 +824,12 @@ export default class Bid extends BidEntity {
      * @returns {boolean} 
      */
     canLock() {
-        // TODO: needs additional logic for user permissions.
-        return !this.isLocked();
+        return (
+            !this.isLocked() &&
+            (this._bidService.context.user.hasRole("admin") ||
+                (this._bidService.context.user.can("edit-bid") &&
+                    this.project.hasUser(this._bidService.context.user.id)))
+        );
     }
 
     /**
@@ -834,7 +838,12 @@ export default class Bid extends BidEntity {
      * @returns {boolean} 
      */
     canUnlock() {
-        return this.isLocked();
+        return (
+            this.isLocked() &&
+            (this._bidService.context.user.hasRole("admin") ||
+                (this._bidService.context.user.can("edit-bid") &&
+                    this.project.hasUser(this._bidService.context.user.id)))
+        );
     }
 
     /**
@@ -861,6 +870,7 @@ export default class Bid extends BidEntity {
         if (this.canUnlock()) {
             this._data.is_locked = false;
             this.dirty();
+            this.bind();
             return this.project.save();
         }
     }

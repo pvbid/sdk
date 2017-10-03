@@ -36,14 +36,14 @@ export default class User {
 
     can(permission) {
         var userPermissions = this.permissions();
-        return _.includes(userPermissions, permission);
+        return userPermissions.indexOf(permission) >= 0;
     }
 
     hasRole(roles) {
         roles = roles.split(",");
         var hasRole = false;
 
-        var userRoles = getRoles();
+        var userRoles = this.roles();
         for (var i = 0; i < roles.length; i++) {
             if (_.includes(userRoles, roles[i].trim())) {
                 hasRole = true;

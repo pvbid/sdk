@@ -98,3 +98,5 @@ describe("When bid markup reset occurs", () => {
         });
     });
 });
+
+//TODO: Test locking/unlocking bid based on user permission, user in project, user being admin.
