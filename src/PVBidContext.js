@@ -25,10 +25,18 @@ export default class PVBidContext {
         if (_.isUndefined(config) || _.isUndefined(config.token)) {
             throw "Authoriziation token is not set. ";
         }
+
+        /**
+         * The current authorized user.  
+         * {@link PVBidContext.loadAuthorizedUser} must get called first.
+         * 
+         * @type {User}
+         */
+        this.user = null;
+
         this._httpConfig = config;
         this._token = config.token;
         this._httpConfig.base_uri = this._httpConfig.base_uri ? this._httpConfig.base_uri : "https://api.pvbid.com/v2";
-        this.user;
 
         /**
          * A property that provides quick access to initialized repositories.
@@ -71,6 +79,11 @@ export default class PVBidContext {
         }
     }
 
+    /**
+     * Loads the authorized user for this context.  Calling {@link PVBidContext.getProject} auto loads the authorized user.
+     * 
+     * @returns  {Promise<User>}
+     */
     async loadAuthorizedUser() {
         try {
             if (!this.user) {

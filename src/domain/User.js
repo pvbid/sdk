@@ -1,6 +1,14 @@
 import _ from "lodash";
 
+/**
+ * @export
+ * @class User
+ */
 export default class User {
+    /**
+     * Creates an instance of User.
+     * @param {object} userData 
+     */
     constructor(userData) {
         this._data = userData;
         this._is_impersonating = false;
@@ -26,6 +34,11 @@ export default class User {
         return this._data.timezone;
     }
 
+    /**
+     * Gets an array of user roles.
+     * 
+     * @returns {string[]}
+     */
     roles() {
         return this._data.roles;
     }
