@@ -209,7 +209,7 @@ export default class Metric extends BidEntity {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
             if (!_.isEmpty(dependencyContract)) {
                 const dependency = this.bid.entities.getDependency(dependencyContract);
-                if (dependency && dependency.on) {
+                if (dependency) {
                     dependency.on("updated", "metric." + this.id, (requesterId, self) => this.assess(self));
                 } else {
                     console.log("m dep", dependencyContract);
@@ -222,9 +222,11 @@ export default class Metric extends BidEntity {
                 for (let manipulationDepCtrct of Object.values(manipulation.dependencies)) {
                     if (!_.isEmpty(manipulationDepCtrct)) {
                         const dependency = this.bid.entities.getDependency(manipulationDepCtrct);
-                        dependency.on("updated", "metric-contract." + this.id, (requesterId, self) =>
-                            this.assess(self)
-                        );
+                        if (dependency) {
+                            dependency.on("updated", "metric-contract." + this.id, (requesterId, self) =>
+                                this.assess(self)
+                            );
+                        }
                     }
                 }
             }

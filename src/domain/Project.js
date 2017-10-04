@@ -387,4 +387,22 @@ export default class Project extends BidEntity {
         delay = delay && typeof delay === "number" ? Math.max(delay, 1000) : 5000;
         this.onDelay("changed", delay, `project.${this.id}`, () => this.save());
     }
+
+    /**
+     * Determines if project is closed.
+     * 
+     * @returns {boolean} 
+     */
+    isClosed() {
+        return this._data.closed_at;
+    }
+
+    /**
+     * Determines if project is reconciled
+     * 
+     * @returns {boolean} 
+     */
+    isReconciled() {
+        return this._data.reconciled_at;
+    }
 }

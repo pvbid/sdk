@@ -247,6 +247,11 @@ export default class BidValidator {
             };
             _.each(metricManipulation.dependencies, (value, key) => {
                 params[key] = 1;
+                if (!this._bid.entities.dependencyExists(dependencyContract)) {
+                    this._logIssue("invalid_metric_manipulation_dependency", sourceBidEntity, value, {
+                        source_bid_entity_dependency_key: key
+                    });
+                }
             });
             if (!Helpers.validateFormula(metricManipulation.formula, params)) {
                 var metric = this._bid.entities.metrics(metricManipulation.id);
