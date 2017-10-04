@@ -233,21 +233,24 @@ export default class BidValidator {
     _testMetricManipulations(sourceBidEntity) {
         _.each(sourceBidEntity.config.manipulations, metricManipulation => {
             //First test to ensure metric manipultion has a valid assembly.
-            var metricManipulationAssembly = this._bid.entities.assemblies(metricManipulation.assembly_id);
 
-            if (_.isUndefined(metricManipulationAssembly || _.isNull(metricManipulationAssembly))) {
-                this._logIssue("invalid_metric_manipulation_assembly_reference", sourceBidEntity, null, {
-                    metric_manipulation: metricManipulation
-                });
+            if (metricManipulation.assembly_id) {
+                let metricManipulationAssembly = this._bid.entities.assemblies(metricManipulation.assembly_id);
+
+                if (!metricManipulationAssembly) {
+                    this._logIssue("invalid_metric_manipulation_assembly_reference", sourceBidEntity, null, {
+                        metric_manipulation: metricManipulation
+                    });
+                }
             }
 
             //Test metric manipulation dependencies.
-            var params = {
+            let params = {
                 original: 1
             };
             _.each(metricManipulation.dependencies, (value, key) => {
                 params[key] = 1;
-                if (!this._bid.entities.dependencyExists(dependencyContract)) {
+                if (!this._bid.entities.dependencyExists(value)) {
                     this._logIssue("invalid_metric_manipulation_dependency", sourceBidEntity, value, {
                         source_bid_entity_dependency_key: key
                     });
