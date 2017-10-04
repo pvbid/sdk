@@ -294,6 +294,27 @@ export default class BidValidator {
         }
 
         if (rule.type === "list_field") {
+            isIncomplete =
+                _.isUndefined(rule.dependencies) ||
+                _.isUndefined(rule.dependencies.list_field) ||
+                _.isUndefined(rule.list_options) ||
+                _.isUndefined(rule.activate_on);
+
+            if (!isIncomplete) {
+                let field = this._bid.entities.getDependency(rule.dependencies.list_field);
+                if (field) {
+                    let dt = field.getDatatable();
+
+                    if (dt) {
+                        let dtRowIds = dt.getOptions().map(item => item.row_id);
+                        rule.list_options.forEach(optionId => {
+                            if (dtRowIds.indexOf(optionId) < 0) {
+                                isIncomplete = true;
+                            }
+                        });
+                    } else isIncomplete = true;
+                } else isIncomplete = true;
+            }
         }
 
         if (isIncomplete) {
