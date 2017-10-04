@@ -14,7 +14,7 @@ npm i pvbid-sdk --save
 **CDN**
 ~120kB gzipped
 
-https://unpkg.com/pvbid-sdk@0.7/dist/pvbid.min.js
+https://unpkg.com/pvbid-sdk@1.0/dist/pvbid.min.js
 
 ## Documentation
 Our most recent docs are hosted at http://sdk.pvbid.com. Code examples are included under the [Manual](http://sdk.pvbid.com/manual) section. The docs are also included in the npm package.  
