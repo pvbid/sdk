@@ -360,7 +360,7 @@ export default class Component extends BidEntity {
                 nonLaborCosts = 0;
 
             _.each(this.getLineItems(), lineItem => {
-                if (!_.isNull(lineItem) && lineItem.isIncluded) {
+                if (lineItem && lineItem.isIncluded) {
                     totalLineItems += 1;
                     if (lineItem.isLabor()) {
                         totalLaborLinetItems += 1;
@@ -424,17 +424,9 @@ export default class Component extends BidEntity {
             isChanged = this._apply("markup", markup) || isChanged;
             isChanged = this._apply("tax_percent", taxPercent) || isChanged;
             isChanged = this._apply("markup_percent", markupPercent) || isChanged;
-            // isChanged = this._apply("base", base) || isChanged;
-            //isChanged = this._apply("wage", wage) || isChanged;
-            //isChanged = this._apply("quantity", quantity) || isChanged;
-            //isChanged = this._apply("burden", burden) || isChanged;
-            //isChanged = this._apply("per_quantity", perQuantity) || isChanged;
-
             isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
             isChanged = this._apply("labor_hours", laborHours) || isChanged;
             isChanged = this._apply("labor_cost", laborCosts) || isChanged;
-            // isChanged = this._apply("included_labor_count", totalLaborLinetItems) || isChanged;
-            // isChanged = this._apply("included_count", totalLineItems) || isChanged;
 
             this._applyVirtualProperty("base", base);
             this._applyVirtualProperty("burden", burden);
@@ -443,7 +435,6 @@ export default class Component extends BidEntity {
             this._applyVirtualProperty("per_quantity", perQuantity);
             this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
             this._applyVirtualProperty("included_count", totalLineItems);
-
             this._applyVirtualProperty("base_avg", baseAvg);
             this._applyVirtualProperty("wage_avg", wageAvg);
             this._applyVirtualProperty("burden_avg", burdenAvg);
@@ -557,9 +548,7 @@ export default class Component extends BidEntity {
         for (let lineItemId of this.config.line_items) {
             var lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
 
-            if (!_.isNull(lineItem)) {
-                lines.push(lineItem);
-            }
+            if (lineItem) lines.push(lineItem);
         }
 
         if (includeSubComponents) {
