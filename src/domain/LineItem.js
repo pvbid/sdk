@@ -1021,6 +1021,7 @@ export default class LineItem extends BidEntity {
 
             delete this.bid._data.line_items[this.id];
             this.removeAllListeners();
+            await this.bid.project.save();
             this.bid.assess();
             return;
         } else Promise.reject({ message: "Line item has dependants." });
