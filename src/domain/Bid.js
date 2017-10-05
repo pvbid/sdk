@@ -608,27 +608,29 @@ export default class Bid extends BidEntity {
      * Binds all interconnected bid entity "update" events
      */
     bind() {
-        for (let f of Object.values(this.entities.fields())) {
-            f.bind();
-            f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let m of Object.values(this.entities.metrics())) {
-            m.bind();
-            m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let li of Object.values(this.entities.lineItems())) {
-            li.bind();
-            li.on("assessed", "line_item." + li.id, () => {
-                waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
-            });
-            li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
-        for (let c of Object.values(this.entities.components())) {
-            c.bind();
-            c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
-        }
+        if (this.isAssessable()) {
+            for (let f of Object.values(this.entities.fields())) {
+                f.bind();
+                f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let m of Object.values(this.entities.metrics())) {
+                m.bind();
+                m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let li of Object.values(this.entities.lineItems())) {
+                li.bind();
+                li.on("assessed", "line_item." + li.id, () => {
+                    waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
+                });
+                li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
+            for (let c of Object.values(this.entities.components())) {
+                c.bind();
+                c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            }
 
-        this.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+            this.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+        }
     }
 
     /**
