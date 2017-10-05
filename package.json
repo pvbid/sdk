@@ -1,6 +1,6 @@
 {
     "name": "pvbid-sdk",
-    "version": "0.7.19",
+    "version": "1.0.0",
     "description": "",
     "main": "dist/pvbid.node.js",
     "scripts": {
