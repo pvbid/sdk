@@ -307,9 +307,12 @@ export default class BidValidator {
 
                     if (dt) {
                         let dtRowIds = dt.getOptions().map(item => item.row_id);
-                        rule.list_options.forEach(optionId => {
+                        _.each(rule.list_options, optionId => {
                             if (dtRowIds.indexOf(optionId) < 0) {
-                                isIncomplete = true;
+                                this._logIssue("non_existant_dt_rows_line_item_rule", sourceBidEntity, null, {
+                                    rule: rule
+                                });
+                                return false;
                             }
                         });
                     } else isIncomplete = true;
