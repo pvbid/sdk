@@ -726,6 +726,10 @@ export default class LineItem extends BidEntity {
             }
         } else {
             this._data.multiplier = 1;
+
+            if (this.isLabor()) {
+                this.laborHours = this.cost / (this.wage + this.burden);
+            }
         }
     }
 

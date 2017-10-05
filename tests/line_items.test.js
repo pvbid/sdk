@@ -1,7 +1,4 @@
-//const PVBid = require("../src/pvbid.js");
-//import { pvbid } from "../src/pvbid";
 import _ from "lodash";
-import jest from "jest";
 var axios = require("axios");
 var jsonfile = require("jsonfile");
 const PVBid = require("../src/pvbid.js");
@@ -51,7 +48,7 @@ async function init() {
     });
     return new Promise(resolve => {
         bid = _.toArray(project.bids)[0];
-        project.on("assessed", "test", () => {
+        project.once("assessed", () => {
             resolve();
         });
         bid.reassessAll(true);
@@ -202,7 +199,7 @@ test(
         expect.assertions(23);
 
         return new Promise(resolve => {
-            lineItem.onDelay("assessed", 100, "test", () => {
+            lineItem.once("assessed", () => {
                 expect(lineItem.isOverridden("cost")).toBe(false);
                 expect(lineItem.isOverridden("price")).toBe(false);
                 expect(lineItem.isOverridden("markup")).toBe(false);
@@ -249,7 +246,7 @@ test(
         expect.assertions(23);
 
         return new Promise(resolve => {
-            lineItem.onDelay("assessed", 100, "test", () => {
+            lineItem.once("assessed", () => {
                 expect(lineItem.isOverridden("cost")).toBe(true);
                 expect(lineItem.isOverridden("price")).toBe(false);
                 expect(lineItem.isOverridden("markup")).toBe(false);
@@ -295,7 +292,7 @@ test(
         expect.assertions(23);
 
         return new Promise(resolve => {
-            lineItem.onDelay("assessed", 100, "test", () => {
+            lineItem.once("assessed", () => {
                 expect(lineItem.isOverridden("cost")).toBe(true);
                 expect(lineItem.isOverridden("price")).toBe(false);
                 expect(lineItem.isOverridden("markup")).toBe(false);
@@ -341,7 +338,7 @@ test(
         expect.assertions(24);
 
         return new Promise(resolve => {
-            lineItem.onDelay("assessed", 100, "test", () => {
+            lineItem.once("assessed", () => {
                 expect(lineItem.isOverridden("cost")).toBe(true);
                 expect(lineItem.isOverridden("price")).toBe(false);
                 expect(lineItem.isOverridden("markup")).toBe(false);
@@ -385,7 +382,7 @@ test("change line item escalator", () => {
     expect.assertions(25);
 
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 100, "test escalator", () => {
+        lineItem.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -430,7 +427,7 @@ test("reset line item", () => {
     expect.assertions(24);
 
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 100, "test escalator", () => {
+        lineItem.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -472,7 +469,7 @@ test("test multiplier", () => {
     expect.assertions(25);
 
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 200, "test escalator", () => {
+        lineItem.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -514,11 +511,18 @@ test("test multiplier", () => {
     });
 });
 
-test("test markup not including tax", () => {
+test("test markup not including tax", async () => {
     expect.assertions(25);
 
+    await new Promise(resolve => {
+        let strategy = lineItem.bid.entities.variables("markup_strategy");
+        strategy.value = false;
+        lineItem.once("assessed", resolve);
+        lineItem.reset();
+    });
+
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 200, "test escalator", () => {
+        lineItem.bid.project.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(true);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -553,18 +557,23 @@ test("test markup not including tax", () => {
 
             resolve();
         });
-        let strategy = lineItem.bid.entities.variables("markup_strategy");
-        strategy.value = false;
-        lineItem.reset();
+
         lineItem.cost = "10";
     });
 });
 
-test("test markup not including tax", () => {
+test("test markup not including tax", async () => {
     expect.assertions(27);
 
+    await new Promise(resolve => {
+        lineItem.config.type = "labor";
+        lineItem.reset();
+        lineItem.wage = "15";
+        lineItem.once("assessed", resolve);
+        lineItem.burden = "6";
+    });
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 200, "test escalator", () => {
+        lineItem.bid.project.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -602,10 +611,6 @@ test("test markup not including tax", () => {
             resolve();
         });
 
-        lineItem.config.type = "labor";
-        lineItem.reset();
-        lineItem.wage = "15";
-        lineItem.burden = "6";
         lineItem.base = "5";
     });
 });
@@ -614,7 +619,7 @@ test("test labor hours override", () => {
     expect.assertions(28);
 
     return new Promise(resolve => {
-        lineItem.onDelay("assessed", 200, "test escalator", () => {
+        lineItem.bid.project.once("assessed", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
             expect(lineItem.isOverridden("price")).toBe(false);
             expect(lineItem.isOverridden("markup")).toBe(false);
@@ -657,5 +662,107 @@ test("test labor hours override", () => {
     });
 });
 
+test("test line item type labor changing cost", async () => {
+    expect.assertions(29);
+    await new Promise(resolve => {
+        lineItem.reset();
+        lineItem.bid.project.once("assessed", resolve);
+        lineItem.base = 2;
+    });
+    return new Promise(resolve => {
+        lineItem.bid.project.once("assessed", () => {
+            expect(lineItem.isLabor()).toBe(true);
+            expect(lineItem.isOverridden("cost")).toBe(true);
+            expect(lineItem.isOverridden("price")).toBe(false);
+            expect(lineItem.isOverridden("markup")).toBe(false);
+            expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden("tax")).toBe(false);
+            expect(lineItem.isOverridden("tax_percent")).toBe(false);
+            expect(lineItem.isOverridden("base")).toBe(true);
+            expect(lineItem.isOverridden("escalator")).toBe(true);
+            expect(lineItem.isOverridden("quantity")).toBe(false);
+            expect(lineItem.isOverridden("per_quantity")).toBe(false);
+            expect(lineItem.isOverridden("wage")).toBe(false);
+            expect(lineItem.isOverridden("burden")).toBe(false);
+            expect(lineItem.isOverridden("labor_hours")).toBe(false);
+
+            expect(_.round(lineItem.base, 2)).toBe(2);
+            expect(_.round(lineItem.quantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.subtotal, 2)).toBe(2);
+
+            expect(_.round(lineItem.laborHours, 2)).toBe(10);
+            expect(_.round(lineItem.wage, 2)).toBe(35);
+            expect(_.round(lineItem.burden, 2)).toBe(5);
+
+            expect(_.round(lineItem.multiplier, 2)).toBe(5);
+            expect(_.round(lineItem.escalator, 2)).toBe(1);
+            expect(_.round(lineItem.cost, 2)).toBe(400);
+
+            expect(_.round(lineItem.tax, 2)).toBe(0);
+            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+
+            expect(_.round(lineItem.markup, 2)).toBe(72);
+            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+
+            expect(_.round(lineItem.price, 2)).toBe(472);
+
+            resolve();
+        });
+
+        lineItem.cost = 400;
+    });
+});
+
+test("labor hours should override when subtotal is zero", async () => {
+    expect.assertions(29);
+    await new Promise(resolve => {
+        lineItem.bid.project.once("assessed", resolve);
+        lineItem.reset();
+    });
+    return new Promise(resolve => {
+        lineItem.bid.project.once("assessed", () => {
+            expect(lineItem.isLabor()).toBe(true);
+            expect(lineItem.isOverridden("cost")).toBe(true);
+            expect(lineItem.isOverridden("price")).toBe(false);
+            expect(lineItem.isOverridden("markup")).toBe(false);
+            expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden("tax")).toBe(false);
+            expect(lineItem.isOverridden("tax_percent")).toBe(false);
+            expect(lineItem.isOverridden("base")).toBe(false);
+            expect(lineItem.isOverridden("escalator")).toBe(true);
+            expect(lineItem.isOverridden("quantity")).toBe(false);
+            expect(lineItem.isOverridden("per_quantity")).toBe(false);
+            expect(lineItem.isOverridden("wage")).toBe(false);
+            expect(lineItem.isOverridden("burden")).toBe(false);
+            expect(lineItem.isOverridden("labor_hours")).toBe(true);
+
+            expect(_.round(lineItem.base, 2)).toBe(0);
+            expect(_.round(lineItem.quantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.subtotal, 2)).toBe(0);
+
+            expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
+            expect(_.round(lineItem.wage, 2)).toBe(35);
+            expect(_.round(lineItem.burden, 2)).toBe(5);
+
+            expect(_.round(lineItem.multiplier, 2)).toBe(1);
+            expect(_.round(lineItem.escalator, 2)).toBe(1);
+            expect(_.round(lineItem.cost, 2)).toBe(300);
+
+            expect(_.round(lineItem.tax, 2)).toBe(0);
+            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+
+            expect(_.round(lineItem.markup, 2)).toBe(54);
+            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+
+            expect(_.round(lineItem.price, 2)).toBe(354);
+
+            resolve();
+        });
+
+        lineItem.cost = 300;
+    });
+});
 //TODO: Test to ensuring assessing/assessed events only fire once
 // even after bind() is called multiple times on the instance
