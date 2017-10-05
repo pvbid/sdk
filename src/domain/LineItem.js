@@ -719,7 +719,11 @@ export default class LineItem extends BidEntity {
         var lineItemSubtotal = this.subtotal;
 
         if (lineItemSubtotal > 0) {
-            this._data.multiplier = this.cost / this.subtotal;
+            if (this.isLabor()) {
+                this._data.multiplier = this.cost / (this.subtotal * (this.wage + this.burden));
+            } else {
+                this._data.multiplier = this.cost / this.subtotal;
+            }
         } else {
             this._data.multiplier = 1;
         }
