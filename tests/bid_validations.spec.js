@@ -91,3 +91,4 @@ describe("Bid validator", () => {
     });
 });
 //TODO: test all known validation error types to ensure they catch the problem.
+//TODO: test bid rule list_field /list options
