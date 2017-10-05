@@ -474,10 +474,11 @@ export default class Component extends BidEntity {
     bind() {
         for (let lineItemId of this.config.line_items) {
             const lineItem = this.bid.entities.lineItems(lineItemId);
-
-            lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
-                waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
-            });
+            if(lineItem){
+                lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
+                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
+                });
+            }
         }
 
         _.each(this.getSubComponents(), c => {
