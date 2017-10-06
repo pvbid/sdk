@@ -956,4 +956,15 @@ export default class Bid extends BidEntity {
     async addLineItem(title) {
         return this._bidService.addLineItem(this, title);
     }
+
+    /**
+     * Adds a new metric to the bid.  
+     * This is a wrapper function for {@link BidService.addMetric}
+     * 
+     * @param {string} [title=New Metric] 
+     * @returns {Promise<Metric>}
+     */
+    async addMetric(title) {
+        return this._bidService.addMetric(this, title);
+    }
 }

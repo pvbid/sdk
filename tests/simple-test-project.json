@@ -1163,6 +1163,7 @@
                 "title": "Watts",
                 "value": 1350,
                 "config": {
+                    "manipulations": [],
                     "formula": "a*b",
                     "short_code": "metric:watts",
                     "dependencies": {

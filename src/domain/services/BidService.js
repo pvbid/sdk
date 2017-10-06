@@ -1,8 +1,11 @@
 import LineItem from "../LineItem";
+import Metric from "../Metric";
 import BidValidator from "./BidValidator";
 import BidFactory from "../factories/BidFactory";
 import { waitForFinalEvent } from "../../utils/WaitForFinalEvent";
 import LineItemScaffolding from "../scaffolding/LineItemScaffolding";
+import MetricScaffolding from "../scaffolding/MetricScaffolding";
+
 /**
  * @class BidService
  */
@@ -50,6 +53,28 @@ export default class BidService {
         });
         lineItem.on("assessed", `bid.${bid.id}`, () => bid._handleAssessmentCompleteEvent());
         return lineItem;
+    }
+
+    /**
+     * Adds a new metric to the bid.
+     * 
+     * @param {Bid} bid 
+     * @param {string} [title=New Metric] 
+     * @returns {Promise<Metric>}
+     */
+    async addMetric(bid, title) {
+        if (this.context.user.can("create-bid")) {
+            const scaffolding = MetricScaffolding.create(bid.id, title);
+            const metricObject = await this.repositories.metrics.create(bid.id, scaffolding);
+            const metric = new Metric(metricObject, bid);
+            bid._data.metrics[metric.id] = metric;
+            metric.bind();
+            metric.on("assessed", "metric." + metric.id, () => {
+                waitForFinalEvent(() => bid.assess(), 15, `bid.${bid.id}.metric`);
+            });
+            metric.on("assessed", `bid.${bid.id}`, () => bid._handleAssessmentCompleteEvent());
+            return metric;
+        } else throw new Error("User does not have permission to add metric.");
     }
 
     /**

@@ -54,43 +54,7 @@ async function init() {
         bid.reassessAll(true);
     });
 }
-/*
-async function init2() {
-    // This sets the mock adapter on the default instance
-    var mock = new MockAdapter(axios);
 
-    // Mock any GET request to /users
-    // arguments for reply are (status, data, headers)
-    let mockedLineItem = LineItemScaffolding.create(179, "The New Line Item");
-    mockedLineItem.id = 1000001;
-    mock.onPost("http://api.pvbid.local/v2/bids/179/line_items/").reply(200, {
-        data: {
-            line_item: mockedLineItem
-        }
-    });
-    project = await new Promise(resolve => {
-        jsonfile.readFile("./tests/test-data.json", (err, data) => {
-            mock.onGet("http://api.pvbid.local/v2/projects/123").reply(200, {
-                data: { project: data.project }
-            });
-            mock.onGet("http://api.pvbid.local/v2/bids/179").reply(200, {
-                data: { bid: data.bid }
-            });
-
-            context.getProject(123).then(p => {
-                resolve(p);
-            });
-        });
-    });
-    return new Promise(resolve => {
-        bid = _.toArray(project.bids)[0];
-        bid.reassessAll(true);
-        project.once("assessed", () => {
-            resolve();
-        });
-    });
-}
-*/
 test("add new line item", () => {
     expect.assertions(2);
 
