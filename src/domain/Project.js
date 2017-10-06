@@ -206,6 +206,13 @@ export default class Project extends BidEntity {
     }
 
     /**
+     * @type {PVBidContext}
+     */
+    get context() {
+        return this._projectService.context;
+    }
+
+    /**
      * Assess project values by summing all active bids.
      * @emits {assessing}
      * @emits {assessed}
