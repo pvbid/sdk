@@ -607,7 +607,7 @@ test("test labor hours override", () => {
             expect(_.round(lineItem.wage, 2)).toBe(15);
             expect(_.round(lineItem.burden, 2)).toBe(6);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(1);
+            expect(_.round(lineItem.multiplier, 2)).toBe(2);
             expect(_.round(lineItem.escalator, 2)).toBe(1);
             expect(_.round(lineItem.cost, 2)).toBe(210);
 

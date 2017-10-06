@@ -105,9 +105,18 @@ export default class LineItem extends BidEntity {
      * @type {number}
      */
     set laborHours(val) {
-        if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val)) {
+        if (Helpers.isNumber(val) && this._data.labor_hours != Helpers.confirmNumber(val) && this.isLabor()) {
             this._data.labor_hours = Helpers.confirmNumber(val);
             this.override("labor_hours", true);
+            this.override("cost", false);
+            this.override("multiplier", false);
+
+            if (this.subtotal > 0) {
+                this.multiplier = this._data.labor_hours / this.subtotal;
+            } else {
+                this.multiplier = 1;
+                this.override("multiplier", false);
+            }
             this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
@@ -728,7 +737,8 @@ export default class LineItem extends BidEntity {
             this._data.multiplier = 1;
 
             if (this.isLabor()) {
-                this.laborHours = this.cost / (this.wage + this.burden);
+                this.override("labor_hours", true);
+                this._data.labor_hours = this.cost / (this.wage + this.burden);
             }
         }
     }
