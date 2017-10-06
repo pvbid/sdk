@@ -18,7 +18,7 @@ export default class MetricScaffolding {
                 manipulations: [],
                 assembly_id: null,
                 dependencies: {},
-                formula: "1",
+                formula: "0",
                 definition_id: null
             }
         };
