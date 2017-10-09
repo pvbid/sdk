@@ -112,9 +112,10 @@ export default class LineItem extends BidEntity {
             this.override("multiplier", false);
 
             if (this.subtotal > 0) {
-                this.multiplier = this._data.labor_hours / this.subtotal;
+                this._data.multiplier = this._data.labor_hours / this.subtotal;
+                this.override("multiplier", true);
             } else {
-                this.multiplier = 1;
+                this._data.multiplier = 1;
                 this.override("multiplier", false);
             }
             this.isIncluded = true;
@@ -261,6 +262,7 @@ export default class LineItem extends BidEntity {
             this.override("multiplier", true);
             this.override("cost", false);
             this.override("price", false);
+            this.override("labor_hours", false);
             this.isIncluded = true;
             this.dirty();
             this.emit("property.updated");
