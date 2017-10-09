@@ -727,10 +727,10 @@ export default class LineItem extends BidEntity {
      * 
      */
     _applyCostChange() {
-        var lineItemSubtotal = this.subtotal;
-
-        if (lineItemSubtotal > 0) {
+        if (this.subtotal > 0) {
+            this.override("multiplier", true);
             if (this.isLabor()) {
+                this.override("labor_hours", false);
                 this._data.multiplier = this.cost / (this.subtotal * (this.wage + this.burden));
             } else {
                 this._data.multiplier = this.cost / this.subtotal;
