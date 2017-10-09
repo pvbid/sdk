@@ -579,153 +579,175 @@ test("test markup not including tax", async () => {
     });
 });
 
-test("test labor hours override", () => {
-    expect.assertions(28);
+describe("When line item is a labor type", () => {
+    describe("changing the multiplier", () => {
+        beforeAll(async () => {
+            await new Promise(resolve => {
+                lineItem.bid.project.once("assessed", resolve);
+                lineItem.reset();
+            });
 
-    return new Promise(resolve => {
-        lineItem.bid.project.once("assessed", () => {
+            return new Promise(resolve => {
+                lineItem.bid.project.once("assessed", resolve);
+                lineItem.override("cost", true);
+                lineItem.override("price", true);
+                lineItem.override("labor_hours", true);
+                lineItem.base = 5;
+                lineItem.multiplier = 2;
+            });
+        });
+
+        test("should override the multipler", () => {
+            expect(lineItem.isOverridden("multiplier")).toBe(true);
+            expect(lineItem.multiplier).toBe(2);
+        });
+        test("should release cost override, if exists", () => {
             expect(lineItem.isOverridden("cost")).toBe(false);
-            expect(lineItem.isOverridden("price")).toBe(false);
-            expect(lineItem.isOverridden("markup")).toBe(false);
-            expect(lineItem.isOverridden("markup_percent")).toBe(false);
-            expect(lineItem.isOverridden("tax")).toBe(false);
-            expect(lineItem.isOverridden("tax_percent")).toBe(false);
-            expect(lineItem.isOverridden("base")).toBe(true);
-            expect(lineItem.isOverridden("escalator")).toBe(false);
-            expect(lineItem.isOverridden("quantity")).toBe(false);
-            expect(lineItem.isOverridden("per_quantity")).toBe(false);
-            expect(lineItem.isOverridden("wage")).toBe(true);
-            expect(lineItem.isOverridden("burden")).toBe(true);
-            expect(lineItem.isOverridden("labor_hours")).toBe(true);
-
-            expect(_.round(lineItem.base, 2)).toBe(5);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
-            expect(_.round(lineItem.subtotal, 2)).toBe(5);
-
-            expect(_.round(lineItem.laborHours, 2)).toBe(10);
-            expect(_.round(lineItem.wage, 2)).toBe(15);
-            expect(_.round(lineItem.burden, 2)).toBe(6);
-
-            expect(_.round(lineItem.multiplier, 2)).toBe(2);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(210);
-
-            expect(_.round(lineItem.tax, 2)).toBe(0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
-
-            expect(_.round(lineItem.markup, 2)).toBe(37.8);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
-
-            expect(_.round(lineItem.price, 2)).toBe(247.8);
-
-            resolve();
         });
-
-        lineItem.laborHours = "10";
-    });
-});
-
-test("test line item type labor changing cost", async () => {
-    expect.assertions(29);
-    await new Promise(resolve => {
-        lineItem.reset();
-        lineItem.bid.project.once("assessed", resolve);
-        lineItem.base = 2;
-    });
-    return new Promise(resolve => {
-        lineItem.bid.project.once("assessed", () => {
-            expect(lineItem.isLabor()).toBe(true);
-            expect(lineItem.isOverridden("cost")).toBe(true);
+        test("should release price override, if exists", () => {
             expect(lineItem.isOverridden("price")).toBe(false);
-            expect(lineItem.isOverridden("markup")).toBe(false);
-            expect(lineItem.isOverridden("markup_percent")).toBe(false);
-            expect(lineItem.isOverridden("tax")).toBe(false);
-            expect(lineItem.isOverridden("tax_percent")).toBe(false);
-            expect(lineItem.isOverridden("base")).toBe(true);
-            expect(lineItem.isOverridden("escalator")).toBe(true);
-            expect(lineItem.isOverridden("quantity")).toBe(false);
-            expect(lineItem.isOverridden("per_quantity")).toBe(false);
-            expect(lineItem.isOverridden("wage")).toBe(false);
-            expect(lineItem.isOverridden("burden")).toBe(false);
+        });
+        test("should release labor hours override, if exists", () => {
             expect(lineItem.isOverridden("labor_hours")).toBe(false);
+        });
+        test("should directly impact labor hour results", () => {
+            expect(lineItem.laborHours).toBe(10);
+        });
+        test("should indirectly impact cost results ", () => {
+            expect(lineItem.cost).toBe(400);
+        });
+    });
+    describe("and the subtotal is zero", () => {
+        describe("changing the cost", () => {
+            beforeAll(async () => {
+                await new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.reset();
+                });
 
-            expect(_.round(lineItem.base, 2)).toBe(2);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
-            expect(_.round(lineItem.subtotal, 2)).toBe(2);
+                return new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.cost = 300;
+                });
+            });
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(10);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
+            test("should override and back calculate the labor hours.", () => {
+                expect(lineItem.isOverridden("cost")).toBe(true);
+                expect(lineItem.isOverridden("multiplier")).toBe(false);
+                expect(lineItem.isOverridden("labor_hours")).toBe(true);
+                expect(_.round(lineItem.subtotal, 2)).toBe(0);
+                expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
+                expect(_.round(lineItem.cost, 2)).toBe(300);
+                expect(_.round(lineItem.price, 2)).toBe(354);
+            });
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(5);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(400);
-
-            expect(_.round(lineItem.tax, 2)).toBe(0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
-
-            expect(_.round(lineItem.markup, 2)).toBe(72);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
-
-            expect(_.round(lineItem.price, 2)).toBe(472);
-
-            resolve();
+            test("should have a multiplier of 1", () => {
+                expect(lineItem.multiplier).toBe(1);
+            });
         });
 
-        lineItem.cost = 400;
+        describe("changing the labor hours", () => {
+            beforeAll(async () => {
+                await new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.reset();
+                });
+
+                return new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.override("price", true);
+                    lineItem.override("cost", true);
+                    lineItem.multiplier = 0.5;
+                    lineItem.laborHours = 10;
+                });
+            });
+
+            test("should override the labor hours", () => {
+                expect(lineItem.isOverridden("labor_hours")).toBe(true);
+                expect(_.round(lineItem.subtotal, 2)).toBe(0);
+                expect(_.round(lineItem.laborHours, 2)).toBe(10);
+                expect(_.round(lineItem.cost, 2)).toBe(400);
+            });
+            test("should release the cost override, if exists", () => {
+                expect(lineItem.isOverridden("price")).toBe(false);
+            });
+            test("should release the price override, if exists", () => {
+                expect(lineItem.isOverridden("price")).toBe(false);
+            });
+
+            test("should release override and set multiplier to 1", () => {
+                expect(lineItem.isOverridden("multiplier")).toBe(false);
+                expect(lineItem.multiplier).toBe(1);
+            });
+        });
     });
-});
 
-test("labor hours should override when subtotal is zero", async () => {
-    expect.assertions(29);
-    await new Promise(resolve => {
-        lineItem.bid.project.once("assessed", resolve);
-        lineItem.reset();
-    });
-    return new Promise(resolve => {
-        lineItem.bid.project.once("assessed", () => {
-            expect(lineItem.isLabor()).toBe(true);
-            expect(lineItem.isOverridden("cost")).toBe(true);
-            expect(lineItem.isOverridden("price")).toBe(false);
-            expect(lineItem.isOverridden("markup")).toBe(false);
-            expect(lineItem.isOverridden("markup_percent")).toBe(false);
-            expect(lineItem.isOverridden("tax")).toBe(false);
-            expect(lineItem.isOverridden("tax_percent")).toBe(false);
-            expect(lineItem.isOverridden("base")).toBe(false);
-            expect(lineItem.isOverridden("escalator")).toBe(true);
-            expect(lineItem.isOverridden("quantity")).toBe(false);
-            expect(lineItem.isOverridden("per_quantity")).toBe(false);
-            expect(lineItem.isOverridden("wage")).toBe(false);
-            expect(lineItem.isOverridden("burden")).toBe(false);
-            expect(lineItem.isOverridden("labor_hours")).toBe(true);
+    describe("and the subtotal is greater than zero", () => {
+        describe("changing the cost", () => {
+            beforeAll(async () => {
+                await new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.reset();
+                });
 
-            expect(_.round(lineItem.base, 2)).toBe(0);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
-            expect(_.round(lineItem.subtotal, 2)).toBe(0);
-
-            expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
-
-            expect(_.round(lineItem.multiplier, 2)).toBe(1);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(300);
-
-            expect(_.round(lineItem.tax, 2)).toBe(0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
-
-            expect(_.round(lineItem.markup, 2)).toBe(54);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
-
-            expect(_.round(lineItem.price, 2)).toBe(354);
-
-            resolve();
+                return new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.override("labor_hours", true);
+                    lineItem.base = 50;
+                    lineItem.cost = 300;
+                });
+            });
+            test("should release labor hours override, if exists.", () => {
+                expect(lineItem.isOverridden("labor_hours")).toBe(false);
+            });
+            test("should override the multiplier", () => {
+                expect(lineItem.isOverridden("multiplier")).toBe(true);
+            });
+            test("should back calculate the multipler.", () => {
+                expect(lineItem.isOverridden("cost")).toBe(true);
+                expect(_.round(lineItem.subtotal, 2)).toBe(50);
+                expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
+                expect(_.round(lineItem.multiplier, 2)).toBe(0.15);
+                expect(_.round(lineItem.cost, 2)).toBe(300);
+                expect(_.round(lineItem.price, 2)).toBe(354);
+            });
         });
 
-        lineItem.cost = 300;
+        describe("changing the labor hours", () => {
+            beforeAll(async () => {
+                await new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.reset();
+                });
+
+                return new Promise(resolve => {
+                    lineItem.bid.project.once("assessed", resolve);
+                    lineItem.override("price", true);
+                    lineItem.override("cost", true);
+                    lineItem.base = 5;
+                    lineItem.laborHours = 10;
+                });
+            });
+
+            test("should override the labor hours", () => {
+                expect(lineItem.isOverridden("labor_hours")).toBe(true);
+                expect(_.round(lineItem.laborHours, 2)).toBe(10);
+                expect(_.round(lineItem.cost, 2)).toBe(400);
+            });
+            test("should persist the original subtotal", () => {
+                expect(_.round(lineItem.subtotal, 2)).toBe(5);
+            });
+            test("should back calculate and override the multiplier", () => {
+                expect(lineItem.isOverridden("multiplier")).toBe(true);
+                expect(lineItem.multiplier).toBe(2);
+            });
+            test("should release the cost override, if exists", () => {
+                expect(lineItem.isOverridden("price")).toBe(false);
+            });
+            test("should release the price override, if exists", () => {
+                expect(lineItem.isOverridden("price")).toBe(false);
+            });
+        });
     });
 });
 //TODO: Test to ensuring assessing/assessed events only fire once
