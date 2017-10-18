@@ -1,4 +1,5 @@
 import BidEntity from "./BidEntity";
+import _ from "lodash";
 
 /**
  * Field Group Class
@@ -16,6 +17,7 @@ export default class FieldGroup extends BidEntity {
          * @type {Bid}
          */
         this.bid = bid;
+        this._original = _.cloneDeep(fieldGroupData);
         this._data = fieldGroupData;
     }
 
@@ -25,5 +27,14 @@ export default class FieldGroup extends BidEntity {
      */
     get config() {
         return this._data.config;
+    }
+
+    /**
+     * Determines if the field group is changed for it's original data.
+     * 
+     * @returns {boolean} 
+     */
+    isDirty() {
+        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
     }
 }
