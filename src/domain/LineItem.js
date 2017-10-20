@@ -674,8 +674,8 @@ export default class LineItem extends BidEntity {
      * 
      */
     _applyProperty(property, value) {
-        let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 3) : this._data[property];
-        let newValue = !_.isBoolean(value) ? _.round(value, 3) : value;
+        let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 4) : this._data[property];
+        let newValue = !_.isBoolean(value) ? _.round(value, 4) : value;
 
         if (oldValue != newValue) {
             //console.log("li changed", property, oldValue, newValue);
