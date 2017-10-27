@@ -79,6 +79,23 @@ export default class AdvanceEventEmitter extends EventEmitter {
     }
 
     /**
+     * Removes event listeners by event and requesterId.
+     * 
+     * @param {string} eventName 
+     * @param {string} requesterId 
+     */
+    removeListenerByRequester(eventName, requesterId) {
+        if (this._events[eventName]) {
+            let listeners = this._events[eventName];
+            for (let i = listeners.length - 1; i >= 0; i--) {
+                if (requesterId && listeners[i].context === requesterId) {
+                    listeners.splice(i, 1);
+                }
+            }
+        }
+    }
+
+    /**
      * 
      * 
      * @param {string} requesterId 

@@ -1,5 +1,6 @@
 import PVBidContext from "./PVBidContext";
 import UserRepository from "./repositories/UserRepository";
+import Helpers from "./utils/Helpers";
 /**
  * @module PVBid
  */
@@ -36,3 +37,5 @@ export const getAuthToken = function(username, password, config) {
     const repo = new UserRepository(config);
     return repo.getAuthToken(username, password);
 };
+
+export const helpers = Helpers;
