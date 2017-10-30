@@ -312,6 +312,46 @@ export default class Project extends BidEntity {
     }
 
     /**
+     * Adds user to project.
+     * 
+     * @param {object} user 
+     * @returns  {Promise<null>}
+     */
+    async attachUser(user) {
+        if (this.users.map(u => u.id).indexOf(user.id) >= 0) {
+            throw "User is already attached.";
+        }
+        try {
+            await this._projectService.repositories.projects.attachUser(this.id, user.id);
+
+            this.users.push(user);
+            return;
+        } catch (error) {
+            return error;
+        }
+    }
+
+    /**
+     * Removes user from project
+     * 
+     * @param {number} userId 
+     * @returns {Promise<null>}
+     */
+    async detachUser(userId) {
+        if (this.users.map(u => u.id).indexOf(userId) < 0) {
+            throw "User does not exist.";
+        }
+
+        try {
+            await this._projectService.repositories.projects.detachUser(this.id, userId);
+            this._data.users = this._data.users.filter(u => u.id != userId);
+            return;
+        } catch (error) {
+            return error;
+        }
+    }
+
+    /**
      * Creates a new bid and attaches and attaches it to the project.
      * This is a wrapper function for {@link ProjectService.createBid}
      * @param {string} title 
@@ -380,7 +420,7 @@ export default class Project extends BidEntity {
      * @property {number} id The id of the new project.
      */
     async clone() {
-        return this.repositories.projects.clone(this.id);
+        return this._projectService.repositories.projects.clone(this.id);
     }
 
     /**

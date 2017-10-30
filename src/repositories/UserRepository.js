@@ -1,8 +1,8 @@
-import CacheRepository from "./CacheRepository";
+import BaseRepository from "./BaseRepository";
 
-export default class UserRepository extends CacheRepository {
+export default class UserRepository extends BaseRepository {
     constructor(config) {
-        super(config.base_uri + "users/", "user", "users", config);
+        super(config.base_uri + "/users/", "user", "users", config);
     }
 
     /**
@@ -17,10 +17,11 @@ export default class UserRepository extends CacheRepository {
      * @property {string} refresh_token
      */
     async getAuthToken(username, password) {
-        this.endpoint = `${this.httpConfig.base_uri}/auth/token`;
-
         try {
-            let response = await this.http.post(this.endpoint, { username: username, password: password });
+            let response = await this.http.post(`${this.httpConfig.base_uri}/auth/token`, {
+                username: username,
+                password: password
+            });
 
             return response.data;
         } catch (error) {
@@ -42,10 +43,8 @@ export default class UserRepository extends CacheRepository {
      * 
      */
     async me() {
-        this.endpoint = `${this.httpConfig.base_uri}/users/me`;
-
         try {
-            let response = await this.http.get(this.endpoint);
+            let response = await this.http.get(this.endpoint + "me");
 
             return response.data.data.user;
         } catch (error) {
