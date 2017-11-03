@@ -73,7 +73,7 @@ export default class FieldAutoPopulateService {
     _autoFill() {
         var dependencyValue = this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_a);
 
-        if (dependencyValue && this._field._data.value != dependencyValue) {
+        if (!_.isNull(dependencyValue) && this._field._data.value != dependencyValue) {
             this._field._data.value = dependencyValue;
             this._field.config.is_auto_selected = true;
 
