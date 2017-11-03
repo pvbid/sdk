@@ -1,10 +1,12 @@
 import LineItem from "../LineItem";
 import Metric from "../Metric";
+import Field from "../Field";
 import BidValidator from "./BidValidator";
 import BidFactory from "../factories/BidFactory";
 import { waitForFinalEvent } from "../../utils/WaitForFinalEvent";
 import LineItemScaffolding from "../scaffolding/LineItemScaffolding";
 import MetricScaffolding from "../scaffolding/MetricScaffolding";
+import FieldScaffolding from "../scaffolding/FieldScaffolding";
 
 /**
  * @class BidService
@@ -75,6 +77,29 @@ export default class BidService {
             metric.on("assessed", `bid.${bid.id}`, () => bid._handleAssessmentCompleteEvent());
             return metric;
         } else throw new Error("User does not have permission to add metric.");
+    }
+
+    /**
+     * Adds a new field to the bid.
+     * 
+     * @param {Bid} bid 
+     * @param {string} [title=New Field] 
+     * @param {string} [type=number] 
+     * @returns {Promise<Field>}
+     */
+    async addField(bid, title, type) {
+        if (this.context.user.can("create-bid")) {
+            const scaffolding = FieldScaffolding.create(bid.id, title, type);
+            const fieldObject = await this.repositories.fields.create(bid.id, scaffolding);
+            const field = new Field(fieldObject, bid);
+            bid._data.fields[field.id] = field;
+            field.bind();
+            field.on("assessed", "field." + field.id, () => {
+                waitForFinalEvent(() => bid.assess(), 15, `bid.${bid.id}.field`);
+            });
+            field.on("assessed", `bid.${bid.id}`, () => bid._handleAssessmentCompleteEvent());
+            return field;
+        } else throw new Error("User does not have permission to add field.");
     }
 
     /**
