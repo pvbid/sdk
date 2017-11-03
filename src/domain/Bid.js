@@ -967,4 +967,16 @@ export default class Bid extends BidEntity {
     async addMetric(title) {
         return this._bidService.addMetric(this, title);
     }
+
+    /**
+     * Adds a new field to the bid.  
+     * This is a wrapper function for {@link BidService.addField}
+     * 
+     * @param {string} [title=New Field] 
+     * @param {string} [type=number] 
+     * @returns {Promise<Field>}
+     */
+    async addField(title, type) {
+        return this._bidService.addField(this, title, type);
+    }
 }

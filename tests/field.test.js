@@ -6,6 +6,7 @@ var axios = require("axios");
 var jsonfile = require("jsonfile");
 const PVBid = require("../src/pvbid.js");
 var MockAdapter = require("axios-mock-adapter");
+import FieldScaffolding from "../src/domain/scaffolding/FieldScaffolding";
 import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
 
 let context = PVBid.createContext({ token: "Bearer Token", base_uri: "http://api.pvbid.local/v2" });
@@ -21,6 +22,10 @@ async function init() {
 
     // Mock any GET request to /users
     // arguments for reply are (status, data, headers)
+    let mockedField = FieldScaffolding.create(190, "Auto Field", "number");
+    mockedField.id = 1000001;
+    mockedField.config.dependencies.auto_a = { type: "bid_variable", field: "wage", bid_entity_id: "bid_variable" };
+
     let mockedLineItem = LineItemScaffolding.create(190, "The New Line Item");
     mockedLineItem.id = 1000001;
     mock.onPost("http://api.pvbid.local/v2/bids/190/line_items/").reply(200, {
@@ -28,6 +33,13 @@ async function init() {
             line_item: mockedLineItem
         }
     });
+
+    mock.onPost("http://api.pvbid.local/v2/bids/190/fields/").reply(200, {
+        data: {
+            field: mockedField
+        }
+    });
+
     project = await new Promise(resolve => {
         jsonfile.readFile("./tests/simple-test-project.json", (err, data) => {
             mock.onGet("http://api.pvbid.local/v2/projects/461").reply(200, {
@@ -53,6 +65,60 @@ async function init() {
         bid.reassessAll(true);
     });
 }
+
+describe("When creating a new field", () => {
+    test("users with the 'create-bid' permission should be permitted.", async () => {
+        let field = await bid.addField("My New Field", "number");
+        expect(field.id).toBe(1000001);
+    });
+
+    test("users without the 'create-bid' permission should be prevented.", async () => {
+        let user = bid._bidService.context.user;
+        user._data.permissions.splice("create-bid", 1);
+
+        await expect(bid.addField("My New Field")).rejects.toBeCalled;
+    });
+
+    test("it should be immediately assessable.", async () => {
+        expect.assertions(1);
+        let field = bid.entities.searchByTitle("field", "auto field")[0];
+        return new Promise(resolve => {
+            field.once("assessed", () => {
+                expect(field.value).toBe(35);
+                resolve();
+            });
+            field.assess();
+        });
+    });
+
+    test("it should update based on dependency changes.", async () => {
+        expect.assertions(1);
+        let bidVariable = bid.entities.variables("wage");
+        let field = bid.entities.searchByTitle("field", "auto field")[0];
+        return new Promise(resolve => {
+            field.once("assessed", () => {
+                expect(field.value).toBe(40);
+                resolve();
+            });
+            bidVariable.value = 40;
+        });
+    });
+});
+
+describe("Fields", () => {
+    test("with number values should auto populated when configured.", async () => {
+        expect.assertions(2);
+        let field = bid.entities.searchByTitle("field", "auto field")[0];
+        return new Promise(resolve => {
+            field.once("assessed", () => {
+                expect(field.value).toBe(40);
+                expect(field.isAutoSelected).toBe(true);
+                resolve();
+            });
+            field.assess();
+        });
+    });
+});
 
 test("get field value", () => {
     let field = bid.entities.searchByTitle("field", "module type")[0];
@@ -174,4 +240,3 @@ describe("Propagation of supporting datatable update event", () => {
         });
     });
 });
-
