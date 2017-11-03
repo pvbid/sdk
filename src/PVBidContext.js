@@ -10,6 +10,7 @@ import TagRepository from "./repositories/TagRepository";
 import UserRepository from "./repositories/UserRepository";
 import LineItemRepository from "./repositories/LineItemRepository";
 import MetricRepository from "./repositories/MetricRepository";
+import FieldRepository from "./repositories/FieldRepository";
 
 /**
  * 
@@ -52,7 +53,7 @@ export default class PVBidContext {
          * @param {UserRepository} users
          * @param {LineItemRepository} lineItems
          * @param {MetricRepository} metrics
-         * 
+         * @param {FieldRepository} fields
          */
         this.repositories = {
             projects: new ProjectRepository(this._httpConfig),
@@ -63,7 +64,8 @@ export default class PVBidContext {
             tags: new TagRepository(this._httpConfig),
             users: new UserRepository(this._httpConfig),
             lineItems: new LineItemRepository(this._httpConfig),
-            metrics: new MetricRepository(this._httpConfig)
+            metrics: new MetricRepository(this._httpConfig),
+            fields: new FieldRepository(this._httpConfig)
         };
     }
 
