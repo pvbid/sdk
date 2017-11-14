@@ -96,6 +96,14 @@ export default class Datatable extends BidEntity {
     }
 
     /**
+     * Flags the datatable and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
+
+    /**
      * Retrieves a cell value.
      * 
      * @param {string} columnId

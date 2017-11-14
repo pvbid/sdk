@@ -243,6 +243,14 @@ export default class Metric extends BidEntity {
     }
 
     /**
+     * Flags the metric and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
+
+    /**
      * Exports intermal metric data.
      * 
      * @returns {object} 

@@ -33,4 +33,12 @@ export default class ComponentGroup extends BidEntity {
     get config() {
         return this._data.config;
     }
+
+    /**
+     * Flags the component group and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
 }

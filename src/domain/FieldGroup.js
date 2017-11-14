@@ -37,4 +37,12 @@ export default class FieldGroup extends BidEntity {
     isDirty() {
         return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
     }
+
+    /**
+     * Flags the field group and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
 }

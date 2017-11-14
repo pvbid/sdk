@@ -87,4 +87,12 @@ export default class BidVariable extends BidEntity {
     dependants() {
         return this.bid.entities.getDependants("bid_variable", this.id);
     }
+
+    /**
+     * Flags the bid variable and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
 }

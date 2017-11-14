@@ -37,4 +37,12 @@ export default class Assembly extends BidEntity {
     get config() {
         return this._data.config;
     }
+
+    /**
+     * Flags the assembly and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
 }
