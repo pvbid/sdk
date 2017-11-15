@@ -432,7 +432,11 @@ export default class Project extends BidEntity {
      */
     enableAutoSave(delay) {
         delay = delay && typeof delay === "number" ? Math.max(delay, 1000) : 5000;
-        this.onDelay("changed", delay, `project.${this.id}`, () => this.save());
+        this.onDelay("changed", delay, `project.${this.id}`, () => {
+            setTimeout(() => {
+                this.save();
+            }, 0);
+        });
     }
 
     /**
