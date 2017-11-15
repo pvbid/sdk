@@ -474,7 +474,7 @@ export default class Component extends BidEntity {
     bind() {
         for (let lineItemId of this.config.line_items) {
             const lineItem = this.bid.entities.lineItems(lineItemId);
-            if(lineItem){
+            if (lineItem) {
                 lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
                     waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
                 });
@@ -632,5 +632,13 @@ export default class Component extends BidEntity {
         if (_.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
+    }
+
+    /**
+     * Flags the component and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
     }
 }

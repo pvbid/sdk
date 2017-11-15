@@ -91,7 +91,9 @@ export default class BidEntity extends AdvanceEventEmitter {
      * Marks the bid entity as clean.
      */
     pristine() {
-        this._is_dirty = false;
+        if (this._is_dirty) {
+            this._is_dirty = false;
+        }
     }
 
     /**

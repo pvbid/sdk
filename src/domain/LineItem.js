@@ -575,6 +575,14 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Flags the line item and corresponding bid as dirty and to be saved.
+     */
+    dirty() {
+        this.bid.dirty();
+        super.dirty();
+    }
+
+    /**
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
