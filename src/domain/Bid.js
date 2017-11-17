@@ -477,6 +477,7 @@ export default class Bid extends BidEntity {
                     isChanged = true;
                 }
             });
+
             this._resetSubMargins();
 
             //TODO: Fix prediction assignment
