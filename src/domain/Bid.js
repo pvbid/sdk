@@ -718,12 +718,14 @@ export default class Bid extends BidEntity {
             "assemblies",
             "assembly_maps",
             "field_groups",
-            "datatables"
+            "datatables",
+            "variables"
         ];
 
         let bidToClone = this._omit(this._data, blacklist);
 
         let bid = _.cloneDeep(bidToClone);
+        bid.variables = {};
 
         _.each(this.entities.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
