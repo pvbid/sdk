@@ -721,13 +721,34 @@ export default class Bid extends BidEntity {
             "datatables"
         ];
 
-        let bid = _.cloneDeep(_.omit(this._data, blacklist));
+        let bidToClone = this._omit(this._data, blacklist);
+
+        let bid = _.cloneDeep(bidToClone);
 
         _.each(this.entities.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
         });
 
         return bid;
+    }
+
+    /**
+     * Returns new shallow copy of object with omitted properties
+     * 
+     * @param {*} obj 
+     * @param {*} blacklist 
+     * @returns {object}
+     */
+    _omit(obj, blacklist) {
+        let keys = Object.keys(obj);
+        let copy = {};
+        keys.forEach(key => {
+            if (blacklist.indexOf(key) < 0) {
+                copy[key] = obj[key];
+            }
+        });
+
+        return copy;
     }
 
     /**
