@@ -709,16 +709,19 @@ export default class Bid extends BidEntity {
      * @property {string} updated_at
      */
     exportData() {
-        let bid = _.cloneDeep(this._data);
-        delete bid.line_items;
-        delete bid.fields;
-        delete bid.components;
-        delete bid.metrics;
-        delete bid.component_groups;
-        delete bid.assemblies;
-        delete bid.assembly_maps;
-        delete bid.field_groups;
-        delete bid.datatables;
+        const blacklist = [
+            "line_items",
+            "fields",
+            "components",
+            "metrics",
+            "component_groups",
+            "assemblies",
+            "assembly_maps",
+            "field_groups",
+            "datatables"
+        ];
+
+        let bid = _.cloneDeep(_.omit(this._data, blacklist));
 
         _.each(this.entities.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
