@@ -378,13 +378,13 @@ export default class Bid extends BidEntity {
         var totalSubMargins = 0;
 
         if (!_.isUndefined(this.entities.variables().sub_margins)) {
-            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
+            _.each(this.entities.variables().sub_margins.value, subMargin => {
                 totalSubMargins += Helpers.confirmNumber(subMargin.value);
             });
 
             var bidMarginPercent = this.getMarginPercent();
 
-            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
+            _.each(this.entities.variables().sub_margins.value, subMargin => {
                 if (totalSubMargins > 0) {
                     subMargin.value = bidMarginPercent * Helpers.confirmNumber(subMargin.value) / totalSubMargins;
                 } else {
