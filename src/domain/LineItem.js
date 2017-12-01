@@ -986,11 +986,15 @@ export default class LineItem extends BidEntity {
     /**
      * Exports the line item's internal data structure.
      * 
-     * @returns  
+     * @returns {object}
      */
     exportData() {
-        let data = _.cloneDeep(this._data);
-        if (_.isEqual(data.config, this._original.config)) delete data.config;
+        let blacklist = [];
+
+        if (_.isEqual(this._data.config, this._original.config)) {
+            blacklist.push("config");
+        }
+        let data = _.cloneDeep(_.omit(this._data, blacklist));
 
         return data;
     }

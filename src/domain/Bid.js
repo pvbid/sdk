@@ -378,13 +378,13 @@ export default class Bid extends BidEntity {
         var totalSubMargins = 0;
 
         if (!_.isUndefined(this.entities.variables().sub_margins)) {
-            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
+            _.each(this.entities.variables().sub_margins.value, subMargin => {
                 totalSubMargins += Helpers.confirmNumber(subMargin.value);
             });
 
             var bidMarginPercent = this.getMarginPercent();
 
-            _.each(this.entities.variables().sub_margins.value, function(subMargin) {
+            _.each(this.entities.variables().sub_margins.value, subMargin => {
                 if (totalSubMargins > 0) {
                     subMargin.value = bidMarginPercent * Helpers.confirmNumber(subMargin.value) / totalSubMargins;
                 } else {
@@ -477,6 +477,7 @@ export default class Bid extends BidEntity {
                     isChanged = true;
                 }
             });
+
             this._resetSubMargins();
 
             //TODO: Fix prediction assignment
@@ -708,22 +709,48 @@ export default class Bid extends BidEntity {
      * @property {string} updated_at
      */
     exportData() {
-        let bid = _.cloneDeep(this._data);
-        delete bid.line_items;
-        delete bid.fields;
-        delete bid.components;
-        delete bid.metrics;
-        delete bid.component_groups;
-        delete bid.assemblies;
-        delete bid.assembly_maps;
-        delete bid.field_groups;
-        delete bid.datatables;
+        const blacklist = [
+            "line_items",
+            "fields",
+            "components",
+            "metrics",
+            "component_groups",
+            "assemblies",
+            "assembly_maps",
+            "field_groups",
+            "datatables",
+            "variables"
+        ];
+
+        let bidToClone = this._omit(this._data, blacklist);
+
+        let bid = _.cloneDeep(bidToClone);
+        bid.variables = {};
 
         _.each(this.entities.variables(), (value, key) => {
             bid.variables[key] = value.exportData();
         });
 
         return bid;
+    }
+
+    /**
+     * Returns new shallow copy of object with omitted properties
+     * 
+     * @param {*} obj 
+     * @param {*} blacklist 
+     * @returns {object}
+     */
+    _omit(obj, blacklist) {
+        let keys = Object.keys(obj);
+        let copy = {};
+        keys.forEach(key => {
+            if (blacklist.indexOf(key) < 0) {
+                copy[key] = obj[key];
+            }
+        });
+
+        return copy;
     }
 
     /**
