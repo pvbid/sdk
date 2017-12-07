@@ -8,15 +8,15 @@ import IndicativePricingHelper from "./services/IndicativePricingHelper";
 
 /**
  * Bids are self assessing classes representing the totality of a bid estimate.
- * A bid contains collections of the following type of {@link BidEntity}s: 
- * {@link LineItem}, {@link Metric}, {@link Field}, {@link Component}, {@link Datatable}, 
+ * A bid contains collections of the following type of {@link BidEntity}s:
+ * {@link LineItem}, {@link Metric}, {@link Field}, {@link Component}, {@link Datatable},
  * {@link Assembly}, {@link FieldGroup}, {@link ComponentGroup}.
  */
 export default class Bid extends BidEntity {
     /**
      * Creates an instance of Bid.
-     * @param {object} bidData 
-     * @param {BidService} bidService 
+     * @param {object} bidData
+     * @param {BidService} bidService
      */
     constructor(bidData, bidService) {
         super();
@@ -41,7 +41,7 @@ export default class Bid extends BidEntity {
     /**
      * Persistent id of the bid.
      * NOTE: id will soon be in alpha-numerical format
-     * 
+     *
      * @type {number}
      */
 
@@ -51,7 +51,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets the type of bid entity.
-     * 
+     *
      * @type {string}
      */
     get type() {
@@ -60,7 +60,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if the bid is active.
-     * 
+     *
      * @type {boolean}
      */
     get isActive() {
@@ -69,7 +69,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Sets the bid active state.
-     * 
+     *
      * @type {boolean}
      */
     set isActive(val) {
@@ -96,7 +96,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Overrides bid cost. Overrides are distibuted proportionally to the included line items.
-     * 
+     *
      * @type {number}
      */
     set cost(val) {
@@ -109,7 +109,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Tax Property
-     * 
+     *
      * @type {number}
      */
     get tax() {
@@ -118,7 +118,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Tax Percent Property
-     * 
+     *
      * @type {number}
      */
     get taxPercent() {
@@ -138,7 +138,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Markup Property
-     * 
+     *
      * @type {number}
      */
     get markup() {
@@ -281,7 +281,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets all the uncategorized Line Items by component group.
-     * 
+     *
      * @param  {number} componentGroupId     The component group id.
      * @return {LineItem[]}              Returns an array of Line Items.
      */
@@ -313,7 +313,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets the total watts for the bid.
-     * 
+     *
      * @return {number}
      */
     _getTotalWatts() {
@@ -328,7 +328,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Calculates and returns the Bid Margin Percent.
-     * 
+     *
      * @return {number}
      */
     getMarginPercent() {
@@ -340,7 +340,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if markup should also be assessed on the tax.
-     * 
+     *
      * @returns {boolean}
      */
     includeTaxInMarkup() {
@@ -349,8 +349,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Applies a user entered margin, back calcualting all line item markups to meet the margin.
-     * 
-     * @param {number} newMarginPercent 
+     *
+     * @param {number} newMarginPercent
      */
     _applyMarginPercentage(newMarginPercent) {
         let bidCost = this.cost + this.tax,
@@ -420,7 +420,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Assess bid values. If bid values changes, the bid will be flagged as dirty and an "updated" event will fire.
-     * 
+     *
      * @emits {assessing}
      * @emits {assessed}
      * @emits {updated}
@@ -497,8 +497,8 @@ export default class Bid extends BidEntity {
      * Reassess all {@link LineItem}s, {@link Fields}s, {@link Metrics}s, and {@ linkComponents}s.
      * This function checks {@link Bid.needsReassessment} first, to determine if reassessment is necessary.
      * Use the force flag to reasses reguardless of necessity.
-     * 
-     * @param {boolean} forceReassessment 
+     *
+     * @param {boolean} forceReassessment
      */
     reassessAll(forceReassessment) {
         if (this.isAssessable()) {
@@ -522,9 +522,9 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Analyzes line items and components calculations.  If the sum up correctly 
-     * to match the bid, reassessment is considered unnecessary. 
-     * 
+     * Analyzes line items and components calculations.  If the sum up correctly
+     * to match the bid, reassessment is considered unnecessary.
+     *
      * @returns {boolean}
      */
     needsReassessment() {
@@ -561,7 +561,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if components need to be reassessed by comparing bid results.
-     * 
+     *
      * @param {Component} component - The component to determine if needs reassessment.
      * @returns {boolean}
      */
@@ -656,7 +656,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets the margin of error for indicative pricing.
-     * 
+     *
      * @return {number}
      */
     getMarginOfError() {
@@ -665,7 +665,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Gets indicative price
-     * 
+     *
      * @param {number} value The value to assess.
      * @param {boolean} isLow The lower or upper bounds (low | high)
      * @return {number}
@@ -676,7 +676,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if indicative pricing is enabled.
-     * 
+     *
      * @return {boolean}
      */
     isIndicativePricing() {
@@ -685,7 +685,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Exports the bid's data to an object.
-     * 
+     *
      * @returns {object}
      * @property {number} id NOTE: id will soon be in UUID format.
      * @property {string} title
@@ -736,9 +736,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Returns new shallow copy of object with omitted properties
-     * 
-     * @param {*} obj 
-     * @param {*} blacklist 
+     *
+     * @param {*} obj
+     * @param {*} blacklist
      * @returns {object}
      */
     _omit(obj, blacklist) {
@@ -778,9 +778,9 @@ export default class Bid extends BidEntity {
 
     /**
      * Creates a snapshot of current Bid data.
-     * 
-     * @param {?string} title 
-     * @param {?string} description 
+     *
+     * @param {?string} title
+     * @param {?string} description
      * @returns {Promise.<object>} Returns a data object of the snapshot.
      * @property {number} id The snapshot id.
      * @property {string} title
@@ -794,10 +794,10 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Determines if bid is in an "assessable" state. Factors include if the bid is as shell bid, 
+     * Determines if bid is in an "assessable" state. Factors include if the bid is as shell bid,
      * if the bid is in read only mode, and if the bid has no validation issues.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isAssessable() {
         return !this.isShell() && !this.isReadOnly() && this.isValid();
@@ -805,10 +805,10 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if is a shell bid. Shell bids are simple data stores for past bids
-     * that can not be assesed. Shell bids do not have line items. Typically shell 
+     * that can not be assesed. Shell bids do not have line items. Typically shell
      * bids are created to import old bid data prior a companies using PVBid.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isShell() {
         return this._data.is_shell;
@@ -817,9 +817,9 @@ export default class Bid extends BidEntity {
     /**
      * Determines if bid is updateable by the user.
      * This method is deprecated. Use {@link Bid.isReadOnly} instead.
-     * 
-     * @deprecated 
-     * @returns {boolean} 
+     *
+     * @deprecated
+     * @returns {boolean}
      */
     isUpdateable() {
         return !this.isReadOnly();
@@ -828,8 +828,8 @@ export default class Bid extends BidEntity {
     /**
      * Determines if bid can be modified by the user.
      * Considers if the bid is locked, if the project is closed, and the user permissions.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isReadOnly() {
         //TODO: add in user permission logic.
@@ -838,8 +838,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if the bid is locked.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isLocked() {
         return this._data.is_locked;
@@ -847,8 +847,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if bid can be locked by user.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     canLock() {
         return (
@@ -861,8 +861,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if bid can be unlocked by user.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     canUnlock() {
         return (
@@ -876,7 +876,7 @@ export default class Bid extends BidEntity {
     /**
      * Locks bid, forcing read-only mode for everyone.  Bid must be unlocked before it can be modified again.
      * This function immediately saves the bid.
-     * 
+     *
      * @returns {Promise<null>}
      */
     async lock() {
@@ -890,7 +890,7 @@ export default class Bid extends BidEntity {
     /**
      * Unlocks bid, making it writable for those with permission.
      * This function immediately saves the bid.
-     * 
+     *
      * @returns {Promise<null>}
      */
     async unlock() {
@@ -904,8 +904,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Removes assembly from a bid. A wrapper function for {@link BidService.removeAssembly}
-     * 
-     * @param {number} assemblyId 
+     *
+     * @param {number} assemblyId
      * @returns {Promise<null>}
      */
     async removeAssembly(assemblyId) {
@@ -914,7 +914,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Adds assemblies to bid. A wrapper function for {@link BidService.addAssemblies}
-     * 
+     *
      * @param {number[]} assemblyMapIds An array of assembly mapping ids to add.
      * @returns {Promise<null>}
      */
@@ -926,9 +926,9 @@ export default class Bid extends BidEntity {
     /**
      * Recovers bid to previous snapshot. An auto snapshot of the current state will be created.
      * This is a wrapper function for {@link BidService.recoverBid}
-     * 
-     * @param {number} snapshotId 
-     * @returns {Promise<null>} 
+     *
+     * @param {number} snapshotId
+     * @returns {Promise<null>}
      */
     async recover(snapshotId) {
         return this._bidService.recoverBid(this, snapshotId);
@@ -936,7 +936,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Clones the current bid and returns the cloned bid.  The cloned bid is also added to the project automatically.
-     * 
+     *
      * @returns {Promise<Bid>}
      */
     async clone() {
@@ -945,8 +945,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Determines if bid has valid dependency references and configurations..
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isValid() {
         if (_.isUndefined(this.validationResults)) {
@@ -957,8 +957,8 @@ export default class Bid extends BidEntity {
 
     /**
      * Validates bid and returns a resultset of issues, if exists.
-     * 
-     * @returns {object[]} 
+     *
+     * @returns {object[]}
      */
     validate() {
         return (this.validationResults = this._bidService.validate(this));
@@ -966,7 +966,7 @@ export default class Bid extends BidEntity {
 
     /**
      * Deletes bid. Wrapper function for {@link BidService.deleteBid}
-     * 
+     *
      * @returns {Promise<null>}
      */
     async delete() {
@@ -976,8 +976,8 @@ export default class Bid extends BidEntity {
     /**
      * Adds a new line item to the bid.  The added line item is uncategorized in all component groups.
      * This is a wrapper function for {@link BidService.addLineItem}
-     * 
-     * @param {string} [title=New Line Item] 
+     *
+     * @param {string} [title=New Line Item]
      * @returns {Promise<LineItem>}
      */
     async addLineItem(title) {
@@ -985,10 +985,10 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Adds a new metric to the bid.  
+     * Adds a new metric to the bid.
      * This is a wrapper function for {@link BidService.addMetric}
-     * 
-     * @param {string} [title=New Metric] 
+     *
+     * @param {string} [title=New Metric]
      * @returns {Promise<Metric>}
      */
     async addMetric(title) {
@@ -996,14 +996,32 @@ export default class Bid extends BidEntity {
     }
 
     /**
-     * Adds a new field to the bid.  
+     * Adds a new field to the bid.
      * This is a wrapper function for {@link BidService.addField}
-     * 
-     * @param {string} [title=New Field] 
-     * @param {string} [type=number] 
+     *
+     * @param {string} [title=New Field]
+     * @param {string} [type=number]
      * @returns {Promise<Field>}
      */
     async addField(title, type) {
         return this._bidService.addField(this, title, type);
+    }
+
+    /**
+     * Flags all fields, metrics, lineItems, and components as dirty.
+     */
+    dirtyAll() {
+        _.each(this.entities.fields(), f => {
+            f.dirty();
+        });
+        _.each(this.entities.metrics(), m => {
+            m.dirty();
+        });
+        _.each(this.entities.lineItems(), li => {
+            li.dirty();
+        });
+        _.each(this.entities.components(), c => {
+            c.dirty();
+        });
     }
 }
