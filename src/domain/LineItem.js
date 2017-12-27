@@ -9,8 +9,8 @@ import LineItemRuleService from "./services/LineItemRuleService";
 export default class LineItem extends BidEntity {
     /**
      * Creates an instance of LineItem.
-     * @param {object} entityData 
-     * @param {Bid} bid 
+     * @param {object} entityData
+     * @param {Bid} bid
      */
     constructor(entityData, bid) {
         super();
@@ -270,7 +270,7 @@ export default class LineItem extends BidEntity {
     }
     /**
      * Cost Property
-     * @type {number}  
+     * @type {number}
      */
     get cost() {
         return Helpers.confirmNumber(this._data.cost);
@@ -283,9 +283,13 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.cost != Helpers.confirmNumber(val)) {
             this._data.cost = Helpers.confirmNumber(val);
             this._data.escalator = 1;
+            this._data.ohp = 1;
+
             this.override("cost", true);
             this.override("escalator", true);
+            this.override("ohp", true);
             this.override("price", false);
+
             this.isIncluded = true;
             this.dirty();
             this._applyCostChange();
@@ -321,6 +325,28 @@ export default class LineItem extends BidEntity {
         }
     }
 
+    /**
+     * OH&P Property (overhead and profit)
+     * @type {number}
+     */
+    get ohp() {
+        return Helpers.confirmNumber(this._data.ohp, 1);
+    }
+
+    /**
+     * @type {number}
+     */
+    set ohp(val) {
+        if (Helpers.isNumber(val) && this._data.ohp != Helpers.confirmNumber(val)) {
+            this._data.ohp = Helpers.confirmNumber(val);
+            this.override("cost", false);
+            this.override("price", false);
+            this.override("ohp", true);
+            this.isIncluded = true;
+            this.dirty();
+            this.emit("property.updated");
+        }
+    }
     /**
      * Tax Percent Property
      * @type {number}
@@ -415,7 +441,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets the line item's definition id.
-     * 
+     *
      * @type {number}
      * @deprecated Definition ids will become obsolete in planned data structure upgrade.
      */
@@ -433,17 +459,17 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets Subtotal aka Initial Results.
-     * 
-     * @return {number}      
+     *
+     * @return {number}
      */
     get subtotal() {
         return Helpers.confirmNumber(parseFloat(this.quantity) * parseFloat(this.perQuantity) + parseFloat(this.base));
     }
 
     /**
-     * 
-     * @param {string} property 
-     * @param {(number|string|boolean)} value 
+     *
+     * @param {string} property
+     * @param {(number|string|boolean)} value
      */
     override(property, value) {
         if (!this.bid.isReadOnly()) {
@@ -467,8 +493,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
-     * @param {string} property 
+     *
+     * @param {string} property
      * @returns {boolean}
      */
     isOverridden(property) {
@@ -481,8 +507,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * Resets a specific line item member, remove override value.
-     * 
-     * @param {string} property 
+     *
+     * @param {string} property
      */
     resetProperty(property) {
         if (
@@ -520,7 +546,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Determines if the line item represents labor costs.
-     * 
+     *
      * @returns {boolean}
      */
     isLabor() {
@@ -529,12 +555,12 @@ export default class LineItem extends BidEntity {
 
     /**
      * Assess line item for changes.
-     * 
+     *
      * @emits {assessing} fires event before assessement.
      * @emits {assessed}
      * @emits {updated}
-     * @param {?BidEntity} dependency The calling dependency 
-     * @param {?boolean} forceUpdate 
+     * @param {?BidEntity} dependency The calling dependency
+     * @param {?boolean} forceUpdate
      */
     assess(dependency, forceUpdate) {
         if (this.bid.isAssessable()) {
@@ -546,6 +572,7 @@ export default class LineItem extends BidEntity {
             isChanged = this._applyProperty("wage", this._getWageValue()) || isChanged;
             isChanged = this._applyProperty("quantity", this._getQuantityValue()) || isChanged;
             isChanged = this._applyProperty("per_quantity", this._getPerQuantityValue()) || isChanged;
+            isChanged = this._applyProperty("ohp", this._getOhpValue()) || isChanged;
             isChanged = this._applyProperty("escalator", this._getEscalatorValue()) || isChanged;
             isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
             isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
@@ -567,8 +594,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * Determines if the line item is has changed for it's original data.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isDirty() {
         return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
@@ -593,8 +620,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets a list of bid entities that the line item instance relys on.
-     * 
-     * @returns {BidEntity[]} 
+     *
+     * @returns {BidEntity[]}
      */
     dependencies() {
         let dependencies = [];
@@ -619,15 +646,15 @@ export default class LineItem extends BidEntity {
 
     /**
      * Gets dependant bid entities that rely on line item instance.
-     * 
-     * @returns {BidEntity[]} 
+     *
+     * @returns {BidEntity[]}
      */
     dependants() {
         return this.bid.entities.getDependants("line_item", this.id);
     }
 
     /**
-     * 
+     *
      */
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
@@ -641,7 +668,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      */
     _bindLineItemRuleDependencies() {
         for (let rule of Object.values(this.config.rules)) {
@@ -659,7 +686,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      */
     _bindLineItemPredictionDependencies() {
         if (this.config.prediction_model) {
@@ -679,22 +706,20 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      */
     _applyProperty(property, value) {
         let oldValue = !_.isBoolean(value) ? _.round(this._data[property], 4) : this._data[property];
         let newValue = !_.isBoolean(value) ? _.round(value, 4) : value;
 
         if (oldValue != newValue) {
-            //console.log("li changed", property, oldValue, newValue);
-
             this._data[property] = _.isBoolean(value) ? value : _.round(value, 6);
             return true;
         } else return false;
     }
 
     /**
-     * 
+     *
      */
     _applyMarkupChange() {
         this.override("markup_percent", true);
@@ -707,7 +732,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      */
     _reverseComputeLaborHours(cost, wage, burden) {
         let wageBurden = parseFloat(wage) + parseFloat(burden);
@@ -716,7 +741,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Internal method to calcualte a Unit price change.
-     * 
+     *
      */
     _applyPriceChange() {
         if (this.cost === 0) {
@@ -732,7 +757,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Internal method that recalculates a line item cost change.
-     * 
+     *
      */
     _applyCostChange() {
         if (this.subtotal > 0) {
@@ -754,7 +779,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      */
     _applyTaxPercentChange() {
         this._data.tax = this.cost * (this.taxPercent / 100);
@@ -773,7 +798,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Retrieves extra scalar dependency contracts.
+     *
      * @return {number}
      */
     _getExtraScalarDependencies() {
@@ -783,7 +809,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getBaseValue() {
@@ -795,7 +821,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getWageValue() {
@@ -806,7 +832,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed IsIncluded  value.
+     *
      * @return {number}
      */
     _getIsIncludedValue() {
@@ -816,7 +843,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed Labor Hours value.
+     *
      * @return {number}
      */
     _getLaborHoursValue() {
@@ -827,7 +855,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed Burden value.
+     *
      * @return {number}
      */
     _getBurdenValue() {
@@ -838,7 +867,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed Scalar value.
+     *
      * @return {number}
      */
     _getScalarValue() {
@@ -862,7 +892,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed Per Quantity value.
+     *
      * @return {number}
      */
     _getPerQuantityValue() {
@@ -882,7 +913,8 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed Escalator value.
+     *
      * @return {number}
      */
     _getEscalatorValue() {
@@ -893,7 +925,20 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     * Internally retrieves the non-cached computed OH&P value.
+     *
+     * @return {number}
+     */
+    _getOhpValue() {
+        if (!this.isOverridden("ohp")) {
+            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.ohp);
+            return _.round(Helpers.confirmNumber(dependencyValue, 1), 4);
+        } else return _.round(Helpers.confirmNumber(this._data.ohp, 1), 4);
+    }
+
+    /**
+     * Internally retrieves the non-cached computed Quantity value.
+     *
      * @return {number}
      */
     _getQuantityValue() {
@@ -911,7 +956,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getCostValue() {
@@ -923,12 +968,12 @@ export default class LineItem extends BidEntity {
                 cost = (this.quantity * this.perQuantity + this.base) * this.multiplier;
             }
 
-            return _.round(Helpers.confirmNumber(cost * this.escalator), 4);
+            return _.round(Helpers.confirmNumber(cost * this.escalator * this.ohp), 4);
         } else return _.round(Helpers.confirmNumber(this._data.cost), 4);
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getTaxValue() {
@@ -940,7 +985,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getTaxPercentValue() {
@@ -951,7 +996,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getMarkupValue() {
@@ -962,7 +1007,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * 
+     *
      * @return {number}
      */
     _getMarkupPercentValue() {
@@ -985,7 +1030,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * Exports the line item's internal data structure.
-     * 
+     *
      * @returns {object}
      */
     exportData() {
@@ -1001,8 +1046,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * Moves line item to a new component and self removes from original component in the same {@link ComponentGroup}
-     * 
-     * @param {Component} component 
+     *
+     * @param {Component} component
      */
     moveToComponent(component) {
         _.each(this.bid.entities.components(), componentToLeave => {
@@ -1023,7 +1068,7 @@ export default class LineItem extends BidEntity {
     /**
      * Gets an array of components that the line item is under.
      * A line item is either uncategorized or under one {@link Component} per {@link ComponentGroup}
-     * 
+     *
      * @returns {Component[]}
      */
     components() {
@@ -1036,8 +1081,8 @@ export default class LineItem extends BidEntity {
 
     /**
      * Deletes line item.
-     * 
-     * @returns {Promise<void>} 
+     *
+     * @returns {Promise<void>}
      */
     async delete() {
         if (this.dependants().length === 0) {
