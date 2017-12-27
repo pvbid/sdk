@@ -154,6 +154,12 @@
                 "value": 35,
                 "is_reserved": true
             },
+            "ohp": {
+                "type": "number",
+                "title": "Subcontractor Scalar",
+                "value": 1.5,
+                "is_reserved": true
+            },
             "burden": {
                 "type": "number",
                 "title": "Burden",
@@ -531,6 +537,11 @@
                             "type": null,
                             "field": null,
                             "bid_entity_id": null
+                        },
+                        "ohp": {
+                            "type": "bid_variable",
+                            "field": "ohp",
+                            "bid_entity_id": "bid_variable"
                         },
                         "escalator": {
                             "type": "bid_variable",

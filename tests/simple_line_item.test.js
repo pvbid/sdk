@@ -55,6 +55,94 @@ async function init() {
     });
 }
 
+describe("Line item OH&P", () => {
+    beforeEach(() => {
+        // This line item has an ohp dependency contract to the ohp bid variable with a value of 1.5
+        let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+        return new Promise(resolve => {
+            lineItem.once("updated", () => {
+                resolve();
+            });
+            lineItem.reset();
+        });
+    });
+
+    describe("should default to 1", () => {
+        test("when there is not a configured dependency.", () => {
+            // This line item data does not have a set ohp dependency contract.
+            let lineItemWithoutOhp = bid.entities.searchByTitle("line_item", "general line item")[0];
+            expect(lineItemWithoutOhp.config.dependencies.ohp).toBeUndefined();
+            expect(lineItemWithoutOhp.ohp).toBe(1);
+        });
+        test("when ohp value is not a valid integer", () => {
+            let lineItem = bid.entities.searchByTitle("line_item", "general line item")[0];
+            lineItem.ohp = "a";
+            expect(lineItem.ohp).toBe(1);
+        });
+    });
+
+    test("should be overridable.", () => {
+        let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+        lineItem.override("ohp", false);
+
+        expect(lineItem.ohp).toBe(1.5);
+        lineItem.ohp = 2.2;
+        expect(lineItem.ohp).toBe(2.2);
+        expect(lineItem.isOverridden("ohp")).toBe(true);
+    });
+
+    describe("should change the line item cost", () => {
+        test("when a set dependency contract not equal to 1", async () => {
+            expect.assertions(2);
+
+            let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+            expect(lineItem.ohp).toBe(1.5);
+
+            return new Promise(resolve => {
+                lineItem.once("updated", () => {
+                    expect(lineItem.cost).toBe(6);
+                    resolve();
+                });
+                lineItem.base = 4;
+            });
+        });
+
+        test("when the ohp is overriden", async () => {
+            expect.assertions(2);
+
+            // This line item has an ohp dependency contract to the ohp bid variable with a value of 1.5
+            let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+            expect(lineItem.ohp).toBe(1.5);
+
+            return new Promise(resolve => {
+                lineItem.once("updated", () => {
+                    expect(lineItem.cost).toBe(8);
+                    resolve();
+                });
+                lineItem.base = 4;
+                lineItem.ohp = 2;
+            });
+        });
+    });
+
+    test("should set to 1 if cost is overriden", () => {
+        expect.assertions(4);
+
+        let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+        expect(lineItem.ohp).toBe(1.5);
+        expect(lineItem.cost).toBe(0);
+        return new Promise(resolve => {
+            lineItem.once("updated", () => {
+                expect(lineItem.cost).toBe(5);
+                expect(lineItem.ohp).toBe(1);
+
+                resolve();
+            });
+            lineItem.cost = 5;
+        });
+    });
+});
+
 describe("Line item markup percent", () => {
     describe("should update to an equally distributed ratio", () => {
         test("when bid markup changes and line item is included.", async () => {
