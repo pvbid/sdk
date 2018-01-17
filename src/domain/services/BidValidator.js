@@ -4,7 +4,7 @@ import Helpers from "../../utils/Helpers";
 
 /**
  * Validates a bid structure and dependencies.
- * 
+ *
  * @class BidValidator
  */
 export default class BidValidator {
@@ -18,15 +18,15 @@ export default class BidValidator {
 
     /**
      * Validates a bid return an array of issues, if any exists.
-     * 
-     * @param {Bid} bid 
+     *
+     * @param {Bid} bid
      * @returns {object[]} Returns an array of validation errors.
      */
     validate(bid) {
         this._bid = bid;
         this._testResults = [];
         try {
-            this._testAll();
+            if (!bid.isShell()) this._testAll();
         } catch (err) {
             console.log(err);
         }

@@ -3,13 +3,13 @@ import Helpers from "../../utils/Helpers";
 
 /**
  * Helper class to manage all bid entities in a bid.
- * 
+ *
  * @class BidEntityRelationsHelper
  */
 export default class BidEntityRelationsHelper {
     /**
      * Creates an instance of BidEntityRelationsHelper.
-     * @param {Bid} bid 
+     * @param {Bid} bid
      */
     constructor(bid) {
         /**
@@ -31,14 +31,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a field entity by id.  If no id is passed, will return an of object of keyed fields by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <Field>,
      *    "103" : <Field>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(Field|Object.<string, Field>)}
      */
     fields(id) {
@@ -47,14 +47,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a field group entity by id.  If no id is passed, will return an of object of keyed field groups by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <FieldGroup>,
      *    "103" : <FieldGroup>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(FieldGroup|Object.<string, FieldGroup>)}
      */
     fieldGroups(id) {
@@ -63,14 +63,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a metric entity by id.  If no id is passed, will return an of object of keyed metrics by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <Metric>,
      *    "103" : <Metric>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(Metric|Object.<string, Metric>)}
      */
     metrics(id) {
@@ -79,14 +79,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a line item entity by id.  If no id is passed, will return an of object of keyed line items by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <LineItem>,
      *    "103" : <LineItem>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(LineItem|Object.<string, LineItem>)}
      */
     lineItems(id) {
@@ -95,14 +95,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a datatable entity by id.  If no id is passed, will return an of object of keyed datatables by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <Datatable>,
      *    "103" : <Datatable>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(Datatable|Object.<string, Datatable>)}
      */
     datatables(id) {
@@ -111,14 +111,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets an assembly entity by id.  If no id is passed, will return an of object of keyed assemblies by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <Assembly>,
      *    "103" : <Assembly>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(Assembly|Object.<string, Assembly>)}
      */
     assemblies(id) {
@@ -127,13 +127,13 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a bid variable entity by id.  If no id is passed, will return an object of keyed bid variables by their id.
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "xyg4" : <BidVariable>,
      *    "burden" : <BidVariable>
      * }
-     * 
+     *
      * @param {string} [id] - The id of the component to retrieve.
      * @returns {?(Component|Object.<string, Component>)}
      */
@@ -143,13 +143,13 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a component entity by id.  If no id is passed, will return an object of keyed components by their id.
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <Component>,
      *    "103" : <Component>
      * }
-     * 
+     *
      * @param {number} [id] - The id of the component to retrieve.
      * @returns {?(Component|Object.<string, Component>)}
      */
@@ -159,14 +159,14 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a component group entity by id.  If no id is passed, will return an of object of keyed component groups by their id..
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <ComponentGroup>,
      *    "103" : <ComponentGroup>
      * }
-     * 
-     * @param {number} id 
+     *
+     * @param {number} id
      * @returns {?(ComponentGroup|Object.<string, ComponentGroup>)}
      */
     componentGroups(id) {
@@ -175,13 +175,13 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a assembly map entity by id.  If no id is passed, will return an object of keyed assembly maps by their id.
-     * 
+     *
      * @example <caption>Example of returned keyed object.</caption>
      * {
      *    "92" : <AssemblyMap>,
      *    "103" : <AssemblyMap>
      * }
-     * 
+     *
      * @param {number} [id] - The id of the assembly map to retrieve.
      * @returns {?(AssemblyMap|Object.<string, AssemblyMap>)}
      */
@@ -191,15 +191,15 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a bid entity by a dependency contract.
-     * 
+     *
      * @example <caption>Example a dependency contract.</caption>
      * {
-     *    "type" : <string>, 
+     *    "type" : <string>,
      *    "bid_entity_id" : <string>,
      *    "field" : <string>
      * }
-     * 
-     * @param {object} dependencyContract 
+     *
+     * @param {object} dependencyContract
      * @param {string} dependencyContract.type - The type of bid entity, ie: line_item, metric, field, component, compnent_group, assembly, etc
      * @param {string} dependencyContract.bid_entity_id - The id of the bid entity. Note, this will eventual be converted to simply "id".
      * @param {string} dependencyContract.field - The bid entity property that holds the needed value.
@@ -227,8 +227,8 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets the value of a bid entity by a dependency contract.
-     * 
-     * @param {object} dependencyContract 
+     *
+     * @param {object} dependencyContract
      * @param {string} dependencyContract.type - The type of bid entity, ie: line_item, metric, field, component, compnent_group, assembly, etc
      * @param {string} dependencyContract.bid_entity_id - The id of the bid entity. Note, this will eventual be converted to simply "id".
      * @param {string} dependencyContract.field - The bid entity property that holds the needed value.
@@ -246,9 +246,8 @@ export default class BidEntityRelationsHelper {
                         ? Helpers.confirmNumber(bidEntity[dependencyContract.field])
                         : 0;
                 case "component":
-                    return !_.isNull(bidEntity[dependencyContract.field])
-                        ? Helpers.confirmNumber(bidEntity[dependencyContract.field])
-                        : 0;
+                    const field = _.camelCase(dependencyContract.field);
+                    return !_.isNull(bidEntity[field]) ? Helpers.confirmNumber(bidEntity[field]) : 0;
                 case "field":
                     if (!_.isNull(bidEntity.value)) {
                         return this.getFieldValue(bidEntity, dependencyContract.field);
@@ -292,7 +291,7 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets all the dependants for a bid bid entity.
-     * 
+     *
      * @param {string} type The type of bid enity. IE. line_item, field, metric, component, etc.
      * @param {int} id The id of the bid entity.
      * @returns [BidEntity[]]
@@ -320,9 +319,9 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a bid entity by type and id.
-     * 
-     * @param {string} type 
-     * @param {(number|string)} id 
+     *
+     * @param {string} type
+     * @param {(number|string)} id
      * @returns {BidEntity}
      */
     getBidEntity(type, id) {
@@ -342,8 +341,8 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Returns the full collection of bid entites by type. Returned is a keyed object by the bid entity id.
-     * 
-     * @param {string} type 
+     *
+     * @param {string} type
      * @returns {object}
      */
     getCollection(type) {
@@ -356,8 +355,8 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Gets a component by their core definition id. Note, this function will be removed once
-     * 
-     * @param {number} defId 
+     *
+     * @param {number} defId
      * @returns {Component}
      */
     getComponentByDefId(defId) {
@@ -371,11 +370,11 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Determines if dependency exists basd on the dependency contract.
-     * 
-     * @param {object} dependencyContract 
-     * @param {string} dependencyContract.type 
+     *
+     * @param {object} dependencyContract
+     * @param {string} dependencyContract.type
      * @param {string} dependencyContract.bid_entity_id
-     * @param {string} dependencyContract.field 
+     * @param {string} dependencyContract.field
      * @returns {boolean}
      */
     dependencyExists(dependencyContract) {
@@ -391,10 +390,10 @@ export default class BidEntityRelationsHelper {
 
     /**
      * Determines if bid entity exists based on type and id.
-     * 
-     * @param {string} type 
-     * @param {(number|string)} id 
-     * @returns {boolean} 
+     *
+     * @param {string} type
+     * @param {(number|string)} id
+     * @returns {boolean}
      */
     bidEntityExists(type, id) {
         let bidEntity = this.getBidEntity(type, id);
@@ -404,9 +403,9 @@ export default class BidEntityRelationsHelper {
     /**
      * Searches and returns an array of bid entities by their title.
      * Results are case-insensitive.
-     * 
+     *
      * @param {string} type The type of bid entity to search for: line_item, field, metric, component, assembly, etc.
-     * @param {string} query 
+     * @param {string} query
      * @returns {BidEntity[]}
      */
     searchByTitle(type, query) {

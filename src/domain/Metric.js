@@ -4,7 +4,7 @@ import Helpers from "../utils/Helpers";
 
 /**
  * Metric Class
- * 
+ *
  * @export
  * @class Metric
  * @memberof module:PVBid/Core
@@ -13,8 +13,8 @@ import Helpers from "../utils/Helpers";
 export default class Metric extends BidEntity {
     /**
      * Creates an instance of Metric.
-     * @param {object} metricData 
-     * @param {Bid} bid 
+     * @param {object} metricData
+     * @param {Bid} bid
      */
     constructor(metricData, bid) {
         super();
@@ -72,7 +72,7 @@ export default class Metric extends BidEntity {
 
     /**
      * Gets the metrics's definition id.
-     * 
+     *
      * @type {number}
      * @deprecated Definition ids will become obsolete in planned data structure upgrade.
      */
@@ -137,7 +137,7 @@ export default class Metric extends BidEntity {
 
     /**
      * Gets an array of bid entities that the metric relies on.
-     * 
+     *
      * @returns {BidEntity[]}
      */
     dependencies() {
@@ -164,7 +164,7 @@ export default class Metric extends BidEntity {
 
     /**
      * Gets an array of bid entities that rely on the metric
-     * 
+     *
      * @returns {BidEntity[]}
      */
     dependants() {
@@ -173,13 +173,12 @@ export default class Metric extends BidEntity {
 
     /**
      * Assess metric for changes.
-     * 
-     * @param {?BidEntity} dependency  - The calling dependency.
+     *
      * @emits {assessing} fires event before assessement.
      * @emits {assessed} fires after assessment is complete.
      * @emits {updated} fires only if there has been a change.
      */
-    assess(dependency) {
+    assess() {
         if (this.bid.isAssessable()) {
             if (!this.config.override) {
                 var baseValue = 0,
@@ -235,8 +234,8 @@ export default class Metric extends BidEntity {
 
     /**
      * Determines if metric instance is dirty.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isDirty() {
         return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
@@ -252,8 +251,8 @@ export default class Metric extends BidEntity {
 
     /**
      * Exports intermal metric data.
-     * 
-     * @returns {object} 
+     *
+     * @returns {object}
      */
     exportData() {
         let blacklist = [];
