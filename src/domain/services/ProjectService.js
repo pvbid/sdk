@@ -43,12 +43,14 @@ export default class ProjectService {
             const bid = exported.bids[bidIds[i]];
 
             const toSave = {
-                bids: bid,
+                bids: {},
                 project: exported.project
             };
+            toSave.bids[bid.id] = bid;
 
             properties.forEach(key => {
-                toSave[key] = _.filter(exported[key], el => el.bid_id === bid.id);
+                const filtered = _.filter(exported[key], el => el.bid_id === bid.id);
+                toSave[key] = _.keyBy(filtered, "id");
             });
 
             promises.push(this.repositories.projects.batchUpdate(project.id, toSave));
