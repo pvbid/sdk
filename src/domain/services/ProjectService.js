@@ -3,14 +3,14 @@ import BidFactory from "../factories/BidFactory";
 import ProjectSavingHelper from "./ProjectSavingHelper";
 
 /**
- * 
- * @param {ProjectRepository} projectRepository 
- * @param {BidService} bidService 
+ *
+ * @param {ProjectRepository} projectRepository
+ * @param {BidService} bidService
  */
 export default class ProjectService {
     /**
      * Creates an instance of ProjectService.
-     * @param {PVBidContext} context 
+     * @param {PVBidContext} context
      */
     constructor(context) {
         this.context = context;
@@ -20,26 +20,52 @@ export default class ProjectService {
 
     /**
      * Saves project and underlying bids.
-     * 
-     * @param {Project} project 
+     *
+     * @param {Project} project
      * @returns {Promise<null>}
      */
     async save(project) {
+        const properties = [
+            "line_items",
+            "fields",
+            "components",
+            "metrics",
+            "field_groups",
+            "assemblies",
+            "component_groups",
+            "datatables"
+        ];
+        const promises = [];
+
         const exported = this._savingHelper.extract(project);
-        return this.repositories.projects.batchUpdate(project.id, exported).then(() => {
-            _.each(project.bids, bid => {
-                bid.pristine();
+        const bidIds = Object.keys(exported.bids);
+        for (let i = 0; i < bidIds.length; i++) {
+            const bid = exported.bids[bidIds[i]];
+
+            const toSave = {
+                bids: bid,
+                project: exported.project
+            };
+
+            properties.forEach(key => {
+                toSave[key] = _.filter(exported[key], el => el.bid_id === bid.id);
             });
-            project.pristine();
-            return;
+
+            promises.push(this.repositories.projects.batchUpdate(project.id, toSave));
+        }
+
+        await Promise.all(promises);
+        _.each(project.bids, bid => {
+            bid.pristine();
         });
+        project.pristine();
     }
 
     /**
      * Creates bid and attaches to project.
-     * 
+     *
      * @param {Project} project
-     * @param {string} [title=New Bid] 
+     * @param {string} [title=New Bid]
      * @returns {Promise<Project>}
      */
     async createBid(project, title) {
