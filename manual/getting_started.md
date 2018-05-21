@@ -26,9 +26,11 @@ The following demonstrates how to set up an authorized context, loading a projec
 
 **Create a context with an authorization token**
 ```javascript
-const config = { token: "your auth token" };
+const config = { token: "Bearer auth_token" };
 const pvbid = PVBid.createContext(config);
 ```
+
+*Important Note: the token string passed to the `config.token` property should include `Bearer` prefix.*
 
 **Load a self assessing Project instance**
 ```javascript 

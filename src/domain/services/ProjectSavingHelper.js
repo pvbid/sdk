@@ -53,6 +53,7 @@ export default class ProjectSavingHelper {
                 }
             } else if (bid.isLocked() && bid.isDirty()) {
                 extracted.bids[bid.id] = {
+                    id: bid.id,
                     title: bid.title,
                     account_id: bid._data.account_id,
                     is_locked: bid.isLocked()
