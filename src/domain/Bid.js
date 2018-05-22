@@ -876,6 +876,7 @@ export default class Bid extends BidEntity {
     /**
      * Locks bid, forcing read-only mode for everyone.  Bid must be unlocked before it can be modified again.
      * This function immediately saves the bid.
+     * Will return a rejected promise if the bid cannot be locked.
      *
      * @returns {Promise<null>}
      */
