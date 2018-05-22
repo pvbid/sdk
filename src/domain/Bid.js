@@ -885,6 +885,7 @@ export default class Bid extends BidEntity {
             this.dirty();
             return this.project.save();
         }
+        return Promise.reject();
     }
 
     /**
