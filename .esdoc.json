@@ -18,6 +18,7 @@
                         "./manual/getting_started.md",
                         "./manual/repositories.md",
                         "./manual/data_models.md",
+                        "./CHANGELOG.md",
                         "./LICENSE.md"
                     ]
                 }
