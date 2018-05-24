@@ -20,10 +20,10 @@ https://unpkg.com/pvbid-sdk@1.0/dist/pvbid.min.js
 Our most recent docs are hosted at http://sdk.pvbid.com. Code examples are included under the [Manual](http://sdk.pvbid.com/manual) section. The docs are also included in the npm package.  
 
 ## Recent Changes
-See our changelog [here](CHANGELOG.md).
+See our changelog [here](http://sdk.pvbid.com/manual/CHANGELOG.html).
 
 ## License
 Copyright (C) PVBid, Inc - All Rights Reserved.
 
-See LICENSE
+[See LICENSE](http://sdk.pvbid.com/manual/LICENSE.html)
 
