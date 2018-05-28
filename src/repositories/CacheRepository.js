@@ -90,7 +90,8 @@ export default class CacheRepository extends BaseRepository {
     }
 
     /**
-     * 
+     * Creates a single entity and invalidates the cached data
+     *
      * @param {BidEntity} entity - bid entity data object
      * @returns {Promise<BidEntity>}
      */
