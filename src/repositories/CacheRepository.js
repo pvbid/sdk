@@ -89,6 +89,27 @@ export default class CacheRepository extends BaseRepository {
         }
     }
 
+    /**
+     * 
+     * @param {BidEntity} entity - bid entity data object
+     * @returns {Promise<BidEntity>}
+     */
+    async create(entity) {
+        try {
+            let response = await super.create(entity);
+
+            //invalidate cache as it's stale
+            if (this._cache["GET_" + this.endpoint]) {
+                delete this._cache["GET_" + this.endpoint];
+                console.log("Cache GET (delete): ", this.endpoint);
+            }
+
+            return response;
+        } catch (error) {
+            return Promise.reject(error);
+        }
+    }
+
     async delete(id) {
         try {
             let response = await super.delete(id);
