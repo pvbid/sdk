@@ -2,6 +2,7 @@
 
 ### 1.0.?? (2018-??-??)
 Bug Fixes:
+* **Snapshot:** Expose the save() method from the snapshot repository
 * **CacheRepository:** The cache is invalidated when the `create()` method is used
 
 ### 1.0.30 (2018-05-24)
