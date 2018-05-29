@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.?? (2018-??-??)
+Bug Fixes:
+* **CacheRepository:** The cache is invalidated when the `create()` method is used
+
 ### 1.0.30 (2018-05-24)
 Bug Fixes:
 * **Documentation:** Link to the changelog from the docs
