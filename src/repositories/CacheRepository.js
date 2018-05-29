@@ -7,6 +7,7 @@ import BaseRepository from "./BaseRepository";
 export default class CacheRepository extends BaseRepository {
     /**
      * Creates an instance of BaseRepository.
+     * 
      * @param {string} endpoint 
      * @param {string} singleMap 
      * @param {string} multiMap 
@@ -69,6 +70,7 @@ export default class CacheRepository extends BaseRepository {
     }
 
     /**
+     * Saves resource and stores response to cache by resource id.
      * 
      * @param {BidEntity} entity - bid entity data object
      * @returns {Promise<BidEntity>}
@@ -111,6 +113,12 @@ export default class CacheRepository extends BaseRepository {
         }
     }
 
+    /**
+     * Deletes resource and removes resource from cache.
+     * 
+     * @param {number} id The id of the resource to delete
+     * @return {Promise<object>} Returns the response data.
+     */
     async delete(id) {
         try {
             let response = await super.delete(id);
