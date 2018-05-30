@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.32 (2018-05-30)
+Changes:
+* **Component:** Expose the componentGroupId property
+
 ### 1.0.31 (2018-05-29)
 Bug Fixes:
 * **Snapshot:** Expose the save() method from the snapshot repository
