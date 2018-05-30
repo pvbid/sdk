@@ -271,6 +271,15 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Gets the component's group id.
+     * 
+     * @type {number} 
+     */
+    get componentGroupId() {
+        return this.config.component_group_id;
+    }
+
+    /**
      * Gets the component's definition id.
      * 
      * @type {number}
