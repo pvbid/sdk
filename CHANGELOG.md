@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.?? (2018-??-??)
+Bug Fixes:
+* **ProjectRepository:** Project `save()` persists changes even if no bids were modified
+
 ### 1.0.32 (2018-05-30)
 Changes:
 * **Component:** Expose the componentGroupId property
