@@ -27,7 +27,8 @@ export default class BaseRepository {
     /**
      * Retrieves a single domain object by its id.
      * 
-     * @param {int} id The id of the entity to retrieve.
+     * @param {number} id The id of the entity to retrieve.
+     * @return {Promise<BidEntity>}
      */
     async findById(id) {
         try {
@@ -43,7 +44,7 @@ export default class BaseRepository {
      * Retrieves an array of results for the endpoint
      * 
      * @param {Object} [params] A set of parameters to include for the endpoint.
-     * @return {Object[]} Array of results filtered by the given params
+     * @return {Promise<BidEntity[]>} Array of results filtered by the given params
      */
     async get(params) {
         try {
@@ -92,7 +93,7 @@ export default class BaseRepository {
      * Deletes a single entity by its id
      *
      * @param {number} id The id of the entity to delete
-     * @return {object} API response object containing a status message
+     * @return {Promise<Object>} Response status message
      */
     async delete(id) {
         try {
