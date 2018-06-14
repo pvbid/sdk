@@ -42,14 +42,7 @@ export default class BaseRepository {
     /**
      * Retrieves an array of results for the endpoint
      * 
-     * @param {Object} params A set of parameters to include for the endpoint.
-     * @param {number} params.per_page Number of items to to display per request (max 100)
-     * @param {number} params.page Page number
-     * @param {string} params.search Search term to apply to object's title
-     * @param {string} params.sort_order 'asc' or 'desc'
-     * @param {string} params.order_by The name of the property to sort the results by
-     * @param {number[]} params.tag_ids List of tags to filter by (excluding this will include all tags)
-     * @param {number[]} params.user_ids List of users to filter by (excluding this will include all users)
+     * @param {Object} [params] A set of parameters to include for the endpoint.
      * @return {Object[]} Array of results filtered by the given params
      */
     async get(params) {
