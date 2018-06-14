@@ -8,9 +8,9 @@ export default class BaseRepository {
     /**
      * Creates an instance of BaseRepository.
      *
-     * @param {string} endpoint 
-     * @param {string} singleMap 
-     * @param {string} multiMap 
+     * @param {string} endpoint The API endpoint for the entity
+     * @param {string} singleMap The singular noun for the entity (ie. 'bid' or 'assembly')
+     * @param {string} multiMap The plural noun for the entity (ie. 'bids' or 'assemblies')
      */
     constructor(endpoint, singleMap, multiMap, httpConfig) {
         axios.defaults.headers.common["Authorization"] = httpConfig.token;
@@ -66,10 +66,10 @@ export default class BaseRepository {
     }
 
     /**
-     * Persists the entity
+     * Persists an update to the entity
      *
      * @param {BidEntity} entity 
-     * @returns {Promise<BidEntity>}
+     * @returns {Promise<BidEntity>} The updated entity
      */
     async save(entity) {
         try {
@@ -80,6 +80,12 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Persists a new entity
+     *
+     * @param {BidEntity} entity An entity object to persist
+     * @returns {Promise<BidEntity>} The newly persisted entity
+     */
     async create(entity) {
         try {
             let response = await this.http.post(this.endpoint, entity);
@@ -89,6 +95,12 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Deletes a single entity by its id
+     *
+     * @param {number} id The id of the entity to delete
+     * @return {object} API response object containing a status message
+     */
     async delete(id) {
         try {
             let response = await this.http.delete(this.endpoint + id);
@@ -98,6 +110,9 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Apply the impersonation ID to the request if applicable
+     */
     _applyIntercepts() {
         this.http.interceptors.request.use(
             configuration => {
