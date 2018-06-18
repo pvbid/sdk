@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 1.0.?? (2018-??-??)
+### 1.0.33 (2018-06-18)
 Bug Fixes:
 * **ProjectRepository:** Project `save()` persists changes even if no bids were modified
 
