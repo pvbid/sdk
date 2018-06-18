@@ -39,23 +39,26 @@ export default class ProjectService {
 
         const exported = this._savingHelper.extract(project);
         const bidIds = Object.keys(exported.bids);
-        for (let i = 0; i < bidIds.length; i++) {
-            const bid = exported.bids[bidIds[i]];
+        if (bidIds.length > 0) {
+            for (let i = 0; i < bidIds.length; i++) {
+                const bid = exported.bids[bidIds[i]];
 
-            const toSave = {
-                bids: {},
-                project: exported.project
-            };
-            toSave.bids[bid.id] = bid;
+                const toSave = {
+                    bids: {},
+                    project: exported.project
+                };
+                toSave.bids[bid.id] = bid;
 
-            properties.forEach(key => {
-                const filtered = _.filter(exported[key], el => el.bid_id === bid.id);
-                toSave[key] = _.keyBy(filtered, "id");
-            });
+                properties.forEach(key => {
+                    const filtered = _.filter(exported[key], el => el.bid_id === bid.id);
+                    toSave[key] = _.keyBy(filtered, "id");
+                });
 
-            promises.push(this.repositories.projects.batchUpdate(project.id, toSave));
+                promises.push(this.repositories.projects.batchUpdate(project.id, toSave));
+            }
+        } else {
+            promises.push(this.repositories.projects.save(exported.project));
         }
-
         await Promise.all(promises);
         _.each(project.bids, bid => {
             bid.pristine();
