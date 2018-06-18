@@ -7,9 +7,10 @@ import axios from "axios";
 export default class BaseRepository {
     /**
      * Creates an instance of BaseRepository.
-     * @param {string} endpoint 
-     * @param {string} singleMap 
-     * @param {string} multiMap 
+     *
+     * @param {string} endpoint The API endpoint for the entity
+     * @param {string} singleMap The singular noun for the entity (ie. 'bid' or 'assembly')
+     * @param {string} multiMap The plural noun for the entity (ie. 'bids' or 'assemblies')
      */
     constructor(endpoint, singleMap, multiMap, httpConfig) {
         axios.defaults.headers.common["Authorization"] = httpConfig.token;
@@ -26,7 +27,8 @@ export default class BaseRepository {
     /**
      * Retrieves a single domain object by its id.
      * 
-     * @param {int} id The id of the entity to retrieve.
+     * @param {number} id The id of the entity to retrieve.
+     * @return {Promise<BidEntity>}
      */
     async findById(id) {
         try {
@@ -41,7 +43,8 @@ export default class BaseRepository {
     /**
      * Retrieves an array of results for the endpoint
      * 
-     * @param {object} params A set of parameters to include for the endpoint.
+     * @param {Object} [params] A set of parameters to include for the endpoint.
+     * @return {Promise<BidEntity[]>} Array of results filtered by the given params
      */
     async get(params) {
         try {
@@ -57,9 +60,10 @@ export default class BaseRepository {
     }
 
     /**
-     * 
+     * Persists an update to the entity
+     *
      * @param {BidEntity} entity 
-     * @returns {Promise<BidEntity>}
+     * @returns {Promise<BidEntity>} The updated entity
      */
     async save(entity) {
         try {
@@ -70,6 +74,12 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Persists a new entity
+     *
+     * @param {BidEntity} entity An entity object to persist
+     * @returns {Promise<BidEntity>} The newly persisted entity
+     */
     async create(entity) {
         try {
             let response = await this.http.post(this.endpoint, entity);
@@ -79,6 +89,12 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Deletes a single entity by its id
+     *
+     * @param {number} id The id of the entity to delete
+     * @return {Promise<Object>} Response status message
+     */
     async delete(id) {
         try {
             let response = await this.http.delete(this.endpoint + id);
@@ -88,6 +104,9 @@ export default class BaseRepository {
         }
     }
 
+    /**
+     * Apply the impersonation ID to the request if applicable
+     */
     _applyIntercepts() {
         this.http.interceptors.request.use(
             configuration => {
