@@ -76,7 +76,7 @@ test("add new line item", () => {
 test(
     "change line item cost (includes tax in markup)",
     () => {
-        expect.assertions(19);
+        expect.assertions(20);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -85,6 +85,7 @@ test(
                 expect(_.round(lineItem.markup, 3)).toBe(1.944);
                 expect(_.round(lineItem.tax, 1)).toBe(0.8);
                 expect(_.round(lineItem.price, 2)).toBe(12.74);
+                expect(_.round(lineItem.costWithTax, 3)).toBe(10.8);
 
                 expect(_.round(lineItem.base, 2)).toBe(0);
                 expect(_.round(lineItem.quantity, 2)).toBe(0);
