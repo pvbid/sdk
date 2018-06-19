@@ -440,6 +440,19 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Price per watt
+     * @type {number}
+     */
+    get priceWatt() {
+        if (this.bid.watts > 0) {
+            return this.price / this.bid.watts;
+        }
+        else {
+            return this.price;
+        }
+    }
+
+    /**
      * Gets the line item's definition id.
      *
      * @type {number}
