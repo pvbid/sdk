@@ -56,7 +56,8 @@ export default class ProjectService {
 
                 promises.push(this.repositories.projects.batchUpdate(project.id, toSave));
             }
-        } else {
+        } else if (exported.project.id) {
+            // project id will not be defined if not project data needs to be saved.
             promises.push(this.repositories.projects.save(exported.project));
         }
         await Promise.all(promises);
