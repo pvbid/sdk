@@ -326,6 +326,14 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Cost With Tax
+     * @type {number}
+     */
+    get costWithTax() {
+        return this.tax + this.cost;
+    }
+
+    /**
      * OH&P Property (overhead and profit)
      * @type {number}
      */
