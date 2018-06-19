@@ -194,9 +194,22 @@ export default class Component extends BidEntity {
      */
     get priceWatt() {
         if (this.bid.watts > 0) {
-            return this.price / this.bid.watts;
+            return Helpers.confirmNumber(this.price / this.bid.watts);
         } else {
             return this.price;
+        }
+    }
+
+    /**
+     * Cost per watt
+     * @type {number}
+     */
+    get costWatt() {
+        if (this.bid.watts > 0) {
+            return Helpers.confirmNumber(this.cost / this.bid.watts);
+        }
+        else {
+            return this.cost;
         }
     }
 
