@@ -453,6 +453,15 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * @type {number}
+     */
+    set priceWatt(val) {
+        if (Helpers.isNumber(val) && this.priceWatt !== Helpers.confirmNumber(val)) {
+            this.price = Helpers.confirmNumber(val * this.bid.watts);
+        }
+    }
+
+    /**
      * Cost per watt
      * @type {number}
      */
@@ -462,6 +471,15 @@ export default class LineItem extends BidEntity {
         }
         else {
             return this.cost;
+        }
+    }
+
+    /**
+     * @type {number}
+     */
+    set costWatt(val) {
+        if (Helpers.isNumber(val) && this.costWatt !== Helpers.confirmNumber(val)) {
+            this.cost = Helpers.confirmNumber(val * this.bid.watts);
         }
     }
 

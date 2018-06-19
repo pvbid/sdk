@@ -76,11 +76,12 @@ test("add new line item", () => {
 test(
     "change line item cost (includes tax in markup)",
     () => {
-        expect.assertions(20);
+        expect.assertions(21);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
                 expect(_.round(lineItem.cost, 3)).toBe(10);
+                expect(_.round(lineItem.costWatt, 3)).toBe(0.007); // test bid is 1350 watt
 
                 expect(_.round(lineItem.markup, 3)).toBe(1.944);
                 expect(_.round(lineItem.tax, 1)).toBe(0.8);
@@ -392,6 +393,40 @@ test("change line item escalator", () => {
 
         lineItem.escalator = "1.5";
     });
+});
+
+test("change line item cost per watt", () => {
+    expect.assertions(3);
+
+    return new Promise(resolve => {
+        lineItem.once("assessed", () => {
+            expect(_.round(lineItem.costWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(_.round(lineItem.cost, 3)).toBe(33.75);
+
+            expect(lineItem.isOverridden("cost")).toBe(true);
+
+            resolve();
+        });
+        lineItem.costWatt = 0.025;
+    });
+
+});
+
+test("change line item price per watt", () => {
+    expect.assertions(3);
+
+    return new Promise(resolve => {
+        lineItem.once("assessed", () => {
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(_.round(lineItem.price, 3)).toBe(33.75);
+
+            expect(lineItem.isOverridden("price")).toBe(true);
+
+            resolve();
+        });
+        lineItem.priceWatt = 0.025;
+    });
+
 });
 
 test("reset line item", () => {
