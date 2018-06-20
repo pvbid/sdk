@@ -297,6 +297,7 @@ export default class LineItem extends BidEntity {
             this._data.ohp = 1;
 
             this.override("cost", true);
+            this.override("cost_watt", false);
             this.override("escalator", true);
             this.override("ohp", true);
             this.override("price", false);
@@ -461,6 +462,7 @@ export default class LineItem extends BidEntity {
             this.isIncluded = true;
             this.dirty();
             this.override("price", true);
+            this.override("price_watt", false);
             this.emit("property.updated");
         }
     }
