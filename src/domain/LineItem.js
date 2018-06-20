@@ -42,7 +42,9 @@ export default class LineItem extends BidEntity {
             this._data.base = Helpers.confirmNumber(val);
             this.override("base", true);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("markup", false);
             this.override("multiplier", false);
             this.multiplier = 1;
@@ -109,6 +111,7 @@ export default class LineItem extends BidEntity {
             this._data.labor_hours = Helpers.confirmNumber(val);
             this.override("labor_hours", true);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("multiplier", false);
 
             if (this.subtotal > 0) {
@@ -185,7 +188,9 @@ export default class LineItem extends BidEntity {
             this._data.per_quantity = Helpers.confirmNumber(val);
             this.override("per_quantity", true);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("markup", false);
 
             this.override("multiplier", false);
@@ -211,7 +216,9 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.escalator != Helpers.confirmNumber(val)) {
             this._data.escalator = Helpers.confirmNumber(val);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("escalator", true);
             this.isIncluded = true;
             this.dirty();
@@ -235,7 +242,9 @@ export default class LineItem extends BidEntity {
             this._data.quantity = Helpers.confirmNumber(val);
             this.override("quantity", true);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("markup", false);
 
             this.override("multiplier", false);
@@ -261,7 +270,9 @@ export default class LineItem extends BidEntity {
             this._data.multiplier = Helpers.confirmNumber(val);
             this.override("multiplier", true);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("labor_hours", false);
             this.isIncluded = true;
             this.dirty();
@@ -289,6 +300,7 @@ export default class LineItem extends BidEntity {
             this.override("escalator", true);
             this.override("ohp", true);
             this.override("price", false);
+            this.override("price_watt", false);
 
             this.isIncluded = true;
             this.dirty();
@@ -314,6 +326,7 @@ export default class LineItem extends BidEntity {
             this.override("tax", true);
             this.override("tax_percent", true);
             this.override("price", false);
+            this.override("price_watt", false);
             this.isIncluded = true;
             this.dirty();
 
@@ -340,7 +353,9 @@ export default class LineItem extends BidEntity {
         if (Helpers.isNumber(val) && this._data.ohp != Helpers.confirmNumber(val)) {
             this._data.ohp = Helpers.confirmNumber(val);
             this.override("cost", false);
+            this.override("cost_watt", false);
             this.override("price", false);
+            this.override("price_watt", false);
             this.override("ohp", true);
             this.isIncluded = true;
             this.dirty();
@@ -363,6 +378,7 @@ export default class LineItem extends BidEntity {
             this._data.tax_percent = Helpers.confirmNumber(val);
             this.override("tax_percent", true);
             this.override("price", false);
+            this.override("price_watt", false);
 
             this._applyTaxPercentChange();
             this.isIncluded = true;
@@ -387,6 +403,7 @@ export default class LineItem extends BidEntity {
             this._data.markup = _.round(Helpers.confirmNumber(val), 4);
             //this.override("markup", true);
             this.override("price", false);
+            this.override("price_watt", false);
             this._applyMarkupChange();
             this.isIncluded = true;
             this.dirty();
@@ -410,6 +427,7 @@ export default class LineItem extends BidEntity {
             this._data.markup_percent = _.round(Helpers.confirmNumber(val), 4);
             this.override("markup_percent", true);
             this.override("price", false);
+            this.override("price_watt", false);
             this._applyMarkupPercent();
             this.isIncluded = true;
             this.dirty();
@@ -458,6 +476,7 @@ export default class LineItem extends BidEntity {
     set priceWatt(val) {
         if (Helpers.isNumber(val) && this.priceWatt !== Helpers.confirmNumber(val)) {
             this.price = Helpers.confirmNumber(val * this.bid.watts);
+            this.override("price_watt", true);
         }
     }
 
@@ -480,6 +499,7 @@ export default class LineItem extends BidEntity {
     set costWatt(val) {
         if (Helpers.isNumber(val) && this.costWatt !== Helpers.confirmNumber(val)) {
             this.cost = Helpers.confirmNumber(val * this.bid.watts);
+            this.override("cost_watt", true);
         }
     }
 
