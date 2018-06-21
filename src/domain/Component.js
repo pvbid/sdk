@@ -102,6 +102,14 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Cost With Tax
+     * @type {number}
+     */
+    get costWithTax() {
+        return this.tax + this.cost;
+    }
+
+    /**
      * @type {number}
      */
     get markup() {
@@ -185,6 +193,49 @@ export default class Component extends BidEntity {
             this._applyComponentValue("price", this._data.price, val, false);
             this.dirty();
             this.emit("updated");
+        }
+    }
+
+    /**
+     * Price per watt
+     * @type {number}
+     */
+    get priceWatt() {
+        if (this.bid.watts > 0) {
+            return Helpers.confirmNumber(this.price / this.bid.watts);
+        } else {
+            return this.price;
+        }
+    }
+
+    /**
+     * @type {number}
+     */
+    set priceWatt(val) {
+        if (Helpers.isNumber(val) && this.priceWatt !== Helpers.confirmNumber(val)) {
+            this.price = Helpers.confirmNumber(val * this.bid.watts);
+        }
+    }
+
+    /**
+     * Cost per watt
+     * @type {number}
+     */
+    get costWatt() {
+        if (this.bid.watts > 0) {
+            return Helpers.confirmNumber(this.cost / this.bid.watts);
+        }
+        else {
+            return this.cost;
+        }
+    }
+
+    /**
+     * @type {number}
+     */
+    set costWatt(val) {
+        if (Helpers.isNumber(val) && this.costWatt !== Helpers.confirmNumber(val)) {
+            this.cost = Helpers.confirmNumber(val * this.bid.watts);
         }
     }
 
