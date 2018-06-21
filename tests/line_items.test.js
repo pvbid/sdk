@@ -76,15 +76,17 @@ test("add new line item", () => {
 test(
     "change line item cost (includes tax in markup)",
     () => {
-        expect.assertions(20);
+        expect.assertions(22);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
                 expect(_.round(lineItem.cost, 3)).toBe(10);
+                expect(_.round(lineItem.costWatt, 3)).toBe(0.007); // test bid is 1350 watt
 
                 expect(_.round(lineItem.markup, 3)).toBe(1.944);
                 expect(_.round(lineItem.tax, 1)).toBe(0.8);
                 expect(_.round(lineItem.price, 2)).toBe(12.74);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
                 expect(_.round(lineItem.costWithTax, 3)).toBe(10.8);
 
                 expect(_.round(lineItem.base, 2)).toBe(0);
@@ -117,7 +119,7 @@ test(
 test(
     "change line item price after cost",
     () => {
-        expect.assertions(22);
+        expect.assertions(23);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -136,6 +138,7 @@ test(
                 expect(_.round(lineItem.price, 2)).toBe(15);
                 expect(_.round(lineItem.markup, 2)).toBe(4.2);
                 expect(_.round(lineItem.markupPercent, 2)).toBe(38.89);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.011); // test bid is 1350 watt
 
                 expect(_.round(lineItem.tax, 2)).toBe(0.8);
                 expect(_.round(lineItem.cost, 2)).toBe(10.0); // cost remains 10 as it is overridden.
@@ -161,7 +164,7 @@ test(
 test(
     "change line item base/quantity",
     () => {
-        expect.assertions(23);
+        expect.assertions(24);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -184,6 +187,7 @@ test(
 
                 expect(_.round(lineItem.price, 2)).toBe(22.5);
                 expect(_.round(lineItem.subtotal, 2)).toBe(15);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.017); // test bid is 1350 watt
 
                 expect(_.round(lineItem.multiplier, 2)).toBe(1);
                 expect(_.round(lineItem.escalator, 2)).toBe(1);
@@ -208,7 +212,7 @@ test(
 test(
     "change line item cost - impacts multiplier",
     () => {
-        expect.assertions(23);
+        expect.assertions(24);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -233,6 +237,7 @@ test(
 
                 expect(_.round(lineItem.price, 2)).toBe(30);
                 expect(_.round(lineItem.subtotal, 2)).toBe(15);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.022); // test bid is 1350 watt
 
                 expect(_.round(lineItem.escalator, 2)).toBe(1);
                 expect(_.round(lineItem.laborHours, 2)).toBe(0);
@@ -254,7 +259,7 @@ test(
 test(
     "change line item markup percent",
     () => {
-        expect.assertions(23);
+        expect.assertions(24);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -279,6 +284,7 @@ test(
 
                 expect(_.round(lineItem.price, 2)).toBe(32.4);
                 expect(_.round(lineItem.subtotal, 2)).toBe(15);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
 
                 expect(_.round(lineItem.escalator, 2)).toBe(1);
                 expect(_.round(lineItem.laborHours, 2)).toBe(0);
@@ -300,7 +306,7 @@ test(
 test(
     "change line item tax percent",
     () => {
-        expect.assertions(24);
+        expect.assertions(25);
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
@@ -334,6 +340,7 @@ test(
                 expect(_.round(lineItem.markupPercent, 2)).toBe(50);
 
                 expect(_.round(lineItem.price, 2)).toBe(33);
+                expect(_.round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
 
                 resolve();
             });
@@ -344,7 +351,7 @@ test(
 );
 
 test("change line item escalator", () => {
-    expect.assertions(25);
+    expect.assertions(26);
 
     return new Promise(resolve => {
         lineItem.once("assessed", () => {
@@ -378,6 +385,7 @@ test("change line item escalator", () => {
             expect(_.round(lineItem.markupPercent, 2)).toBe(50);
 
             expect(_.round(lineItem.price, 2)).toBe(49.5);
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.037); // test bid is 1350 watt
 
             resolve();
         });
@@ -388,8 +396,42 @@ test("change line item escalator", () => {
     });
 });
 
+test("change line item cost per watt", () => {
+    expect.assertions(3);
+
+    return new Promise(resolve => {
+        lineItem.once("assessed", () => {
+            expect(_.round(lineItem.costWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(_.round(lineItem.cost, 3)).toBe(33.75);
+
+            expect(lineItem.isOverridden("cost")).toBe(true);
+
+            resolve();
+        });
+        lineItem.costWatt = 0.025;
+    });
+
+});
+
+test("change line item price per watt", () => {
+    expect.assertions(3);
+
+    return new Promise(resolve => {
+        lineItem.once("assessed", () => {
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(_.round(lineItem.price, 3)).toBe(33.75);
+
+            expect(lineItem.isOverridden("price")).toBe(true);
+
+            resolve();
+        });
+        lineItem.priceWatt = 0.025;
+    });
+
+});
+
 test("reset line item", () => {
-    expect.assertions(24);
+    expect.assertions(25);
 
     return new Promise(resolve => {
         lineItem.once("assessed", () => {
@@ -423,6 +465,7 @@ test("reset line item", () => {
             expect(_.round(lineItem.markupPercent, 2)).toBe(18);
 
             expect(_.round(lineItem.price, 2)).toBe(0);
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0);
 
             resolve();
         });
@@ -431,7 +474,7 @@ test("reset line item", () => {
 });
 
 test("test multiplier", () => {
-    expect.assertions(25);
+    expect.assertions(26);
 
     return new Promise(resolve => {
         lineItem.once("assessed", () => {
@@ -466,6 +509,7 @@ test("test multiplier", () => {
             expect(_.round(lineItem.markupPercent, 2)).toBe(18);
 
             expect(_.round(lineItem.price, 2)).toBe(12.74);
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
 
             resolve();
         });
@@ -477,7 +521,7 @@ test("test multiplier", () => {
 });
 
 test("test markup not including tax", async () => {
-    expect.assertions(25);
+    expect.assertions(26);
 
     await new Promise(resolve => {
         let strategy = lineItem.bid.entities.variables("markup_strategy");
@@ -519,6 +563,7 @@ test("test markup not including tax", async () => {
             expect(_.round(lineItem.markupPercent, 2)).toBe(18);
 
             expect(_.round(lineItem.price, 2)).toBe(12.6);
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
 
             resolve();
         });
@@ -528,7 +573,7 @@ test("test markup not including tax", async () => {
 });
 
 test("test markup not including tax", async () => {
-    expect.assertions(27);
+    expect.assertions(28);
 
     await new Promise(resolve => {
         lineItem.config.type = "labor";
@@ -572,6 +617,7 @@ test("test markup not including tax", async () => {
             expect(_.round(lineItem.markupPercent, 2)).toBe(18);
 
             expect(_.round(lineItem.price, 2)).toBe(123.9);
+            expect(_.round(lineItem.priceWatt, 3)).toBe(0.092); // test bid is 1350 watt
 
             resolve();
         });
