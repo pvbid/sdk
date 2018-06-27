@@ -1,5 +1,4 @@
 import _ from "lodash";
-import BidEntity from "../BidEntity";
 import Helpers from "../../utils/Helpers";
 
 /**
@@ -220,7 +219,9 @@ export default class BidValidator {
     _testMetricFormulaReferences(sourceBidEntity) {
         var params = {};
         _.each(sourceBidEntity.config.dependencies, (value, key) => {
-            params[key] = 1;
+            if (!_.isEmpty(value) && !_.isNull(value.type)) {
+                params[key] = 1;
+            }
         });
         if (!Helpers.validateFormula(sourceBidEntity.config.formula, params)) {
             this._logIssue("invalid_metric_formula_dependency", sourceBidEntity, null, {
@@ -493,10 +494,11 @@ export default class BidValidator {
         }
     }
 
-    _testEmptyField(sourceBidEntity, dependencyContract, dependencyKey) {
+    _testEmptyField(sourceBidEntity, dependencyContract, dependencyKey) { //
         if (
-            ["line_item", "metric", "bid_variable"].indexOf(sourceBidEntity.type) >= 0 &&
-            (_.isNull(dependencyContract.field) || _.isEmpty(dependencyContract.field))
+            ["line_item", "metric", "bid_variable", "field"].indexOf(sourceBidEntity.type) >= 0 &&
+            (_.isNull(dependencyContract.field) || _.isEmpty(dependencyContract.field)) &&
+            !(sourceBidEntity.type === "field" && dependencyContract.type === "datatable")
         ) {
             this._logIssue("empty_field", sourceBidEntity, dependencyContract, {
                 source_bid_entity_dependency_key: dependencyKey
