@@ -494,7 +494,7 @@ export default class BidValidator {
         }
     }
 
-    _testEmptyField(sourceBidEntity, dependencyContract, dependencyKey) { //
+    _testEmptyField(sourceBidEntity, dependencyContract, dependencyKey) {
         if (
             ["line_item", "metric", "bid_variable", "field"].indexOf(sourceBidEntity.type) >= 0 &&
             (_.isNull(dependencyContract.field) || _.isEmpty(dependencyContract.field)) &&
