@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.36 (2018-07-12)
+Bug Fixes:
+* **Bid Validation** Improved formula reference validation
+
 ### 1.0.35 (2018-06-21)
 Improvements:
 * **LineItem & Component** Added new editable and computable `costWatt` and `priceWatt` properties.
