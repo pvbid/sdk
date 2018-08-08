@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.X.X (2018-XX-XX)
+Changes:
+* **Field:** Number field values are now typed as numbers instead of strings
+
 ### 1.0.36 (2018-07-12)
 Bug Fixes:
 * **Bid Validation** Improved formula reference validation
