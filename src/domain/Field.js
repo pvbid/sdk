@@ -27,7 +27,7 @@ export default class Field extends BidEntity {
      * Gets value of the field. 
      * If the field is of a list type, will return the associated datatable row id.
      * 
-     * @type {string} 
+     * @type {string|number|boolean} 
      */
     get value() {
         let val = this._data.value;
@@ -37,6 +37,8 @@ export default class Field extends BidEntity {
             }
 
             val = val == true || val == "1" || val == "true" ? true : false;
+        } else if (this.fieldType === "number" && !_.isNil(val)) {
+            val = +val; // cast to number
         }
         return val;
     }
