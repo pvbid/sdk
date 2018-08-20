@@ -1,8 +1,8 @@
 # CHANGELOG
 
-### 1.X.X (2018-XX-XX)
+### 1.0.37 (2018-08-20)
 Changes:
-* **Field:** Number field values are now typed as numbers instead of strings
+* **Field:** For number type fields, getters return value typed as number (instead of string)
 
 ### 1.0.36 (2018-07-12)
 Bug Fixes:
