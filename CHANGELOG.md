@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.38 (2018-08-29)
+Bug Fixes:
+* **Bid:** Fix bug in submargin back-calculation
+
 ### 1.0.37 (2018-08-20)
 Changes:
 * **Field:** For number type fields, getters return value typed as number (instead of string)
