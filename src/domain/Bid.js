@@ -412,7 +412,7 @@ export default class Bid extends BidEntity {
         if (this.isAssessable()) {
             let totalSubMargins = 0;
             _.each(this.entities.variables().sub_margins.value, subMargin => {
-                totalSubMargins += Heleprs.confirmNumber(subMargin.value);
+                totalSubMargins += Helpers.confirmNumber(subMargin.value);
             });
             this.marginPercent = totalSubMargins;
         }
