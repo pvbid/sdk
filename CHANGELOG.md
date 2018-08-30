@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.0.39 (2018-08-30)
+Bug Fixes:
+* **Project:** Improve tracking of changes to the data while project is saving
+
 ### 1.0.38 (2018-08-29)
 Bug Fixes:
 * **Bid:** Fix bug in submargin back-calculation
