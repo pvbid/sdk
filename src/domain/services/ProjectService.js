@@ -38,6 +38,7 @@ export default class ProjectService {
         const promises = [];
 
         const exported = this._savingHelper.extract(project);
+        const exportedJSON = JSON.stringify(exported);
         const bidIds = Object.keys(exported.bids);
         if (bidIds.length > 0) {
             for (let i = 0; i < bidIds.length; i++) {
@@ -61,10 +62,16 @@ export default class ProjectService {
             promises.push(this.repositories.projects.save(exported.project));
         }
         await Promise.all(promises);
-        _.each(project.bids, bid => {
-            bid.pristine();
-        });
-        project.pristine();
+
+        // check for new changes before clearing dirty flags because changes may have been made
+        // while saving the project asynchonously
+        const compareJSON = JSON.stringify(this._savingHelper.extract(project));
+        if (compareJSON === exportedJSON) {
+            _.each(project.bids, bid => {
+                bid.pristine();
+            });
+            project.pristine();
+        }
     }
 
     /**
