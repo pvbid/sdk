@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 1.1.1 (2018-10-10)
+### 1.1.1 (2018-10-18)
 Features:
 * **Predictive Pricing:** Introduced services to handle the evaluation of prediction models
 * **LineItem:** Line items can now determine their value by evaluating a prediction model if configured to do so. A **predicted value** will be used if the `predictive_pricing` bid variable is `true` and the line item's value cannot be computed by evaluating it's dependencies. The computed value may be overriden by setting the `use_computed` bid variable to `false` or `lineItem.useComputedValueWhenAvailable` to `false`. The bid must have a non-zero value for Watts.
