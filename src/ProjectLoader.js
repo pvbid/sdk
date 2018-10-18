@@ -29,6 +29,7 @@ export default class ProjectLoader {
             const projectData = await this.context.repositories.projects.findById(projectId, forceReload);
             const bidIds = projectData.bids.map(b => b.id);
             const projectService = new ProjectService(this.context);
+            projectData.prediction_models = await this._loadPredictionModels();
             const project = new Project(projectData, projectService);
             const bids = await this._loadBids(bidIds, project, forceReload);
             _.each(bids, b => project.attachBid(b));
@@ -84,5 +85,21 @@ export default class ProjectLoader {
             .catch(err => {
                 console.log(err);
             });
+    }
+
+    /**
+     * Load a formatted list of prediction models keyed by their line item def id
+     *
+     * @return {Promise<Object>} Prediction models keyed by thier line item def id
+     */
+    async _loadPredictionModels() {
+        const predictionModels = await this.context.repositories.predictionModels.get();
+        const keyedPredictionModels = _.keyBy(predictionModels, 'line_item_def_id');
+        const formattedPredictionModels = _.mapValues(keyedPredictionModels, (model) => ({
+            models: model.models,
+            contribution_weight: model.contribution_weight,
+            use_count: model.use_count,
+        }));
+        return formattedPredictionModels;
     }
 }

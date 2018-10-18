@@ -1,7 +1,6 @@
 //const PVBid = require("../src/pvbid.js");
 //import { pvbid } from "../src/pvbid";
 import _ from "lodash";
-import jest from "jest";
 var axios = require("axios");
 var jsonfile = require("jsonfile");
 const PVBid = require("../src/pvbid.js");
@@ -38,6 +37,9 @@ async function init() {
             });
             mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                 data: { user: data.user }
+            });
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
             });
 
             context.getProject(461).then(p => {
@@ -95,6 +97,41 @@ describe("When bid markup reset occurs", () => {
             });
 
             bid.resetMarkup();
+        });
+    });
+});
+
+describe("when a bid uses predictive pricing", () => {
+    beforeAll(() => {
+        return new Promise(resolve => {
+            bid.project.once("updated", resolve);
+            bid.entities.variables().predictive_pricing.value = true;
+        });
+    });
+
+    afterAll(() => {
+        return new Promise(resolve => {
+            bid.project.once("updated", resolve);
+            bid.entities.variables().use_computed.value = true;
+            bid.entities.variables().predictive_pricing.value = false;
+        });
+    });
+
+    describe("isPredicted status should represent that of the bids line items", () => {
+        test("when line items are not predicted", () => {
+            expect.assertions(2);
+            expect(bid.isPredicted("cost")).toBe(false);
+            expect(bid.isPredicted("price")).toBe(false);
+        });
+
+        test("when line items are predicted", async () => {
+            expect.assertions(2);
+            await new Promise(resolve => {
+                bid.project.once("updated", resolve);
+                bid.entities.variables().use_computed.value = false;
+            });
+            expect(bid.isPredicted("cost")).toBe(true);
+            expect(bid.isPredicted("price")).toBe(true);
         });
     });
 });

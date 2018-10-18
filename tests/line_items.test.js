@@ -41,6 +41,10 @@ async function init() {
                 data: { user: data.user }
             });
 
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
+
             context.getProject(461).then(p => {
                 resolve(p);
             });
@@ -524,8 +528,6 @@ test("test markup not including tax", async () => {
     expect.assertions(26);
 
     await new Promise(resolve => {
-        let strategy = lineItem.bid.entities.variables("markup_strategy");
-        strategy.value = false;
         lineItem.once("assessed", resolve);
         lineItem.reset();
     });
@@ -569,6 +571,8 @@ test("test markup not including tax", async () => {
         });
 
         lineItem.cost = "10";
+        let strategy = lineItem.bid.entities.variables("markup_strategy");
+        strategy.value = false;
     });
 });
 
@@ -795,6 +799,94 @@ describe("When line item is a labor type", () => {
                 expect(lineItem.isOverridden("price")).toBe(false);
             });
         });
+    });
+});
+
+describe("Consider whether a line item property depends on an undefined dependency value", () => {
+    let $lineItem;
+    let originalLineItemDependencies;
+    beforeAll(() => {
+        $lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+        originalLineItemDependencies = _.cloneDeep($lineItem.config.dependencies);
+    });
+
+    afterEach(() => {
+        $lineItem.config.dependencies = _.cloneDeep(originalLineItemDependencies);
+        $lineItem.config.formula = '1';
+        $lineItem.reset();
+    });
+
+    test("should not be considered to have null depenency if not referencing null dependencies", () => {
+        expect.assertions(4);
+
+        expect($lineItem.hasNullDependency("cost")).toBe(false);
+        expect($lineItem.hasNullDependency("tax")).toBe(false);
+        expect($lineItem.hasNullDependency("markup")).toBe(false);
+        expect($lineItem.hasNullDependency("price")).toBe(false);
+    });
+
+    test("should be considered to have null depenency for markup and price if markup references a null dependency", () => {
+        expect.assertions(4);
+        $lineItem.config.dependencies.markup = {
+            field: "value",
+            type: "metric",
+            bid_entity_id: 36095,
+        };
+        $lineItem.assess();
+
+        expect($lineItem.hasNullDependency("cost")).toBe(false);
+        expect($lineItem.hasNullDependency("tax")).toBe(false);
+        expect($lineItem.hasNullDependency("markup")).toBe(true);
+        expect($lineItem.hasNullDependency("price")).toBe(true);
+    });
+
+    test("should be considered to have null depenency for cost, tax, markup and price if scalar references a null dependency", () => {
+        expect.assertions(4);
+        $lineItem.config.dependencies.scalar = {
+            field: "value",
+            type: "metric",
+            bid_entity_id: 36095,
+        };
+        $lineItem.config.formula = 'X';
+        $lineItem.base = 10;
+        $lineItem.assess();
+
+        expect($lineItem.hasNullDependency("price")).toBe(true);
+        expect($lineItem.hasNullDependency("markup")).toBe(true);
+        expect($lineItem.hasNullDependency("tax")).toBe(true);
+        expect($lineItem.hasNullDependency("cost")).toBe(true);
+    });
+
+    test("should not be considered to have null depenency if scalar references a null dependency but not used in formula", () => {
+        expect.assertions(4);
+        $lineItem.config.dependencies.scalar = {
+            field: "value",
+            type: "metric",
+            bid_entity_id: 36095,
+        };
+        $lineItem.assess();
+
+        expect($lineItem.hasNullDependency("cost")).toBe(false);
+        expect($lineItem.hasNullDependency("tax")).toBe(false);
+        expect($lineItem.hasNullDependency("markup")).toBe(false);
+        expect($lineItem.hasNullDependency("price")).toBe(false);
+    });
+
+    test("should not be considered to have null depenency if undefined references is overridden", () => {
+        expect.assertions(4);
+        $lineItem.config.dependencies.scalar = {
+            field: "value",
+            type: "metric",
+            bid_entity_id: 36095,
+        };
+        $lineItem.config.formula = "X";
+        $lineItem.perQuantity = 1;
+        $lineItem.assess();
+
+        expect($lineItem.hasNullDependency("cost")).toBe(false);
+        expect($lineItem.hasNullDependency("tax")).toBe(false);
+        expect($lineItem.hasNullDependency("markup")).toBe(false);
+        expect($lineItem.hasNullDependency("price")).toBe(false);
     });
 });
 //TODO: Test to ensuring assessing/assessed events only fire once

@@ -63,6 +63,7 @@ export default class Field extends BidEntity {
             }
 
             this._data.value = val;
+            this._data.config.has_null_dependency = false;
             this.dirty();
             this.assess();
             this.emit("updated");
@@ -251,6 +252,13 @@ export default class Field extends BidEntity {
         if (_.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
+    }
+
+    /**
+     * Determines if the field has any null or undefined dependencies
+     */
+    hasNullDependency() {
+        return this.config.has_null_dependency || false;
     }
 
     /**

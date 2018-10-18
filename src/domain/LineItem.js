@@ -1,6 +1,7 @@
 import _ from "lodash";
 import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
+import PredictionService from "./services/PredictionService";
 import LineItemRuleService from "./services/LineItemRuleService";
 
 /**
@@ -24,6 +25,7 @@ export default class LineItem extends BidEntity {
         this._data = entityData;
         this._ruleService = new LineItemRuleService(this);
         this.onDelay("property.updated", 5, "self", () => this.assess(this, true));
+        this._predictionService = new PredictionService(this.bid);
     }
 
     /**
@@ -96,6 +98,29 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Is Weighted Property - determes whether or not the contribution weight should be applied to the cost
+     * @type {boolean}
+     */
+    get isWeighted() {
+        if (!this.isPredicted('cost')) {
+            return false;
+        }
+        return this.config.is_weighted;
+    }
+
+    /**
+     * @type {boolean}
+     */
+    set isWeighted(val) {
+        if (_.isBoolean(val) && this._data.config.is_weighted != val) {
+            this._data.config.is_weighted = val;
+            this.override("is_weighted", true);
+            this.dirty();
+            this.emit("property.updated");
+        }
+    }
+
+    /**
      * Labor Hours Property
      * @type {number}
      */
@@ -153,21 +178,23 @@ export default class LineItem extends BidEntity {
      * @type {number}
      */
     get scalar() {
-        const scalarContracts = this._getExtraScalarDependencies();
-
         let valueMap = {};
+        const formulaArgs = Helpers.parseFormulaArguments(this.config.formula);
 
+        const scalarContracts = this._getExtraScalarDependencies();
         _.each(scalarContracts, (dependencyContract, key) => {
-            valueMap[key.charAt(7)] = Helpers.confirmNumber(
-                this.bid.entities.getDependencyValue(dependencyContract),
-                0,
-                true
-            );
+            // check if dependency is included in formula
+            const formulaUsesDependency = formulaArgs.indexOf(key.charAt(7)) >= 0;
+            if (formulaUsesDependency) {
+                const val = this._evaluateDependency(dependencyContract, "scalar");
+                valueMap[key.charAt(7)] = Helpers.confirmNumber(val, 0);
+            }
         });
 
-        var xScalarValue = this.bid.entities.getDependencyValue(this.config.dependencies.scalar);
-        valueMap.x = Helpers.confirmNumber(xScalarValue, 1, true);
-
+        if (formulaArgs.indexOf('x') >= 0) {
+            const val = this._evaluateDependency(this.config.dependencies.scalar, "scalar");
+            valueMap.x = Helpers.confirmNumber(val, 1);
+        }
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return Helpers.confirmNumber(results, 1);
     }
@@ -541,6 +568,30 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * When using predictive pricing, should the computed value be used if it's available?
+     * @type {boolean}
+     */
+    get useComputedValueWhenAvailable() {
+        if (this._data.config.hasOwnProperty('use_computed_when_available')) {
+            return this._data.config.use_computed_when_available;
+        }
+        return this.bid.entities.variables().use_computed.value;
+    }
+
+    /**
+     * Overrides the bid variable for the line item
+     * @type {boolean}
+     */
+    set useComputedValueWhenAvailable(val) {
+        if (_.isBoolean(val)) {
+            if (this._data.config.use_computed_when_available !== val) {
+                this._data.config.use_computed_when_available = val;
+                this.assess();
+            }
+        }
+    }
+
+    /**
      *
      * @param {string} property
      * @param {(number|string|boolean)} value
@@ -580,6 +631,38 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Determines if a property is predicted by recursively checking the
+     *  properties calculation dependencies prediction status.
+     *
+     * @param {string} property snake case property name
+     * @returns {boolean}
+     */
+    isPredicted(property) {
+        const calcDependencyMap = {
+            cost: ['labor_hours'],
+            tax: this.isLabor() ? [] : ['cost'],
+            markup: this.bid.includeTaxInMarkup() ? ['cost', 'tax'] : ['cost'],
+            price: ['cost', 'tax', 'markup'],
+            cost_watt: ['cost'],
+            price_watt: ['price'],
+            cost_with_tax: ['cost', 'tax'],
+        };
+        if (this.isOverridden(property)) {
+            return false;
+        }
+        if (property === 'labor_hours') {
+            return this._data.config.is_predicted_labor_hours || false;
+        }
+        if (property === 'cost') {
+            return this._data.config.is_predicted_cost || this._data.config.is_predicted_labor_hours || false;
+        }
+        if (!calcDependencyMap[property] || calcDependencyMap[property].length === 0) {
+            return false;
+        }
+        return calcDependencyMap[property].map(prop => this.isPredicted(prop)).some(val => val);
+    }
+
+    /**
      * Resets a specific line item member, remove override value.
      *
      * @param {string} property
@@ -614,6 +697,7 @@ export default class LineItem extends BidEntity {
         if (this.bid.isAssessable()) {
             this.config.overrides = {};
             this._data.multiplier = 1;
+            delete this.config.use_computed_when_available;
             this.assess(this, true);
         }
     }
@@ -639,7 +723,8 @@ export default class LineItem extends BidEntity {
     assess(dependency, forceUpdate) {
         if (this.bid.isAssessable()) {
             this.bid.emit("assessing");
-            var isChanged = false;
+            let isChanged = false;
+            this._resetUndefinedPropFlags();
 
             isChanged = this._applyProperty("base", this._getBaseValue()) || isChanged;
             isChanged = this._applyProperty("burden", this._getBurdenValue()) || isChanged;
@@ -649,6 +734,7 @@ export default class LineItem extends BidEntity {
             isChanged = this._applyProperty("ohp", this._getOhpValue()) || isChanged;
             isChanged = this._applyProperty("escalator", this._getEscalatorValue()) || isChanged;
             isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
+            isChanged = this._applyConfig("is_weighted", this._getIsWeightedValue()) || isChanged;
             isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
             isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
             isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
@@ -656,6 +742,10 @@ export default class LineItem extends BidEntity {
             isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
             isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
             isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
+
+            if (this._applyUndefinedPropFlags()) {
+                isChanged = true;
+            }
 
             if (isChanged || forceUpdate) {
                 this.dirty();
@@ -690,6 +780,8 @@ export default class LineItem extends BidEntity {
         this._bindLineItemDependencies();
         this._bindLineItemRuleDependencies();
         this._bindLineItemPredictionDependencies();
+        this._bindPredictionBidVariables();
+        this._bindMarkupStrategy();
     }
 
     /**
@@ -760,22 +852,43 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     *
+     * Bind the dependencies of the prediction models
      */
     _bindLineItemPredictionDependencies() {
-        if (this.config.prediction_model) {
-            var predictionModels = this.config.prediction_model;
-
-            for (let predictionModel of predictionModels) {
-                var bidEnities = this.bid.getBidEntitiesByDefId(
-                    predictionModel.dependencies.x.type,
-                    predictionModel.dependencies.x.definition_id
-                );
-
-                for (let bidEntity of bidEnities) {
-                    bidEntity.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
-                }
+        if (this.definitionId && this._predictionService.hasPredictionModels(this.definitionId)) {
+            const dependencies = this._predictionService.getPredictionDependencies(this.definitionId);
+            for (let dependency of dependencies) {
+                dependency.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
             }
+        }
+    }
+
+    /**
+     * Predictive pricing bid variable need to be explicitely bound to the line items since they are not
+     * included in the entity's dependencies.
+     */
+    _bindPredictionBidVariables() {
+        if (!_.isNil(this.bid.entities.variables().predictive_pricing)) {
+            this.bid.entities.variables().predictive_pricing
+                .on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
+        }
+
+        if (
+            !_.isNil(this.bid.entities.variables().use_computed) &&
+            _.isNil(this._data.config.use_computed_when_available)
+        ) {
+            this.bid.entities.variables().use_computed
+                .on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
+        }
+    }
+
+    /**
+     * Bind to markup strategy variable
+     */
+    _bindMarkupStrategy() {
+        if (!_.isNil(this.bid.entities.variables().markup_strategy)) {
+            this.bid.entities.variables().markup_strategy
+                .on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
         }
     }
 
@@ -788,6 +901,19 @@ export default class LineItem extends BidEntity {
 
         if (oldValue != newValue) {
             this._data[property] = _.isBoolean(value) ? value : _.round(value, 6);
+            return true;
+        } else return false;
+    }
+
+    /**
+     *
+     */
+    _applyConfig(property, value) {
+        let oldValue = !_.isBoolean(value) ? _.round(this._data.config[property], 4) : this._data.config[property];
+        let newValue = !_.isBoolean(value) ? _.round(value, 4) : value;
+
+        if (oldValue !== newValue) {
+            this._data.config[property] = _.isBoolean(value) ? value : _.round(value, 6);
             return true;
         } else return false;
     }
@@ -900,7 +1026,7 @@ export default class LineItem extends BidEntity {
      */
     _getWageValue() {
         if (!this.isOverridden("wage")) {
-            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.wage);
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.wage, "wage");
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.wage), 4);
     }
@@ -908,12 +1034,23 @@ export default class LineItem extends BidEntity {
     /**
      * Internally retrieves the non-cached computed IsIncluded  value.
      *
-     * @return {number}
+     * @return {boolean}
      */
     _getIsIncludedValue() {
         if (!this.isOverridden("is_included")) {
             return this._ruleService.isIncluded(this);
         } else return this._data.is_included;
+    }
+
+    /**
+     * Internally retrieves the non-cached computed IsWeighted value.
+     *
+     * @return {boolean}
+     */
+    _getIsWeightedValue() {
+        if (!this.isOverridden("is_weighted")) {
+            return this._ruleService.isWeighted(this);
+        } else return this._data.config.is_weighted;
     }
 
     /**
@@ -923,7 +1060,22 @@ export default class LineItem extends BidEntity {
      */
     _getLaborHoursValue() {
         if (!this.isOverridden("labor_hours")) {
-            let hours = this.isLabor() ? (this.quantity * this.perQuantity + this.base) * this.multiplier : 0;
+            let hours;
+            if (this.isLabor()) {
+                if (this._shouldPredict(["quantity", "per_quantity", "base", "multiplier", "scalar"])) {
+                    hours = this.getPredictedLaborHours();
+                    this._applyConfig("is_predicted_labor_hours", true);
+                } else {
+                    hours = (this.quantity * this.perQuantity + this.base) * this.multiplier;
+                    this._applyConfig("is_predicted_labor_hours", false);
+                    if (this._undefinedPropsIncludes("quantity", "per_quantity", "base", "multiplier")) {
+                        this._undefinedPropFlags.push("labor_hours");
+                    }
+                }
+            } else {
+                hours = 0;
+                this._applyConfig("is_predicted_labor_hours", false);
+            }
             return _.round(Helpers.confirmNumber(hours), 4);
         } else return _.round(Helpers.confirmNumber(this._data.labor_hours), 4);
     }
@@ -935,7 +1087,7 @@ export default class LineItem extends BidEntity {
      */
     _getBurdenValue() {
         if (!this.isOverridden("burden")) {
-            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.burden);
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.burden, "burden");
             return Helpers.confirmNumber(dependencyValue);
         } else return Helpers.confirmNumber(this._data.burden);
     }
@@ -951,15 +1103,12 @@ export default class LineItem extends BidEntity {
         let valueMap = {};
 
         _.each(scalarContracts, (dependencyContract, key) => {
-            valueMap[key.charAt(7)] = Helpers.confirmNumber(
-                this.bid.entities.getDependencyValue(dependencyContract),
-                0,
-                true
-            );
+            const dependencyValue = this._evaluateDependency(dependencyContract, "scalar");
+            valueMap[key.charAt(7)] = Helpers.confirmNumber(dependencyValue, 0);
         });
 
-        var xScalarValue = this.bid.entities.getDependencyValue(this.config.dependencies.scalar);
-        valueMap.x = Helpers.confirmNumber(xScalarValue, 1, true);
+        var xScalarValue = this._evaluateDependency(this.config.dependencies.scalar, "scalar");
+        valueMap.x = Helpers.confirmNumber(xScalarValue, 1);
 
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return _.round(Helpers.confirmNumber(results, 1), 7);
@@ -977,10 +1126,14 @@ export default class LineItem extends BidEntity {
             if (this.config.per_quantity.type === "value") {
                 val = this.config.per_quantity.value;
             } else {
-                val = this.bid.entities.getDependencyValue(this.config.dependencies.per_quantity);
+                val = this._evaluateDependency(this.config.dependencies.per_quantity, "per_quantity");
             }
 
             var scaledPerQuantity = Helpers.confirmNumber(val) * this.scalar;
+
+            if (this._undefinedPropsIncludes("scalar")) {
+                this._undefinedPropFlags.push("per_quantity");
+            }
 
             return _.round(Helpers.confirmNumber(scaledPerQuantity), 4);
         } else return _.round(Helpers.confirmNumber(this._data.per_quantity), 4);
@@ -993,7 +1146,7 @@ export default class LineItem extends BidEntity {
      */
     _getEscalatorValue() {
         if (!this.isOverridden("escalator")) {
-            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.escalator);
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.escalator, "escalator");
             return _.round(Helpers.confirmNumber(dependencyValue, 1), 4);
         } else return _.round(Helpers.confirmNumber(this._data.escalator, 1), 4);
     }
@@ -1005,7 +1158,7 @@ export default class LineItem extends BidEntity {
      */
     _getOhpValue() {
         if (!this.isOverridden("ohp")) {
-            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.ohp);
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.ohp, "ohp");
             return _.round(Helpers.confirmNumber(dependencyValue, 1), 4);
         } else return _.round(Helpers.confirmNumber(this._data.ohp, 1), 4);
     }
@@ -1023,7 +1176,7 @@ export default class LineItem extends BidEntity {
             if (!_.isUndefined(this.config.quantity) && this.config.quantity.type === "value") {
                 val = this.config.quantity.value;
             } else {
-                val = this.bid.entities.getDependencyValue(this.config.dependencies.quantity);
+                val = this._evaluateDependency(this.config.dependencies.quantity, "quantity");
             }
             return _.round(Helpers.confirmNumber(val), 4);
         } else return _.round(Helpers.confirmNumber(this._data.quantity), 4);
@@ -1035,14 +1188,37 @@ export default class LineItem extends BidEntity {
      */
     _getCostValue() {
         if (!this.isOverridden("cost")) {
+            const dependencies = ["escalator", "ohp"];
             let cost = 0;
             if (this.isLabor()) {
+                dependencies.push("wage", "burden");
+                // use predicted cost only if cost specific dependencies are undefinded. Otherwise compute using predicted hours
+                if (this._undefinedPropsIncludes(...dependencies) && this._shouldPredict(dependencies)) {
+                    this._applyConfig("is_predicted_cost", true);
+                    let cost = this.getPredictedCost();
+                    return this.isWeighted ? cost * this._predictionService.getContributionWeight(this.definitionId) : cost;
+                }
+
                 cost = this.laborHours * (this.wage + this.burden);
             } else {
+                dependencies.push("quantity", "per_quantity", "multiplier", "base", "scalar");
+                if (this._shouldPredict(dependencies)) {
+                    this._applyConfig("is_predicted_cost", true);
+                    let cost = this.getPredictedCost();
+                    return this.isWeighted ? cost * this._predictionService.getContributionWeight(this.definitionId) : cost;
+                }
+
                 cost = (this.quantity * this.perQuantity + this.base) * this.multiplier;
             }
+            this._applyConfig("is_predicted_cost", false);
 
-            return _.round(Helpers.confirmNumber(cost * this.escalator * this.ohp), 4);
+            cost = cost * this.escalator * this.ohp;
+
+            if (this._undefinedPropsIncludes(...dependencies)) {
+                this._undefinedPropFlags.push("cost");
+            }
+
+            return _.round(Helpers.confirmNumber(cost), 4);
         } else return _.round(Helpers.confirmNumber(this._data.cost), 4);
     }
 
@@ -1053,6 +1229,10 @@ export default class LineItem extends BidEntity {
     _getTaxValue() {
         if (!this.isOverridden("tax")) {
             if (!this.isLabor() && this.cost > 0) {
+                if (this._undefinedPropsIncludes("cost", "tax_percent")) {
+                    this._undefinedPropFlags.push("tax");
+                }
+
                 return _.round(Helpers.confirmNumber(this.cost * (this.taxPercent / 100)), 4);
             } else return 0;
         } else return _.round(Helpers.confirmNumber(this._data.tax));
@@ -1064,7 +1244,7 @@ export default class LineItem extends BidEntity {
      */
     _getTaxPercentValue() {
         if (!this.isOverridden("tax_percent")) {
-            var dependencyValue = this.bid.entities.getDependencyValue(this.config.dependencies.tax);
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.tax, "tax_percent");
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.tax_percent), 4);
     }
@@ -1075,8 +1255,21 @@ export default class LineItem extends BidEntity {
      */
     _getMarkupValue() {
         if (!this.isOverridden("markup")) {
-            const costToMarkup = this.bid.includeTaxInMarkup() ? this.cost + this.tax : this.cost;
-            return _.round(costToMarkup * (this.markupPercent / 100), 4);
+            let costToMarkup = this.cost;
+            const propsUsed = ["cost"];
+
+            if (this.bid.includeTaxInMarkup()) {
+                costToMarkup += this.tax;
+                propsUsed.push("tax");
+            }
+
+            const val = _.round(costToMarkup * (this.markupPercent / 100), 4);
+            propsUsed.push("markup_percent");
+
+            if (this._undefinedPropsIncludes(...propsUsed)) {
+                this._undefinedPropFlags.push("markup");
+            }
+            return val;
         } else return _.round(Helpers.confirmNumber(this._data.markup), 4);
     }
 
@@ -1086,8 +1279,7 @@ export default class LineItem extends BidEntity {
      */
     _getMarkupPercentValue() {
         if (!this.isOverridden("markup_percent")) {
-            let dependencyValue = this.bid.entities.getDependencyValue(this._data.config.dependencies.markup);
-
+            const dependencyValue = this._evaluateDependency(this.config.dependencies.markup, "markup_percent");
             return _.round(Helpers.confirmNumber(dependencyValue), 4);
         } else return _.round(Helpers.confirmNumber(this._data.markup_percent), 4);
     }
@@ -1098,8 +1290,141 @@ export default class LineItem extends BidEntity {
     _getPriceValue() {
         if (!this.isOverridden("price")) {
             let price = this.cost + this.tax + this._getMarkupValue();
+
+            if (this._undefinedPropsIncludes("cost", "tax", "markup")) {
+                this._undefinedPropFlags.push("price");
+            }
             return _.round(Helpers.confirmNumber(price), 4);
         } else return _.round(Helpers.confirmNumber(this._data.price), 4);
+    }
+
+    /**
+     * Gets the value for a dependency. If a dependency is undefined, it will be flagged in the config.undefined_prop_flags
+     *
+     * @param {object} dependencyContract The dependency contract
+     * @param {string} propName The name of the line item prop that depends on this dependency.
+     *                          Needed so that it can be flagged if the dependency is null or flagged as undefined.
+     * @return {number|boolean|undefined|null} The resolved dependency value
+     */
+    _evaluateDependency(dependencyContract, propName) {
+        const dependencyValue = this.bid.entities.getDependencyValue(dependencyContract);
+        const isNullDependency = _.isNil(dependencyValue) || !this.bid.entities.isDependencyFullyDefined(dependencyContract);
+
+        if (!_.isNil(dependencyContract) && !_.isNil(dependencyContract.field) && isNullDependency) {
+            this._undefinedPropFlags.push(propName);
+        }
+        return dependencyValue;
+    }
+
+    /**
+     * Reset the flags for props that rely on undefined dependencies in assessment
+     */
+    _resetUndefinedPropFlags() {
+        this._undefinedPropFlags = [];
+    }
+
+    /**
+     * Determines if the field is dependent on null/undefined dependencies
+     *
+     * @param {string} field The field value in question
+     * @return {boolean}
+     */
+    hasNullDependency(field) {
+        if (field) {
+            if (this.isOverridden(field)) {
+                return false;
+            }
+            if (this.config.undefined_prop_flags && this.config.undefined_prop_flags.indexOf(field) >= 0) {
+                return true;
+            }
+            return false;
+        }
+        return this.config.undefined_prop_flags > 0;
+    }
+
+    /**
+     * Checks if any of the given dependencies have been flagged as undefined during the assessment
+     *
+     * @param {...string} dependencies Dependencies to check
+     * @return {boolean} Whether or not any of the given dependencies have relied on any numbers that were not fully defined
+     */
+    _undefinedPropsIncludes(...dependencies) {
+        return this._undefinedPropFlags.reduce((isFlagged, dependency) =>
+            isFlagged || dependencies.indexOf(dependency) >= 0,
+            false);
+    }
+
+    /**
+     * Determine is the undefined props flags have changed during the assesment. If so update the config var
+     *
+     * @return {boolean} Whether or not there has been a change
+     */
+    _applyUndefinedPropFlags() {
+        const oldFlags = this.config.undefined_prop_flags ? this.config.undefined_prop_flags.concat().sort().join(',') : [];
+        const newFlags = Array.from(new Set(this._undefinedPropFlags)).concat().sort().join(',');
+        if (oldFlags !== newFlags) {
+            this.config.undefined_prop_flags = Array.from(new Set(this._undefinedPropFlags));
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Determines whether a prediction should be used during assessment given the dependencies
+     *
+     * @param {boolean} propsToConsider The required properties used in this calculation
+     * @return {boolean} Whether or not a predicted value should be used
+     */
+    _shouldPredict(propsToConsider) {
+        // PredictivePricing bid variable must be ON
+        if (!this.bid.entities.variables().predictive_pricing.value) return false;
+
+        // Line item must have a definition
+        if (_.isNil(this.definitionId)) return false;
+
+        // Line item must have prediction models
+        if (!this._predictionService.hasPredictionModels(this.definitionId)) return false;
+
+        // The bid must have a watts value greater than 0 (bid watts are rounded up to at least 1 so 1 is used instead of 0 here)
+            // getTotalWatts() used instead of bid.watts because bid.watts is not calculated untill the bid is assessed
+        if (this.bid._getTotalWatts() <= 1) return false;
+
+        // The line item should have dependencies that are not fully defined or useComputedValueWhenAvaliable should be OFF
+        if (!this._undefinedPropsIncludes(...propsToConsider) && this.useComputedValueWhenAvailable) return false;
+
+        return true;
+    }
+
+    /**
+     * Evaluates the cost prediction models for the line item.
+     *
+     * @return {number} The predicted cost value
+     */
+    getPredictedCost() {
+        // there are no prediciton models for line items without definition.
+        if (this.definitionId && this._predictionService.hasPredictionModels(this.definitionId)) {
+            const models = this._predictionService.getCostPredictionModels(this.definitionId);
+            if (models && models.length > 0) {
+                return _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4);
+            }
+        }
+        return 0;
+    }
+
+    /**
+     * Evaluates the labor hours prediction models for the line item.
+     *
+     * @return {number} The predicted cost value
+     */
+    getPredictedLaborHours() {
+        // there are no prediciton models for line items without definition
+        if (this.definitionId && this._predictionService.hasPredictionModels(this.definitionId)) {
+            const models = this._predictionService.getLaborPredictionModels(this.definitionId);
+            if (models && models.length > 0) {
+                return  _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4);
+            }
+        }
+        return 0;
     }
 
     /**

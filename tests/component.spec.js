@@ -27,6 +27,9 @@ async function init() {
             mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                 data: { user: data.user }
             });
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
 
             context.getProject(461).then(p => {
                 resolve(p);
@@ -46,6 +49,47 @@ describe('Component data modal', () => {
     test('should expose componentGroupId', () => {
         let component = bid.entities.searchByTitle("component", "Modules")[0];
         expect(component.componentGroupId).toBe(813);
+    });
+});
+
+describe("Predictive pricing in use", () => {
+    beforeAll(() => {
+        return new Promise(resolve => {
+            bid.project.once("updated", resolve);
+            bid.entities.variables().predictive_pricing.value = true;
+        });
+    });
+
+    afterAll(() => {
+        return new Promise(resolve => {
+            bid.project.once("updated", resolve);
+            bid.entities.variables().use_computed.value = true;
+            bid.entities.variables().predictive_pricing.value = false;
+        });
+    });
+
+    describe("isPredicted() should represent the components line items and sub components", () => {
+        it("should not be predicted if no sub items or components are predicted", async () => {
+            const component = bid.entities.components(62472);
+            expect.assertions(2);
+            await new Promise(resolve => {
+                bid.project.once("updated", resolve);
+                bid.entities.variables().use_computed.value = true;
+            });
+            expect(component.isPredicted("cost")).toBe(false);
+            expect(component.isPredicted("price")).toBe(false);
+        });
+
+        it("should be predicted if the sub items or components are predicted", async () => {
+            const component = bid.entities.components(62472);
+            expect.assertions(2);
+            await new Promise(resolve => {
+                bid.project.once("updated", resolve);
+                bid.entities.variables().use_computed.value = false;
+            });
+            expect(component.isPredicted("cost")).toBe(true);
+            expect(component.isPredicted("price")).toBe(true);
+        });
     });
 });
 //TODO: test when all line items in component are excluded that they all enable with an equally distributed value.

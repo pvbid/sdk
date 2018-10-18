@@ -71,12 +71,23 @@ export default class FieldAutoPopulateService {
      * Auto fills the field based on the field rules.
      */
     _autoFill() {
-        var dependencyValue = this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_a);
+        this._nullDependencyCount = 0;
+        let isChanged = false;
 
+        const dependencyValue = this._evaluateDependency(this._field.config.dependencies.auto_a);
         if (!_.isNull(dependencyValue) && this._field._data.value != dependencyValue) {
             this._field._data.value = dependencyValue;
             this._field.config.is_auto_selected = true;
+            isChanged = true;
+        }
 
+        const hasNullDependency = this._nullDependencyCount > 0;
+        if (this._field.config.has_null_dependency !== hasNullDependency) {
+            this._field.config.has_null_dependency = hasNullDependency;
+            isChanged = true;
+        }
+
+        if (isChanged) {
             this._field.dirty();
             this._field.emit("updated");
         }
@@ -86,6 +97,7 @@ export default class FieldAutoPopulateService {
      * Auto selects a field list option based on field rules.
      */
     _autoSelect() {
+        this._nullDependencyCount = 0;
         var expression = this._field.config.auto_populate.expression_type;
         const datatable = this._field.getDatatable();
         if (datatable) {
@@ -98,10 +110,10 @@ export default class FieldAutoPopulateService {
                 };
             });
 
-            var dependencyValueA = this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_a);
+            var dependencyValueA = this._evaluateDependency(this._field.config.dependencies.auto_a);
             var dependencyValueB =
                 expression === "between"
-                    ? this._field.bid.entities.getDependencyValue(this._field.config.dependencies.auto_b)
+                    ? this._evaluateDependency(this._field.config.dependencies.auto_b)
                     : null;
             var results = null;
             switch (expression) {
@@ -141,12 +153,33 @@ export default class FieldAutoPopulateService {
                 isChanged = true;
             }
 
+            const hasNullDependency = this._nullDependencyCount > 0;
+            if (hasNullDependency !== this._field.config.has_null_dependency) {
+                this._field.config.has_null_dependency = hasNullDependency;
+                isChanged = true;
+            }
+
             if (isChanged) {
                 this._field.config.is_auto_selected = true;
                 this._field.emit("updated");
                 this._field.dirty();
             }
         }
+    }
+
+    /**
+     * Evaluates the contracts value and tracks if the dependency is null or has a null dependency itself
+     *
+     * @param {object} dependencyContract The dependency contract to evaluate
+     * @return {number|null|undefined} The evaluated value of the dependency contract
+     */
+    _evaluateDependency(dependencyContract) {
+        const dependencyValue = this._field.bid.entities.getDependencyValue(dependencyContract);
+
+        const isNullDependency = _.isNil(dependencyValue) || !this._field.bid.entities.isDependencyFullyDefined(dependencyContract);
+        this._nullDependencyCount += isNullDependency ? 1 : 0;
+
+        return dependencyValue;
     }
 
     _filterLessThan(rowValues, dependencyValue) {

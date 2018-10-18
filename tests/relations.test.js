@@ -42,6 +42,10 @@ async function init() {
                 data: { user: data.user }
             });
 
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
+
             context.getProject(461).then(p => {
                 resolve(p);
             });

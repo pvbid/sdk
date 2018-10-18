@@ -117,7 +117,20 @@
             "title": "Include Tax in Markup",
             "value": true,
             "is_reserved": true
-        }
+        },
+        "predictive_pricing": {
+            "type": "boolean",
+            "title": "Predictive Pricing Enabled",
+            "value": false,
+            "is_reserved": true
+        },
+        "use_computed": {
+            "type": "boolean",
+            "title": "Use computed values when available (Predictive Pricing)",
+            "value": true,
+            "is_reserved": true
+        },
+
     },
     "system_version": 1,
     "definition_id": 0,
@@ -125,6 +138,10 @@
     "created_at": "2017-09-26T23:04:55+00:00",
     "updated_at": "2017-09-27T01:10:54+00:00",
     "integrations": [],
+    "config": {
+        "predicted_values": [],
+        "undefined_prop_flags": [],
+    },
     "is_locked": false,
     "is_shell": false,
     "reconciled_at": null,
@@ -197,6 +214,8 @@
         },
         "base": 0,
         "formula": "1",
+        "is_predicted_cost": false,
+        "is_predicted_labor_hours": false,
         "dependencies": {
             "tax": {
                 "type": "bid_variable",
@@ -233,6 +252,7 @@
                 "title": "Always Include"
             }
         ],
+        "undefined_prop_flags": [],
         "rule_inclusion": "any",
         "overrides": {},
         "short_code": "line:general_line_item",
@@ -288,6 +308,7 @@
                 "bid_entity_id": 7580
             }
         },
+        "has_null_dependency": false,
         "is_auto_selected": false
     },
     "definition_id": 903,
@@ -328,6 +349,7 @@
     "definition_version": 9,
     "created_at": "2017-09-26T23:04:55+00:00",
     "updated_at": "2017-09-27T01:10:55+00:00",
+    "has_null_dependency": false,
     "actual_value": null,
     "is_active": true,
     "type": "metric"
@@ -404,6 +426,8 @@
         "comments": [],
         "description": null,
         "order_index": 0,
+        "undefined_prop_flags": [],
+        "predicted_values": [],
         "short_code": "component:modules"
     },
     "properties": {

@@ -51,6 +51,9 @@ async function init() {
             mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                 data: { user: data.user }
             });
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
 
             context.getProject(461).then(p => {
                 resolve(p);
@@ -238,5 +241,46 @@ describe("Propagation of supporting datatable update event", () => {
             dt.config.rows[1].values[1] = 305;
             dt.emit("updated");
         });
+    });
+});
+
+describe("checking if it has null dependencies", () => {
+    let $field;
+    beforeAll(() => {
+        $field = bid.entities.searchByTitle("field", "Number of Modules")[0];
+    });
+
+    afterEach(() => {
+        $field.config.dependencies.auto_a = {};
+        $field.value = 3;
+    });
+
+    test("should not have null dependencies when value is overriden", () => {
+        expect.assertions(1);
+
+        $field.value = 5;
+        expect($field.hasNullDependency()).toBe(false);
+    });
+
+    test("should be considered to have null dependencies when value is null", () => {
+        expect.assertions(2);
+        $field.value = null;
+
+        expect($field.value).toBe(null);
+        expect($field.hasNullDependency()).toBe(true);
+    });
+    
+    test("should be considered to have null dependencies when auto-select value depends on null dependency", () => {
+        expect.assertions(3);
+        $field.config.dependencies.auto_a = {
+            type: "metric",
+            field: "value",
+            bid_entity_id: 36095, // depends on undefined field
+        }
+        $field.value = null;
+
+        expect($field.isAutoSelected).toBe(true);
+        expect($field.value).toBe(0);
+        expect($field.hasNullDependency()).toBe(true);
     });
 });

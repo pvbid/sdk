@@ -9,6 +9,7 @@ Included in the SDK are multiple repositories to easily access data from the ser
 * `pvbid.repositories.snapshots` See [SnapshotRepository]
 * `pvbid.repositories.assemblies` See [AssemblyRepository]
 * `pvbid.repositories.users` See [UserRepository]
+* `pvbid.repositories.predictionModels` See [PredictionModelRepository]
 
 ### Code Examples
 
@@ -36,4 +37,5 @@ try {
 [SnapshotRepository]: ../class/src/repositories/SnapshotRepository.js~SnapshotRepository.html
 [AssemblyRepository]: ../class/src/repositories/AssemblyRepository.js~AssemblyRepository.html
 [UserRepository]: ../class/src/repositories/UserRepository.js~UserRepository.html
+[PredictionModelRepository]: ../class/src/repositories/PredictionModelRepository.js~PredictionModelRepository.html
 [PVBidContext]: class/src/PVBidContext.js~PVBidContext.html
