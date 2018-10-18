@@ -252,12 +252,11 @@ export default class BidEntityRelationsHelper {
                     if (!_.isNull(bidEntity.value)) {
                         return this.getFieldValue(bidEntity, dependencyContract.field);
                     } else return null;
-                    break;
                 case "datatable":
                     //TODO: This needs a test. I didn't know a dep contract.field could be an object. -Sean
                     return bidEntity.getValue(dependencyContract.field.column, dependencyContract.field.row);
                 case "metric":
-                    return _.isNull(bidEntity.value) ? 0 : Helpers.confirmNumber(bidEntity.value);
+                    return _.isNull(bidEntity.value) ? null : Helpers.confirmNumber(bidEntity.value);
                 case "bid":
                     return _.isNull(bidEntity[dependencyContract.field])
                         ? 0
@@ -266,6 +265,24 @@ export default class BidEntityRelationsHelper {
                     return null;
             }
         } else return null;
+    }
+
+    /**
+     * Checks if the dependency used an undefined dependency value when evaluating
+     * (dependencies may evaluate to a number even if they rely on an undefined value somewhere in the calc)
+     *
+     * @param {object} dependencyContract
+     * @return {boolean} If the dependency is fully defined / not relient on any unefined dependencies
+     */
+    isDependencyFullyDefined(dependencyContract) {
+        const dependency = this.getDependency(dependencyContract);
+        if (dependency) {
+            const hasAnyNullDependencies = dependency.hasNullDependency(dependencyContract.field);
+            if (!hasAnyNullDependencies) {
+                return true;
+            }
+        }
+        return false;
     }
 
     getFieldValue(field, dataColumnId) {
@@ -277,15 +294,16 @@ export default class BidEntityRelationsHelper {
         } else return null;
     }
 
+    /**
+     * Get bid entities (field or metric) by a definition id
+     *
+     * @param {string} type The type of bid entity ('metric'|'field')
+     * @param {number} defId The definition id to lookup by
+     * @return {BidEntity[]} list of bid entities with the given def id
+     */
     getBidEntitiesByDefId(type, defId) {
-        if (type === "metric") {
-            return _.filter(this.getBidEntity("metric"), {
-                definition_id: defId
-            });
-        } else if (type === "field") {
-            return _.filter(this.getBidEntity("field"), {
-                definition_id: defId
-            });
+        if (type === "metric" || type === "field") {
+            return _.filter(this.getBidEntity(type), { definitionId: defId });
         }
     }
 

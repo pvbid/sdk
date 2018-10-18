@@ -11,6 +11,7 @@ import UserRepository from "./repositories/UserRepository";
 import LineItemRepository from "./repositories/LineItemRepository";
 import MetricRepository from "./repositories/MetricRepository";
 import FieldRepository from "./repositories/FieldRepository";
+import PredictionModelRepository from './repositories/PredictionModelRepository';
 
 /**
  * 
@@ -65,7 +66,8 @@ export default class PVBidContext {
             users: new UserRepository(this._httpConfig),
             lineItems: new LineItemRepository(this._httpConfig),
             metrics: new MetricRepository(this._httpConfig),
-            fields: new FieldRepository(this._httpConfig)
+            fields: new FieldRepository(this._httpConfig),
+            predictionModels: new PredictionModelRepository(this._httpConfig),
         };
     }
 

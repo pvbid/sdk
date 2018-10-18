@@ -40,6 +40,9 @@ describe("Testing Line Item Rules", () => {
                 mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                     data: { user: data.user }
                 });
+                mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
 
                 context.getProject(461).then(p => {
                     resolve(p);
@@ -189,6 +192,49 @@ describe("Testing Line Item Rules", () => {
                 let options = field.getListOptions();
                 field.value = options[0].row_id;
             });
+        });
+    });
+
+    describe("Determint if line item should be weighted", () => {
+        afterAll(() => {
+            lineItem.bid.entities.variables().predictive_pricing.value = false;
+            lineItem.bid.entities.variables().wage.value = 35;
+        });
+
+        test("Line item should not be weighted if predictive pricing is off", () => {
+            expect.assertions(1);
+            lineItem.bid.entities.variables().predictive_pricing.value = false;
+            lineItem.reset();
+
+            expect(lineItem.isWeighted).toBe(false);
+        });
+
+        test("Line item should not be weighted if predictive pricing is on but all rules are defined", () => {
+            expect.assertions(1);
+            lineItem.bid.entities.variables().predictive_pricing.value = true;
+            lineItem.reset();
+
+            expect(lineItem.isWeighted).toBe(false);
+        });
+
+        test("Line item should not be weighted if it is not predicted and a rule is undefined", () => {
+            let $lineItem = bid.entities.searchByTitle("line_item", "On With Rule Value Expression - Watts > Wage")[0];
+            expect.assertions(1);
+            $lineItem.bid.entities.variables().predictive_pricing.value = true;
+            $lineItem.bid.entities.variables().wage.value = null;
+            $lineItem.reset();
+
+            expect($lineItem.isWeighted).toBe(false);
+        });
+
+        test("Line item should be weighted if it is predicted and a rule is undefined", () => {
+            let $lineItem = bid.entities.searchByTitle("line_item", "On With Rule Value Expression - Watts > Wage")[0];
+            expect.assertions(1);
+            $lineItem.bid.entities.variables().predictive_pricing.value = true;
+            $lineItem.bid.entities.variables().wage.value = null;
+            $lineItem.useComputedValueWhenAvailable = false;
+
+            expect($lineItem.isWeighted).toBe(true);
         });
     });
 });

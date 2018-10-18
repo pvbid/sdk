@@ -78,6 +78,9 @@ export default class LineItemScaffolding {
                         field: "markup"
                     }
                 },
+                "is_predicted_cost": false,
+                "is_predicted_labor_hours": false,
+                "undefined_prop_flags": [],
                 formula: "1",
                 definition_id: null
             }

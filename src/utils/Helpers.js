@@ -54,6 +54,21 @@ export default class Helpers {
         return _.isFinite(_.toNumber(val));
     }
 
+    /**
+     * Parse the variables referenced in a formula
+     *
+     * @param {string} formula
+     * @return {string[]} Array of variables referenced in the formula
+     */
+    static parseFormulaArguments(formula) {
+        if (formula) {
+            const node = math.parse(this._clean(formula.toString().toLowerCase()));
+            const args = node.filter((n) => n.isSymbolNode);
+            return args.map(arg => arg.name);
+        }
+        return [];
+    }
+
     static calculateFormula(formula, valuesMap) {
         var result;
         if (!formula || formula === "") {

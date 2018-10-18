@@ -444,17 +444,30 @@ export default class Bid extends BidEntity {
                 watts: 0
             };
 
+            const predictedValues = new Set();
+            const valuesWithNullDependency = new Set();
+
             _.each(this.entities.lineItems(), li => {
                 if (li.isIncluded) {
                     bidValues.cost += li.cost;
                     bidValues.price += li.price;
                     bidValues.tax += li.tax;
                     bidValues.markup += li.markup;
+
+                    this._applyPredictedDependencies(li, predictedValues, ['cost', 'price', 'tax', 'markup']);
+                    this._applyNullDependencies(li, valuesWithNullDependency, ['cost', 'price', 'tax', 'markup']);
+
                     if (li.isLabor()) {
                         bidValues.labor_hours += li.laborHours;
                         bidValues.labor_cost += li.cost;
+
+                        this._applyPredictedDependencies(li, predictedValues, ['labor_hours', ['cost', 'labor_cost']]);
+                        this._applyNullDependencies(li, valuesWithNullDependency, ['labor_hours', ['cost', 'labor_cost']]);
                     } else {
                         bidValues.taxable_cost += li.cost;
+
+                        this._applyPredictedDependencies(li, predictedValues, [['cost', 'taxable_cost']]);
+                        this._applyNullDependencies(li, valuesWithNullDependency, [['cost', 'taxable_cost']]);
                     }
                 }
             });
@@ -478,10 +491,17 @@ export default class Bid extends BidEntity {
                 }
             });
 
-            this._resetSubMargins();
+            if (!this._data.config.predicted_values || _.xor([...predictedValues.values()], this._data.config.predicted_values).length > 0) {
+                this._data.config.predicted_values = [...predictedValues.values()];
+                isChanged = true;
+            }
 
-            //TODO: Fix prediction assignment
-            //this.bid.prediction = PredictionService.getBidPrediction();
+            if (!this._data.config.undefined_prop_flags || _.xor([...valuesWithNullDependency.values()], this._data.config.undefined_prop_flags).length > 0) {
+                this._data.config.undefined_prop_flags = [...valuesWithNullDependency.values()];
+                isChanged = true;
+            }
+
+            this._resetSubMargins();
 
             if (isChanged || forceUpdate) {
                 this._calcRounds += 1;
@@ -533,7 +553,7 @@ export default class Bid extends BidEntity {
             needsReassesment = this.price === 0 ? true : false;
 
         if (!needsReassesment) {
-            _.each(this.entities.components(), (c, k) => {
+            _.each(this.entities.components(), (c) => {
                 if (!needsReassesment) {
                     needsReassesment = this._componentNeedsReassessment(c);
                 } else return false;
@@ -812,6 +832,38 @@ export default class Bid extends BidEntity {
      */
     isShell() {
         return this._data.is_shell;
+    }
+
+    /**
+     * Determines if a bid property is predicted.
+     *
+     * @param {string} property The bid property
+     * @return {boolean}
+     */
+    isPredicted(property) {
+        if (property) {
+            if (this._data.config.predicted_values && this._data.config.predicted_values.indexOf(property) >= 0) {
+                return true;
+            }
+            return false;
+        }
+        return this._data.config.predicted_values.length > 0;
+    }
+
+    /**
+     * Determines if a property depends on a null dependency somewhere in it's calculation
+     *
+     * @param {string} property The bid property name
+     * @return {boolean}
+     */
+    hasNullDependency(property) {
+        if (property) {
+            if (this._data.config.undefined_prop_flags && this._data.config.undefined_prop_flags.indexOf(property) >= 0) {
+                return true;
+            }
+            return false;
+        }
+        return this._data.config.undefined_prop_flags.length > 0;
     }
 
     /**

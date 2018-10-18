@@ -41,6 +41,7 @@ export default class Metric extends BidEntity {
         if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.value && !this.bid.isReadOnly()) {
             this.config.override = true;
             this._data.value = Helpers.confirmNumber(val);
+            this.config.has_null_dependency = false;
             this.dirty();
             this.emit("updated");
         }
@@ -81,15 +82,18 @@ export default class Metric extends BidEntity {
     }
 
     _getBaseValue() {
-        var valueMap = {},
-            baseValue = 0;
+        let valueMap = {};
+        let baseValue = 0;
 
         if (!_.isUndefined(this.config.formula)) {
-            _.each(this.config.dependencies, (dependencyContract, key) => {
-                valueMap[key] = Helpers.confirmNumber(this.bid.entities.getDependencyValue(dependencyContract), 0);
+            const formulaVariables = Helpers.parseFormulaArguments(this.config.formula);
+            formulaVariables.forEach(variable => {
+                const dependencyContract = this.config.dependencies[variable];
+                const dependencyValue = this._evaluateDependency(dependencyContract);
+                valueMap[variable] = Helpers.confirmNumber(dependencyValue, 0)
             });
 
-            var results = Helpers.calculateFormula(this.config.formula, valueMap);
+            const results = Helpers.calculateFormula(this.config.formula, valueMap);
             baseValue = Helpers.confirmNumber(results);
         }
         return baseValue;
@@ -107,21 +111,46 @@ export default class Metric extends BidEntity {
     }
 
     _calculateMetricManipulation(metricManipulation, baseValue) {
-        var valueMap = {
-                original: baseValue
-            },
-            manipulatedValue = baseValue;
+        let valueMap = { original: baseValue };
+        let manipulatedValue = baseValue;
 
         if (!_.isUndefined(metricManipulation.formula)) {
-            _.each(metricManipulation.dependencies, (dependencyContract, key) => {
-                valueMap[key] = Helpers.confirmNumber(this.bid.entities.getDependencyValue(dependencyContract), 0);
+            const formulaVariables = Helpers.parseFormulaArguments(metricManipulation.formula);
+            formulaVariables.forEach(variable => {
+                if (variable.toLowerCase() !== 'original') {
+                    const dependencyContract = metricManipulation.dependencies[variable];
+                    const dependencyValue = this._evaluateDependency(dependencyContract);
+                    valueMap[variable] = Helpers.confirmNumber(dependencyValue, 0);
+                }
             });
 
-            var results = Helpers.calculateFormula(metricManipulation.formula, valueMap);
+            const results = Helpers.calculateFormula(metricManipulation.formula, valueMap);
             manipulatedValue = Helpers.confirmNumber(results);
         }
 
         return manipulatedValue;
+    }
+
+    /**
+     * Evaluates the dependency contract and tracks if a null evaluation was encountered
+     *
+     * @param {object} dependencyContract Dependency Contract to evaluate
+     * @return {number|null|undefined}
+     */
+    _evaluateDependency(dependencyContract) {
+        const dependencyValue = this.bid.entities.getDependencyValue(dependencyContract);
+
+        const isNullDependency = _.isNil(dependencyValue) || !this.bid.entities.isDependencyFullyDefined(dependencyContract);
+        this._nullDependencyCount += isNullDependency ? 1 : 0;
+
+        return dependencyValue;
+    }
+
+    /**
+     * Determines if the metric has any null dependencies
+     */
+    hasNullDependency() {
+        return this.config.has_null_dependency;
     }
 
     /**
@@ -181,18 +210,26 @@ export default class Metric extends BidEntity {
     assess() {
         if (this.bid.isAssessable()) {
             if (!this.config.override) {
-                var baseValue = 0,
-                    finalValue = 0;
+                let isChanged = false;
 
-                baseValue = this._getBaseValue();
-                finalValue = this._calculateMetricManipulations(baseValue);
+                this._nullDependencyCount = 0;
+                
+                let baseValue = this._getBaseValue();
+                let finalValue = this._calculateMetricManipulations(baseValue);
 
-                var oldValue = this._data.value ? _.round(this._data.value, 4) : 0;
-
-                if (oldValue !== _.round(finalValue, 4)) {
+                if (_.round(this._data.value, 4) !== _.round(finalValue, 4)) {
                     this._data.value = _.round(finalValue, 7);
-                    this.dirty();
+                    isChanged = true;
+                }
 
+                const hasNullDependency = this._nullDependencyCount > 0;
+                if (this.config.has_null_dependency !== hasNullDependency) {
+                    this._data.config.has_null_dependency = hasNullDependency;
+                    isChanged = true;
+                }
+
+                if (isChanged) {
+                    this.dirty();
                     this.emit("updated");
                 }
             }

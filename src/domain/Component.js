@@ -419,6 +419,9 @@ export default class Component extends BidEntity {
                 laborCosts = 0,
                 nonLaborCosts = 0;
 
+            let predictedValues = new Set();
+            let hasNullDependencyValues = new Set();
+
             _.each(this.getLineItems(), lineItem => {
                 if (lineItem && lineItem.isIncluded) {
                     totalLineItems += 1;
@@ -426,9 +429,15 @@ export default class Component extends BidEntity {
                         totalLaborLinetItems += 1;
                         laborCosts += lineItem.cost;
                         laborHours += lineItem.laborHours;
+
+                        this._applyPredictedDependencies(lineItem, predictedValues, [["cost", "labor_cost"], "labor_hours"]);
+                        this._applyNullDependencies(lineItem, hasNullDependencyValues, [["cost", "labor_cost"], "labor_hours"]);
                     } else {
                         nonLaborCosts += lineItem.cost;
                         taxableCost += lineItem.cost;
+
+                        this._applyPredictedDependencies(lineItem, predictedValues, [["cost", "non_labor_cost"], ["cost", "taxable_cost"]]);
+                        this._applyNullDependencies(lineItem, hasNullDependencyValues, [["cost", "non_labor_cost"], ["cost", "taxable_cost"]]);
                     }
 
                     cost += lineItem.cost;
@@ -440,6 +449,9 @@ export default class Component extends BidEntity {
                     burden += lineItem.burden;
                     quantity += lineItem.quantity;
                     perQuantity += lineItem.perQuantity;
+
+                    this._applyPredictedDependencies(lineItem, predictedValues, ["cost", "price", "markup", "tax"]);
+                    this._applyNullDependencies(lineItem, hasNullDependencyValues, ["cost", "price", "markup", "tax"]);
                 }
             });
 
@@ -460,6 +472,10 @@ export default class Component extends BidEntity {
                 perQuantity += Helpers.confirmNumber(subComponent._data.per_quantity);
                 totalLineItems += Helpers.confirmNumber(subComponent._data.included_count);
                 totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.included_labor_count);
+
+                const valuesToCheck = ["cost", "price", "markup", "tax", "taxable_cost", "labor_hours", "labor_cost", "non_labor_cost"];
+                this._applyPredictedDependencies(subComponent, predictedValues, valuesToCheck);
+                this._applyNullDependencies(subComponent, hasNullDependencyValues, valuesToCheck);
             });
 
             var markupPercent = 0;
@@ -488,6 +504,16 @@ export default class Component extends BidEntity {
             isChanged = this._apply("labor_hours", laborHours) || isChanged;
             isChanged = this._apply("labor_cost", laborCosts) || isChanged;
 
+            if (!this.config.predicted_values || _.xor([...predictedValues.values()], this.config.predicted_values).length > 0) {
+                this._data.config.predicted_values = [...predictedValues.values()];
+                isChanged = true;
+            }
+
+            if (!this.config.undefined_prop_flags || _.xor([...hasNullDependencyValues.values()], this.config.undefined_prop_flags).length > 0) {
+                this._data.config.undefined_prop_flags = [...hasNullDependencyValues.values()];
+                isChanged = true;
+            }
+
             this._applyVirtualProperty("base", base);
             this._applyVirtualProperty("burden", burden);
             this._applyVirtualProperty("wage", wage);
@@ -501,7 +527,6 @@ export default class Component extends BidEntity {
             this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
             this._applyVirtualProperty("quantity_avg", quantityAvg);
 
-            //FIXME: component.prediction = PredictionService.getComponentPrediction(component);
             if (isChanged) this.emit("updated");
 
             this.emit("assessed");
@@ -635,6 +660,38 @@ export default class Component extends BidEntity {
                 lineItem.isIncluded = isIncluded;
             });
         }
+    }
+
+    /**
+     * Check whether a given value is predicted or not
+     *
+     * @param {string} value The value to check the prediction status of
+     * @return {boolean}
+     */
+    isPredicted(value) {
+        if (value) {
+            if (this.config.predicted_values && this.config.predicted_values.indexOf(value) >= 0) {
+                return true;
+            }
+            return false;
+        }
+        return this.config.predicted_values.length > 0;
+    }
+
+    /**
+     * Checks if a component property relied on a null dependency at any point in calculation
+     *
+     * @param {string} value The property to check
+     * @return {boolean}
+     */
+    hasNullDependency(value) {
+        if (value) {
+            if (this.config.undefined_prop_flags && this.config.undefined_prop_flags.indexOf(value) >= 0) {
+                return true;
+            }
+            return false;
+        }
+        return this.config.undefined_prop_flags.length > 0;
     }
 
     /**

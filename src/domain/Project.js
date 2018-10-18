@@ -212,6 +212,10 @@ export default class Project extends BidEntity {
         return this._projectService.context;
     }
 
+    get predictionModels() {
+        return this._data.prediction_models;
+    }
+
     /**
      * Assess project values by summing all active bids.
      * @emits {assessing}

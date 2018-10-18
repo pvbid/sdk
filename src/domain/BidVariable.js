@@ -73,6 +73,13 @@ export default class BidVariable extends BidEntity {
     }
 
     /**
+     * @type {boolean}
+     */
+    get isReserved() {
+        return this._data.is_reserved;
+    }
+
+    /**
      * @type {object}
      */
     get config() {

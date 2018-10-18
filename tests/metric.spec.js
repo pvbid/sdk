@@ -42,6 +42,9 @@ async function init() {
             mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
                 data: { user: data.user }
             });
+            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
+                data: { prediction_models: data.prediction_models }
+            });
 
             context.getProject(461).then(p => {
                 resolve(p);
@@ -125,5 +128,38 @@ describe("Metrics", () => {
 
             burden.value = 6;
         });
+    });
+});
+
+describe("check if metric depends on undefined dependency value", () => {
+    let $metric;
+    beforeAll(() => {
+        $metric = bid.entities.searchByTitle("metric", "Depends on undefined number")[0];
+    });
+
+    afterEach(() => {
+        $metric.reset();
+    });
+
+    test("should be considered to have null dependency if it references an entity that depends on an undefined entity", () => {
+        expect.assertions(3);
+        expect($metric.value).toBe(0);
+        expect($metric.bid.entities.getDependencyValue($metric.config.dependencies.a)).toBe(null);
+        expect($metric.hasNullDependency()).toBe(true);
+    });
+
+    test("should not be considered to have null dependency if the value is overriden", () => {
+        expect.assertions(2);
+        $metric.value = 1;
+
+        expect($metric.value).toBe(1);
+        expect($metric.hasNullDependency()).toBe(false);
+    });
+
+    test("should not be considered to have null dependency if it depends on a fully defined entity", () => {
+        expect.assertions(1);
+        const definedMetric = bid.entities.searchByTitle("metric", "Depends on defined number")[0];
+        
+        expect(definedMetric.hasNullDependency()).toBe(false);
     });
 });
