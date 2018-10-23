@@ -2,7 +2,7 @@
 Included in the SDK are multiple repositories to easily access data from the server. The repositories are initialized within the [PVBidContext].
 
 **Available Repositories**
-* `pvbid.repositories.bids` See [BidRepository] 
+* `pvbid.repositories.bids` See [BidRepository]
 * `pvbid.repositories.projects` See [ProjectRepository]
 * `pvbid.repositories.projectStatuses` See [ProjectStatusRepository]
 * `pvbid.repositories.tags` See [TagRepository]
@@ -18,7 +18,7 @@ Included in the SDK are multiple repositories to easily access data from the ser
 let params = {
     order_by: "created_at",
     sort_order: "asc",
-    per_page: 50 
+    per_page: 50
 }
 
 try {
@@ -28,7 +28,7 @@ try {
     //handle error;
 }
 ```
-    
+
 
 [BidRepository]: ../class/src/repositories/BidRepository.js~BidRepository.html
 [ProjectRepository]: ../class/src/repositories/ProjectRepository.js~ProjectRepository.html

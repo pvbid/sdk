@@ -7,7 +7,7 @@ export default class PredictionModelRepository extends BaseRepository {
 
     /**
      * Retrieves a list of predition models
-     * 
+     *
      * @param {object} params
      * @param {number} params.lineItemDefId Filters results by line item definition
      * @return {Promise<BidEntity[]>} List of predictions
@@ -19,7 +19,7 @@ export default class PredictionModelRepository extends BaseRepository {
     /**
      * Get a prediction model with associated datasets
      *
-     * @param {number} predictionModelId 
+     * @param {number} predictionModelId
      * @return {promise<BidEntity>} prediction model with datasets
      */
     async getData(predictionModelId) {
@@ -28,6 +28,6 @@ export default class PredictionModelRepository extends BaseRepository {
             return res.data.data;
         } catch (error) {
             return Promise.reject(error);
-        } 
+        }
     }
 }
