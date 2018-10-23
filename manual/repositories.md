@@ -38,4 +38,4 @@ try {
 [AssemblyRepository]: ../class/src/repositories/AssemblyRepository.js~AssemblyRepository.html
 [UserRepository]: ../class/src/repositories/UserRepository.js~UserRepository.html
 [PredictionModelRepository]: ../class/src/repositories/PredictionModelRepository.js~PredictionModelRepository.html
-[PVBidContext]: class/src/PVBidContext.js~PVBidContext.html
+[PVBidContext]: ../class/src/PVBidContext.js~PVBidContext.html

@@ -41,6 +41,17 @@ let project = await pvbid.getProject(projectId);
 project.onDelay("changed", 1500, "requesterId", () => project.save());
 ```
 
+**Create a new project (w/bid)**
+```javascript
+const newProject = await pvbid.repositories.projects.create({ title: "New Project" }); // initializes the new project
+const project = await pvbid.getProject(newProject.id); // gets the self assessing project instance
+```
+
+**Create a new bid in a project**
+```javascript
+await project.createBid("Bid Title");
+```
+
 **Choose a bid to modify**
 
 Project instances contain a list of their child bids.
@@ -67,6 +78,14 @@ if(fields.length > 0){
 ```javascript 
 let metric = bid.entities.metrics(metricId);
 if (metric) metric.value = 123.45;
+```
+**Manually assessing the bid**
+
+It is a good idea to assess (calculate) the bid after making changes to Metrics, Fields and Variables.
+``` javascript
+bid.assess();
+// OR
+bid.reassessAll(true); // forces a full reassessment of ALL entities within the bid
 ```
 **Manually save the bid, underlying bid entities, and parent project**
 

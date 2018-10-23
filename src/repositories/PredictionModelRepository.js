@@ -1,6 +1,6 @@
 import BaseRepository from "./BaseRepository";
 
-export default class ProjectRepository extends BaseRepository {
+export default class PredictionModelRepository extends BaseRepository {
   constructor(config) {
       super(config.base_uri + "/predictions/", "prediction", "prediction_models", config);
   }
