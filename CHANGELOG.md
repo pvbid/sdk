@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.1.3 (2018-10-24)
+Features:
+* **PredictionModels Repository:** `repositories.predictionModels.getData(id)` retrieves specific prediction model and the model data
+
 ### 1.1.2 (2018-10-23)
 Improvements:
 * **Documentation:** Add additional examples to the Getting Started section of the Manual
@@ -18,7 +22,7 @@ Features:
 
 Improvements:
 * **BidVariable:** Expose `isReserved` property
-* **PredictionModels Repository:** `repositories.predictionModels` retrieves prediction models for account or specified lineItemDefId
+* **PredictionModels Repository:** `repositories.predictionModels.get()` retrieves prediction models for account or specified lineItemDefId
 * **Project:** `predictionModels` property allows access to project's prediction models
 
 Bug Fixes:

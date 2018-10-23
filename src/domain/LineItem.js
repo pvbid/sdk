@@ -180,7 +180,6 @@ export default class LineItem extends BidEntity {
     get scalar() {
         let valueMap = {};
         const formulaArgs = Helpers.parseFormulaArguments(this.config.formula);
-
         const scalarContracts = this._getExtraScalarDependencies();
         _.each(scalarContracts, (dependencyContract, key) => {
             // check if dependency is included in formula
