@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 1.1.2 (2018-10-19)
+### 1.1.2 (2018-10-23)
 Improvements:
 * **Documentation:** Add additional examples to the Getting Started section of the Manual
 
