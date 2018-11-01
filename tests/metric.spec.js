@@ -129,6 +129,12 @@ describe("Metrics", () => {
             burden.value = 6;
         });
     });
+
+    test("shoule evaluate formula with math js constants (ie pi) correctly", () => {
+        let metric = bid.entities.searchByTitle("metric", "Formula has Pi")[0];
+        metric.assess();
+        expect(metric.value).toBeCloseTo(3.14, 2);
+    });
 });
 
 describe("check if metric depends on undefined dependency value", () => {
