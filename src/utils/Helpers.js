@@ -61,9 +61,12 @@ export default class Helpers {
      * @return {string[]} Array of variables referenced in the formula
      */
     static parseFormulaArguments(formula) {
+        // math js has several constants that need to be blacklisted because they look like variables when the formula is parsed
+        // NOTE: 'E', 'e', and 'i' have not been included because they are actively being used as variables by pvbid users
+        const mathjsConstants = ['Infinity', 'LN2', 'LN10', 'LOG2E', 'LOG10E', 'NaN', 'null', 'phi', 'pi', 'PI', 'SQRT1_2', 'SQRT2', 'tau', 'undefined'];
         if (formula) {
             const node = math.parse(this._clean(formula.toString().toLowerCase()));
-            const args = node.filter((n) => n.isSymbolNode);
+            const args = node.filter((n) => n.isSymbolNode && !mathjsConstants.includes(n.name));
             return args.map(arg => arg.name);
         }
         return [];
