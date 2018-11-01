@@ -65,9 +65,9 @@ export default class Helpers {
         // NOTE: 'E', 'e', and 'i' have not been included because they are actively being used as variables by pvbid users
         const mathjsConstants = ['Infinity', 'LN2', 'LN10', 'LOG2E', 'LOG10E', 'NaN', 'null', 'phi', 'pi', 'PI', 'SQRT1_2', 'SQRT2', 'tau', 'undefined'];
         if (formula) {
-            const node = math.parse(this._clean(formula.toString().toLowerCase()));
+            const node = math.parse(this._clean(formula.toString()));
             const args = node.filter((n) => n.isSymbolNode && !mathjsConstants.includes(n.name));
-            return args.map(arg => arg.name);
+            return args.map(arg => arg.name.toLowerCase());
         }
         return [];
     }
@@ -95,7 +95,7 @@ export default class Helpers {
                 valuesMap = [];
             }
 
-            result = math.eval(this._clean(formula), valuesMap);
+            result = math.eval(this._clean(formula).toLowerCase(), valuesMap);
             result = math.typeof(result) == "boolean" ? Number(result) : result;
             result = math.isNumeric(result) && result != Infinity ? result : null;
         } catch (e) {
@@ -107,14 +107,13 @@ export default class Helpers {
     static _clean(formula) {
         return formula
             .replace(/[\[\]]/g, "") // what is this?
-            .toLowerCase() // make everything lowercase
-            .replace(/roundup/g, "ceil") // change roundup to ceil
-            .replace(/rounddown/g, "floor") // change rowndown to floor
+            .replace(/roundup/gi, "ceil") // change roundup to ceil
+            .replace(/rounddown/gi, "floor") // change rowndown to floor
             .replace(/<=/g, "smallerEq") // temp hold the smallerEq val
             .replace(/>=/g, "largerEq") // temp hold the largerEq val
             .replace(/=/g, "==") // change equals to the js version of equal to
-            .replace(/smallerEq/g, "<=") // revert back to smaller than equal to
-            .replace(/largerEq/g, ">=") // revert back to smaller than equal to
+            .replace(/smallerEq/gi, "<=") // revert back to smaller than equal to
+            .replace(/largerEq/gi, ">=") // revert back to smaller than equal to
             .replace(/#/g, "pound_sign"); // replace pound sign
     }
     /**
