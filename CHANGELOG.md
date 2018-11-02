@@ -1,5 +1,9 @@
 # CHANGELOG
 
+### 1.1.4 (2018-11-02)
+Bug Fixes:
+* **Formula Constant Evaluation:** Fixed problem with variables and math constants (e.g. `pi`) conflicting during evaluation
+
 ### 1.1.3 (2018-10-24)
 Features:
 * **PredictionModels Repository:** `repositories.predictionModels.getData(id)` retrieves specific prediction model and the model data
