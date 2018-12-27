@@ -741,6 +741,7 @@ export default class LineItem extends BidEntity {
             isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
             isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
             isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
+            isChanged = this._applyConfigArray("tags", this._getTagValue()) || isChanged;
 
             if (this._applyUndefinedPropFlags()) {
                 isChanged = true;
@@ -905,6 +906,19 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Checks to see if the supplied array is different than the currently assigned value
+     * If so, it updates the value
+     *
+     * @return {boolean} whether the value was updated or not
+     */
+    _applyConfigArray(property, arr) {
+        if (_.isNil(this._data.config[property]) || _.xor(arr, this._data.config[property]).length > 0) {
+            this._data.config[property] = arr;
+            return true;
+        } else return false;
+    }
+
+    /**
      *
      */
     _applyConfig(property, value) {
@@ -1004,6 +1018,17 @@ export default class LineItem extends BidEntity {
     _getExtraScalarDependencies() {
         return _.pickBy(this.config.dependencies, function(el, key) {
             return key.indexOf("scalar_") === 0;
+        });
+    }
+
+    /**
+     * Retrieves extra tag dependency contracts.
+     *
+     * @return {Array}
+     */
+    _getExtraTagDependencies() {
+        return _.pickBy(this.config.dependencies, function(el, key) {
+            return key.indexOf("tag_") === 0;
         });
     }
 
@@ -1111,6 +1136,26 @@ export default class LineItem extends BidEntity {
 
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return _.round(Helpers.confirmNumber(results, 1), 7);
+    }
+
+    /**
+     * Internally retrieves the non-cached Tag value.
+     *
+     * @return {(string|number|boolean)[]}
+     */
+    _getTagValue() {
+        const tagContracts = this._getExtraTagDependencies();
+
+        let valueMap = [];
+
+        _.each(tagContracts, (dependencyContract) => {
+            const dependencyValue = this.bid.entities.getDependencyValue(dependencyContract)
+            if (!_.isNil(dependencyValue)) {
+                valueMap.push(dependencyValue);
+            }
+        });
+
+        return valueMap;
     }
 
     /**

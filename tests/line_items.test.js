@@ -58,6 +58,39 @@ async function init() {
         bid.reassessAll(true);
     });
 }
+test("add new null tag and ensure config.tags is empty array", () => {
+    expect.assertions(1);
+
+    const $lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+
+    $lineItem.config.dependencies.tag_0 = {
+        "type": null, "field": null, "bid_entity_id": null
+    };
+
+    $lineItem.assess();
+
+    expect($lineItem.config.tags).toEqual([]);
+});
+
+
+test("add new tags and ensure they are pushed to config.tags", () => {
+    expect.assertions(1);
+
+    const $lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+
+    $lineItem.config.dependencies.tag_0 = {
+        "type": "field", "field": "at57", "bid_entity_id": 18262
+    };
+
+    $lineItem.config.dependencies.tag_1 = {
+        "type": "field", "field": "tp7q", "bid_entity_id": 18262
+    };
+
+    $lineItem.assess();
+
+    expect($lineItem.config.tags).toEqual(["Module 1", "400.00"]);
+});
+
 
 test("add new line item", () => {
     expect.assertions(2);
