@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 1.1.X (20XX-XX-XX)
+### 1.1.5 (2019-01-11)
 Features:
 * **Field:** Introduced the `anchor` property. `Anchors` are a means for identifying similar entities universally across any assembly and any account
 
