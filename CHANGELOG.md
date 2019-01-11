@@ -1,5 +1,17 @@
 # CHANGELOG
 
+### 1.1.5 (2019-01-11)
+Features:
+* **Field:** Introduced the `anchor` property. `Anchors` are a means for identifying similar entities universally across any assembly and any account
+
+Improvements:
+* **Bid:** `bid.addAssemblies()` now returns the newly created entities.
+* **Assembly:** Exposed `assembly.definitionId`
+
+### 1.1.4 (2018-11-02)
+Bug Fixes:
+* **Formula Constant Evaluation:** Fixed problem with variables and math constants (e.g. `pi`) conflicting during evaluation
+
 ### 1.1.3 (2018-10-24)
 Features:
 * **PredictionModels Repository:** `repositories.predictionModels.getData(id)` retrieves specific prediction model and the model data

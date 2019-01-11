@@ -160,17 +160,19 @@ export default class BidService {
      * 
      * @param {Bid} bid 
      * @param {number[]} assemblyMapIds An array of assembly mapping ids to add.
-     * @returns {Promise<null>}
+     * @returns {Promise<Object[]>} Array of created bid entities
      */
     async addAssemblies(bid, assemblyMapIds) {
         try {
             await bid.project.save();
+            let entities = [];
             for (let aId of assemblyMapIds) {
-                await this.repositories.assemblies.implement(bid.id, aId);
+                const res = await this.repositories.assemblies.implement(bid.id, aId);
+                entities.push(res.data.data.bid_entities);
             }
             const bidObject = await this.repositories.bids.findById(bid.id, true);
             new BidFactory().reload(bid, bidObject);
-            return;
+            return entities;
         } catch (error) {
             return Promise.reject(error);
         }

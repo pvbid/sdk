@@ -1396,6 +1396,31 @@
                 "actual_value": null,
                 "is_active": true,
                 "type": "metric"
+            },
+            {
+                "id": 36097,
+                "account_id": 3,
+                "bid_id": 190,
+                "title": "Formula has Pi",
+                "value": 3,
+                "config": {
+                    "formula": "1 * pi",
+                    "short_code": "metric:defined_metric",
+                    "dependencies": {
+                        "a": {
+                            "type": "field",
+                            "field": "value",
+                            "bid_entity_id": 18263
+                        }
+                    }
+                },
+                "definition_id": 843,
+                "definition_version": 2,
+                "created_at": "2017-09-26T23:04:55+00:00",
+                "updated_at": "2017-09-27T01:10:55+00:00",
+                "actual_value": null,
+                "is_active": true,
+                "type": "metric"
             }
         ],
         "datatables": [

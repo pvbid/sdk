@@ -39,6 +39,13 @@ export default class Assembly extends BidEntity {
     }
 
     /**
+     * @type {number}
+     */
+    get definitionId() {
+        return this._data.definition_id;
+    }
+
+    /**
      * Flags the assembly and corresponding bid as dirty and to be saved.
      */
     dirty() {

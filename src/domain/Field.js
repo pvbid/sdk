@@ -88,6 +88,14 @@ export default class Field extends BidEntity {
     }
 
     /**
+     * Returns the anchor identifier of the field
+     * @type {string|null}
+     */
+    get anchor() {
+        return this._data.anchor || null;
+    }
+
+    /**
      * Gets the field type.
      * Options: text, boolean, number, list
      * 
