@@ -8,6 +8,7 @@
         "build-node": "PLATFORM=node webpack",
         "build-web": "PLATFORM=web webpack",
         "watch": "SKIP_MIN=true WATCH=true webpack",
+        "watch-node": "SKIP_MIN=true WATCH=true PLATFORM=node webpack",
         "docs": "./node_modules/.bin/esdoc && open docs/index.html",
         "publish-docs": "npm run test && npm run docs && PLATFORM=web DOCS=true webpack",
         "size": "size-limit",

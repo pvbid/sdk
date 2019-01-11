@@ -1,5 +1,13 @@
 # CHANGELOG
 
+### 1.1.X (20XX-XX-XX)
+Features:
+* **Field:** Introduced the `anchor` property. `Anchors` are a means for identifying similar entities universally across any assembly and any account
+
+Improvements:
+* **Bid:** `bid.addAssemblies()` now returns the newly created entities.
+* **Assembly:** Exposed `assembly.definitionId`
+
 ### 1.1.4 (2018-11-02)
 Bug Fixes:
 * **Formula Constant Evaluation:** Fixed problem with variables and math constants (e.g. `pi`) conflicting during evaluation
