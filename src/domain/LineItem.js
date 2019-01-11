@@ -550,6 +550,15 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Gets the line items tags array
+     *
+     * @type {Array<string|number|boolean>}
+     */
+    get tags() {
+        return this._data.config.tags || [];
+    }
+
+    /**
      * Config Property
      * @type {object}
      */
