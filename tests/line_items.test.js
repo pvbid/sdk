@@ -833,6 +833,37 @@ describe("When line item is a labor type", () => {
             });
         });
     });
+    describe("Labor tax variable", () => {
+        let $lineItem;
+        beforeAll(async () => {
+            $lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
+            $lineItem.reset();
+            $lineItem.config.type = "labor";
+            $lineItem.cost = 300;
+            $lineItem.taxPercent = 10;
+        });
+
+        afterAll(async () => {
+            await new Promise((resolve) => {
+                lineItem.bid.project.once("assessed", resolve);
+                bid.entities.variables("taxable_labor").value = false;
+                $lineItem.reset();
+                $lineItem.assess();
+            });
+        });
+
+        test("Tax should be zero if its false", () => {
+            bid.entities.variables("taxable_labor").value = false;
+            $lineItem.assess();
+            expect($lineItem.tax).toBe(0);
+        });
+
+        test("Tax should have tax value if its true", () => {
+            bid.entities.variables("taxable_labor").value = true;
+            $lineItem.assess();
+            expect($lineItem.tax).toBe(30);
+        });
+    });
 });
 
 describe("Consider whether a line item property depends on an undefined dependency value", () => {

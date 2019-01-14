@@ -791,6 +791,7 @@ export default class LineItem extends BidEntity {
         this._bindLineItemPredictionDependencies();
         this._bindPredictionBidVariables();
         this._bindMarkupStrategy();
+        this._bindTaxableLabor();
     }
 
     /**
@@ -898,6 +899,18 @@ export default class LineItem extends BidEntity {
         if (!_.isNil(this.bid.entities.variables().markup_strategy)) {
             this.bid.entities.variables().markup_strategy
                 .on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
+        }
+    }
+
+    /**
+     * Bind to taxable labor variable
+     */
+    _bindTaxableLabor() {
+        if (!_.isNil(this.bid.entities.variables().taxable_labor)) {
+            this.bid.entities.variables().taxable_labor
+                .on("updated", `line_item.${this.id}`, (requesterId, self) => {
+                    if (this.isLabor()) this.assess(self);
+                });
         }
     }
 
@@ -1281,7 +1294,8 @@ export default class LineItem extends BidEntity {
      */
     _getTaxValue() {
         if (!this.isOverridden("tax")) {
-            if (!this.isLabor() && this.cost > 0) {
+            const shouldTax = !this.isLabor() || this.bid.entities.variables().taxable_labor.value;
+            if (shouldTax && this.cost > 0) {
                 if (this._undefinedPropsIncludes("cost", "tax_percent")) {
                     this._undefinedPropFlags.push("tax");
                 }
