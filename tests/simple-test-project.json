@@ -217,6 +217,12 @@
                 "title": "Use calculated value when available (Predictive Pricing)",
                 "value": true,
                 "is_reserved": true
+            },
+            "taxable_labor": {
+                "title": "Tax Labor",
+                "is_reserved": true,
+                "type": "boolean",
+                "value": false
             }
         },
         "system_version": 1,
