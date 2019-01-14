@@ -1,6 +1,7 @@
 import _ from "lodash";
 import Helpers from "../utils/Helpers";
 import BidEntity from "./BidEntity";
+import BidVariable from "./BidVariable";
 import now from "performance-now";
 import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 import BidEntityRelationsHelper from "./services/BidEntityRelationsHelper";
@@ -1025,6 +1026,27 @@ export default class Bid extends BidEntity {
      */
     async delete() {
         return this._bidService.deleteBid(this);
+    }
+
+    /**
+     * Adds a new bid variable to the bid
+     */
+    addBidVariable() {
+        const newVar = new BidVariable({
+            type: 'number',
+            title: 'New Variable',
+            value: 0,
+            is_reserved: false,
+        }, this);
+
+        // generate a random unique key for the variable
+        const currentKeys = Object.keys(this.entities.variables());
+        let newKey;
+        do {
+            newKey = ("0000" + (Math.random() * Math.pow(36, 4) << 0).toString(36)).slice(-4);
+        } while (currentKeys.includes(newKey));
+
+        this._data.variables[newKey] = newVar;
     }
 
     /**
