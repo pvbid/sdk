@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 1.1.6 (2019-01-14)
+Features:
+* **Bid Variable:** Add a new bid variables to a bid with `bid.addBidVariable()`.
+* **Line Item:** Labor type line items may now consider tax if the `taxable_labor` bid variable is set to true (false by default).
+
 ### 1.1.5 (2019-01-11)
 Features:
 * **Field:** Introduced the `anchor` property. `Anchors` are a means for identifying similar entities universally across any assembly and any account
