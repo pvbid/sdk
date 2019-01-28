@@ -65,6 +65,15 @@ test("test search by title", () => {
     expect(field.title).toBe("Module Type");
 });
 
+test("test search by exact title", () => {
+    const notExact = bid.entities.searchByTitle("field", "odule Typ", true)[0];
+    const exact = bid.entities.searchByTitle("field", "Module Type", true)[0];
+
+    expect(notExact).toBeUndefined();
+    expect(exact).toBeDefined();
+    expect(exact.title).toBe("Module Type");
+})
+
 test("test field options", () => {
     let options = field.getListOptions();
     expect(options[0].title).toBe("Module 1");

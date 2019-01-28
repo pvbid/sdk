@@ -424,12 +424,16 @@ export default class BidEntityRelationsHelper {
      *
      * @param {string} type The type of bid entity to search for: line_item, field, metric, component, assembly, etc.
      * @param {string} query
+     * @param {boolean} [exactMatch=false] By default, the search will match any title that contains the search term. If this flag is set to true, the title search will perform a case-insensitive exact match
      * @returns {BidEntity[]}
      */
-    searchByTitle(type, query) {
+    searchByTitle(type, query, exactMatch=false) {
         const typeKey = type === "assembly" ? "assemblies" : type + "s";
         let collection = this.getCollection(typeKey);
         return _.filter(collection, item => {
+            if (exactMatch) {
+                return item.title.toLowerCase() === query.trim().toLowerCase();
+            }
             return item.title.toLowerCase().indexOf(query.trim().toLowerCase()) >= 0;
         });
     }
