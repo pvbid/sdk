@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.8 (2019-01-30)
+Documentation:
+* Added summary of bid and cost breakdown with code examples. 
+* Improved anchors documentation
 
 ### 1.1.7 (2019-01-28)
 Improvements:
