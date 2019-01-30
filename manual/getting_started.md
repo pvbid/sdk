@@ -95,11 +95,48 @@ project.save();
 // OR
 project.once("assessed", () => project.save());
 ```
+**Log a summary of the bid**
+
+``` javascript
+console.log(`
+    ${bid.title}:
+     + ${bid.cost} (cost)
+     + ${bid.tax} (tax)
+     + ${bid.markup} (markup)
+    ------------------
+     = ${bid.price} (price)
+`);
+```
+**Log a summary of the bid with a top-level component cost breakdown**
+
+[Components] are organized in [ComponentGroups] such as "Cost Codes" or "PVBid Standard". Looking at the top-level components in a group gives us a general overview of the cost breakdown within a bid.
+``` javascript
+// First, select a component group (ie. "Cost Codes" or "PVBid Standard")
+const groups = bid.entities.componentGroups();
+const group = Object.values(groups)
+    .find(group => group.title === 'PVBid Standard');
+
+// Next, get the top-level (summary) components for the group
+const allComponents = bid.entities.components();
+const componentsInGroup = Object.values(allComponents)
+    .filter(component => component.componentGroupId === group.id);
+const topLevelComponents = componentsInGroup
+    .filter(component => !component.config.is_nested);
+
+// Finally, display a cost summary
+const componentCostSummary = topLevelComponents
+    .map(c => `[$${c.cost}] ${c.title}`)
+    .join('\n');
+console.log(componentCostSummary);
+console.log(`Total: ${bid.cost}`);
+```
+
 
 [Bid]: ../class/src/domain/Bid.js~Bid.html
 [Bids]: ../class/src/domain/Bid.js~Bid.html
 [Fields]: ../class/src/domain/Field.js~Field.html
 [Components]: ../class/src/domain/Component.js~Component.html
+[ComponentGroups]: ../class/src/domain/ComponentGroup.js~ComponentGroup.html
 [Assemblies]: ../class/src/domain/Assembly.js~Assembly.html
 [Assembly]: ../class/src/domain/Assembly.js~Assembly.html
 [Metrics]: ../class/src/domain/Metric.js~Metric.html

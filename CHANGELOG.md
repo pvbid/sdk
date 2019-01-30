@@ -1,4 +1,12 @@
 # CHANGELOG
+### 1.1.8 (2019-01-30)
+Documentation:
+* Added summary of bid and cost breakdown with code examples. 
+* Improved anchors documentation
+
+### 1.1.7 (2019-01-28)
+Improvements:
+* **BidEntities:** Add flag for `exactMatch` when searching for a bid entity by title (`bid.entities.searchByTitle(type, query, exactMatch)`). The exact match flag defaults to false. Think of `exactMatch=false` as wrapping wildcard characters around the query string (`(%<query>%)`). Note that both methods are case insensitive.
 
 ### 1.1.7 (2019-01-28)
 Improvements:
