@@ -88,7 +88,10 @@ export default class Field extends BidEntity {
     }
 
     /**
-     * Returns the anchor identifier of the field
+     * Returns the anchor identifier of the field.
+     * Anchors are a common global identifier that help identify similar fields across different assemblies.
+     * They should be unique to their assembly.
+     * Using anchors allow for greater automation potential.
      * @type {string|null}
      */
     get anchor() {

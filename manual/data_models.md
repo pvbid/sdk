@@ -292,6 +292,8 @@
     "title": "Module Type",
     "value": "mhzk",
     "is_active": true,
+    "anchor": "module_type",
+    "anchor_id": 2,
     "config": {
         "type": "list",
         "constraint": "Whole",
