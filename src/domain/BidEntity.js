@@ -1,9 +1,9 @@
-import _ from "lodash";
+import { cloneDeep } from "lodash";
 import AdvanceEventEmitter from "../utils/AdvanceEventEmitter";
 
 /**
  * A base class for all other bid entities to extend.
- * 
+ *
  * @class BidEntity
  */
 export default class BidEntity extends AdvanceEventEmitter {
@@ -16,22 +16,17 @@ export default class BidEntity extends AdvanceEventEmitter {
          */
         this._data = {};
 
-        this.on("assessed", "self", () =>
-            this._waitForFinalEvent(
-                () => {
-                    // console.log("clearing", this.type);
-                    this._eventTree = {};
-                },
-                500,
-                "self.clear"
-            )
-        );
+        this.on("assessed", "self", () => this._waitForFinalEvent(() => {
+            this._eventTree = {};
+        },
+        500,
+        "self.clear"));
     }
 
     /**
      * Gets the id of the bid entity.
      * NOTE: Esculding Projects, all bid entity id's will soon be in UUID format
-     * 
+     *
      * @type {number}
      */
     get id() {
@@ -40,7 +35,7 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Gets the bid entity title.
-     * 
+     *
      * @type {string}
      */
     get title() {
@@ -49,7 +44,7 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Sets the bid entity title. Flags bid entity as dirty.
-     * 
+     *
      * @type {string}
      */
     set title(val) {
@@ -59,7 +54,7 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Gets the bid entity type.
-     * 
+     *
      * @type {string}
      */
     get type() {
@@ -68,8 +63,8 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Determines of bid entity is dirty.
-     * 
-     * @returns {boolean} 
+     *
+     * @returns {boolean}
      */
     isDirty() {
         return this._is_dirty;
@@ -101,12 +96,12 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @returns {object}
      */
     exportData() {
-        return _.cloneDeep(this._data);
+        return cloneDeep(this._data);
     }
 
     /**
      * Gets all the dependencies that the bid entity relies on.
-     * 
+     *
      * @returns {BidEntity[]} Returns an array of bid entities.
      */
     dependencies() {
@@ -125,44 +120,28 @@ export default class BidEntity extends AdvanceEventEmitter {
     }
 
     /**
-     * Check the prediction status of the dependant bid entity's properties.
-     * Adds predicted properties to the given Set.
-     * If a different property name is desired for the predicted set, an array can be given in
-     *  place of a string where the 0 index is the property name on the bid entity and the
-     *  1 index is the property name on this entity
+     * Check the status of entity properties using a test method.
      *
-     * @param {BidEntity} bidEntity The contributing bid entity
-     * @param {Set} predictedSet The current set of predicted values
-     * @param {Array<string|string[]>} propsToCheck The properties of the bid entity to check the prediction status of
+     * @param {Array<string|string[]>} propsMap Properties of the bid entity to check using testMethod.
+     *      Each prop can be a string or a [testProp, outputProp] pair.
+     *      The testProp is tested and if true, the outputProp is in the return array.
+     * @param {function} testMethod Called to test the props
+     * @return {string[]} Array of properties that passed the test
      */
-    _applyPredictedDependencies(bidEntity, predictedSet, propsToCheck) {
-        propsToCheck.forEach(property => {
+    _checkProperties(propsMap, testMethod) {
+        const foundProps = [];
+        propsMap.forEach((property) => {
             const [prop1, prop2] = Array.isArray(property) ? property : [property, property];
-            if (bidEntity.isPredicted(prop1)) predictedSet.add(prop2);
+            if (testMethod(prop1)) {
+                foundProps.push(prop2);
+            }
         });
-    }
-
-    /**
-     * Check the null dependency status of the dependant bid entity's properties.
-     * Adds null dependant properties to the given Set.
-     * If a different property name is desired for the Set, an array can be given in
-     *  place of a string where the 0 index is the property name on the bid entity and the
-     *  1 index is the property name on this entity
-     *
-     * @param {BidEntity} bidEntity The contributing bid entity
-     * @param {Set} nullSet The current set of null dependant values
-     * @param {Array<string|string[]>} propsToCheck The properties of the bid entity to check the null dependency status of
-     */
-    _applyNullDependencies(bidEntity, nullSet, propsToCheck) {
-        propsToCheck.forEach(property => {
-            const [prop1, prop2] = Array.isArray(property) ? property : [property, property];
-            if (bidEntity.hasNullDependency(prop1)) nullSet.add(prop2);
-        });
+        return foundProps;
     }
 
     /**
      * Gets an array of depndants that rely on the bid entity.
-     * 
+     *
      * @returns {BidEntity[]} Returns an array of bid entities.
      */
     dependants() {
@@ -170,8 +149,8 @@ export default class BidEntity extends AdvanceEventEmitter {
     }
 
     /**
-     * Assesses bid entity. 
-     * 
+     * Assesses bid entity.
+     *
      * @emits {assessing} Fires as assessment begins.
      * @emits {assessed} Fires when bid entity assessement is completed
      * @emits {updated} Fires when the bid entity has changed.
@@ -179,6 +158,6 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @abstract
      */
     assess(dependency) {
-        throw "Must be implemented by subclass.";
+        throw new Error("Must be implemented by subclass.");
     }
 }

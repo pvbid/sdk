@@ -626,16 +626,17 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Determine if the line item or one of its properties is overriden
      *
-     * @param {string} property
+     * @param {string} [property=null]
      * @returns {boolean}
      */
-    isOverridden(property) {
-        return (
-            !_.isUndefined(this._data.config.overrides) &&
-            !_.isUndefined(this._data.config.overrides[property]) &&
-            this._data.config.overrides[property] === true
-        );
+    isOverridden(property=null) {
+        if (this._data.config.overrides === undefined) return false;
+
+        return property === null
+            ? Object.values(this._data.config.overrides).some(value => value)
+            : this._data.config.overrides[property] === true;
     }
 
     /**

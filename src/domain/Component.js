@@ -25,7 +25,7 @@ export default class Component extends BidEntity {
 
     /**
      * The summed cost from the nested line items.
-     * 
+     *
      * @type {number}
      */
     get cost() {
@@ -36,7 +36,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set cost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.cost) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.cost) {
             this._applyComponentValue("cost", this._data.cost, val, false);
             this.dirty();
             this.emit("updated");
@@ -45,19 +45,20 @@ export default class Component extends BidEntity {
 
     /**
      * The summed taxable cost from the nested line items.
-     * 
+     *
      * @type {number}
      */
     get taxableCost() {
         return this._data.taxable_cost;
     }
+
     /**
      * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
-     * 
+     *
      * @type {number}
      */
     set taxableCost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.taxable_cost) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.taxable_cost) {
             this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
             this.dirty();
             this.emit("updated");
@@ -77,7 +78,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set taxPercent(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax_percent) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
             this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
             this.dirty();
             this.emit("updated");
@@ -90,11 +91,12 @@ export default class Component extends BidEntity {
     get tax() {
         return this._data.tax;
     }
+
     /**
      * @type {number}
      */
     set tax(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.tax_percent) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
             this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
             this.dirty();
             this.emit("updated");
@@ -120,7 +122,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set markup(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.markup) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup) {
             this._applyComponentValue("markup", this._data.markup, val, false);
             this.dirty();
             this.emit("updated");
@@ -138,7 +140,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set markupPercent(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.markup_percent) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup_percent) {
             this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
             this.dirty();
             this.emit("updated");
@@ -156,7 +158,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set laborHours(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.labor_hours) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.labor_hours) {
             this._applyComponentValue("laborHours", this._data.labor_hours, val, false);
             this.dirty();
             this.emit("updated");
@@ -189,7 +191,7 @@ export default class Component extends BidEntity {
      * @type {number}
      */
     set price(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) != this._data.price) {
+        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.price) {
             this._applyComponentValue("price", this._data.price, val, false);
             this.dirty();
             this.emit("updated");
@@ -203,9 +205,8 @@ export default class Component extends BidEntity {
     get priceWatt() {
         if (this.bid.watts > 0) {
             return Helpers.confirmNumber(this.price / this.bid.watts);
-        } else {
-            return this.price;
         }
+        return this.price;
     }
 
     /**
@@ -225,9 +226,8 @@ export default class Component extends BidEntity {
         if (this.bid.watts > 0) {
             return Helpers.confirmNumber(this.cost / this.bid.watts);
         }
-        else {
-            return this.cost;
-        }
+
+        return this.cost;
     }
 
     /**
@@ -282,7 +282,7 @@ export default class Component extends BidEntity {
     get baseAvg() {
         if (this._data.properties && this._data.properties.base_avg) {
             return this._data.properties.base_avg.value;
-        } else return 0;
+        } return 0;
     }
 
     /**
@@ -291,7 +291,7 @@ export default class Component extends BidEntity {
     get wageAvg() {
         if (this._data.properties && this._data.properties.wage_avg) {
             return this._data.properties.wage_avg.value;
-        } else return 0;
+        } return 0;
     }
 
     /**
@@ -300,7 +300,7 @@ export default class Component extends BidEntity {
     get burdenAvg() {
         if (this._data.properties && this._data.properties.burden_avg) {
             return this._data.properties.burden_avg.value;
-        } else return 0;
+        } return 0;
     }
 
     /**
@@ -309,7 +309,7 @@ export default class Component extends BidEntity {
     get quantityAvg() {
         if (this._data.properties && this._data.properties.per_quantity) {
             return this._data.properties.per_quantity.value;
-        } else return 0;
+        } return 0;
     }
 
     /**
@@ -318,13 +318,13 @@ export default class Component extends BidEntity {
     get perQuantityAvg() {
         if (this._data.properties && this._data.properties.per_quantity_avg) {
             return this._data.properties.per_quantity_avg.value;
-        } else return 0;
+        } return 0;
     }
 
     /**
      * Gets the component's group id.
-     * 
-     * @type {number} 
+     *
+     * @type {number}
      */
     get componentGroupId() {
         return this.config.component_group_id;
@@ -332,7 +332,7 @@ export default class Component extends BidEntity {
 
     /**
      * Gets the component's definition id.
-     * 
+     *
      * @type {number}
      * @deprecated Definition ids will become obsolete in planned data structure upgrade.
      */
@@ -342,32 +342,31 @@ export default class Component extends BidEntity {
 
     /**
      * Applies a new value to the component and assesses if there is a change.
-     * 
-     * @param {string} property 
-     * @param {number} value 
+     *
+     * @param {string} property
+     * @param {number} value
      * @returns {boolean} Returns true if there is a change.
      */
     _apply(property, value) {
-        var oldValue = _.round(this._data[property], 4);
-        var newValue = _.round(Helpers.confirmNumber(value), 4);
+        const oldValue = _.round(this._data[property], 4);
+        const newValue = _.round(Helpers.confirmNumber(value), 4);
         if (oldValue !== newValue) {
-            //console.log("Component Change", property, oldValue, newValue);
             this._data[property] = Helpers.confirmNumber(value);
             this.dirty();
 
             return true;
-        } else return false;
+        } return false;
     }
 
     /**
      * Applies a new virtual property value to the component and returns true if there is a change.
-     * 
-     * @param {string} property 
-     * @param {number} value 
+     *
+     * @param {string} property
+     * @param {number} value
      * @returns {boolean}
      */
     _applyVirtualProperty(property, value) {
-        //Must check if config.properties exists due to not existing in legacy bids.
+        // Must check if config.properties exists due to not existing in legacy bids.
         if (_.isUndefined(this._data.properties) || _.isNull(this._data.properties)) {
             this._data.properties = {};
         }
@@ -376,24 +375,60 @@ export default class Component extends BidEntity {
             this._data.properties[property] = {
                 value: 0,
                 config: {
-                    data_type: "number"
-                }
+                    data_type: "number",
+                },
             };
         }
 
-        var oldValue = _.round(this._data.properties[property].value, 4);
-        var newValue = _.round(Helpers.confirmNumber(value), 4);
+        const oldValue = _.round(this._data.properties[property].value, 4);
+        const newValue = _.round(Helpers.confirmNumber(value), 4);
         if (oldValue !== newValue) {
             this._data.properties[property].value = newValue;
             this.dirty();
 
             return true;
-        } else return false;
+        } return false;
+    }
+
+    /**
+     * Applies any changes to a config flag set
+     *
+     * @param {string} configProp config property name
+     * @param {string[]} newFlags flags to be set true
+     * @return {boolean} If there was a change or not
+     */
+    _applyConfigFlags(configProp, newFlags) {
+        if (!this.config[configProp] || _.xor(newFlags, this.config[configProp]).length > 0) {
+            this.config[configProp] = [...newFlags];
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Sets the override status for any props in the given array
+     *
+     * @param {string[]} newOverrideProps Overriden props from the assessment
+     * @return {boolean} Whether or not the overrides have changed
+     */
+    _applyOverrides(newOverrideProps) {
+        const currentOverrides = this.config.overrides
+            ? Object.keys(this.config.overrides).filter(o => this.config.overrides[o] === true)
+            : [];
+
+        if (!this.config.overrides || _.xor(newOverrideProps, currentOverrides).length > 0) {
+            this.config.overrides = {};
+            newOverrideProps.forEach((prop) => {
+                this.config.overrides[prop] = true;
+            });
+            return true;
+        }
+        return false;
     }
 
     /**
      * Assess the component instance.
-     * 
+     *
      * @emits {assessing}
      * @emits {assessed}
      * @emits {updated}
@@ -401,61 +436,80 @@ export default class Component extends BidEntity {
      */
     assess(dependency) {
         if (this.bid.isAssessable()) {
-            var isChanged = false;
-
-            let cost = 0,
-                taxableCost = 0,
-                price = 0,
-                markup = 0,
-                tax = 0,
-                base = 0,
-                laborHours = 0,
-                totalLineItems = 0,
-                totalLaborLinetItems = 0,
-                wage = 0,
-                burden = 0,
-                quantity = 0,
-                perQuantity = 0,
-                laborCosts = 0,
-                nonLaborCosts = 0;
-
+            let isChanged = false;
+            let cost = 0;
+            let taxableCost = 0;
+            let price = 0;
+            let markup = 0;
+            let tax = 0;
+            let base = 0;
+            let laborHours = 0;
+            let totalLineItems = 0;
+            let totalLaborLinetItems = 0;
+            let wage = 0;
+            let burden = 0;
+            let quantity = 0;
+            let perQuantity = 0;
+            let laborCosts = 0;
+            let nonLaborCosts = 0;
             let predictedValues = new Set();
             let hasNullDependencyValues = new Set();
+            let overrides = new Set();
 
-            _.each(this.getLineItems(), lineItem => {
-                if (lineItem && lineItem.isIncluded) {
-                    totalLineItems += 1;
-                    if (lineItem.isLabor()) {
-                        totalLaborLinetItems += 1;
-                        laborCosts += lineItem.cost;
-                        laborHours += lineItem.laborHours;
+            _.each(this.getLineItems(), (lineItem) => {
+                if (!lineItem) return true;
 
-                        this._applyPredictedDependencies(lineItem, predictedValues, [["cost", "labor_cost"], "labor_hours"]);
-                        this._applyNullDependencies(lineItem, hasNullDependencyValues, [["cost", "labor_cost"], "labor_hours"]);
-                    } else {
-                        nonLaborCosts += lineItem.cost;
-                        taxableCost += lineItem.cost;
-
-                        this._applyPredictedDependencies(lineItem, predictedValues, [["cost", "non_labor_cost"], ["cost", "taxable_cost"]]);
-                        this._applyNullDependencies(lineItem, hasNullDependencyValues, [["cost", "non_labor_cost"], ["cost", "taxable_cost"]]);
-                    }
-
-                    cost += lineItem.cost;
-                    price += lineItem.price;
-                    markup += lineItem.markup;
-                    tax += lineItem.tax;
-                    base += lineItem.base;
-                    wage += lineItem.wage;
-                    burden += lineItem.burden;
-                    quantity += lineItem.quantity;
-                    perQuantity += lineItem.perQuantity;
-
-                    this._applyPredictedDependencies(lineItem, predictedValues, ["cost", "price", "markup", "tax"]);
-                    this._applyNullDependencies(lineItem, hasNullDependencyValues, ["cost", "price", "markup", "tax"]);
+                if (!lineItem.isIncluded) {
+                    overrides = new Set([...overrides, ...this._checkProperties(["is_included"], lineItem.isOverridden.bind(lineItem))]);
+                    return true;
                 }
+
+                totalLineItems += 1;
+                const dependantValuesMap = []; // track line item values used in component
+
+                if (lineItem.isLabor()) {
+                    totalLaborLinetItems += 1;
+                    laborCosts += lineItem.cost;
+                    laborHours += lineItem.laborHours;
+
+                    dependantValuesMap.push(["cost", "labor_cost"], "labor_hours");
+                } else {
+                    nonLaborCosts += lineItem.cost;
+                    taxableCost += lineItem.cost;
+
+                    dependantValuesMap.push(["cost", "non_labor_cost"], ["cost", "taxable_cost"]);
+                }
+
+                cost += lineItem.cost;
+                price += lineItem.price;
+                markup += lineItem.markup;
+                tax += lineItem.tax;
+                base += lineItem.base;
+                wage += lineItem.wage;
+                burden += lineItem.burden;
+                quantity += lineItem.quantity;
+                perQuantity += lineItem.perQuantity;
+
+                dependantValuesMap.push("cost", "price", "markup", "tax", "base", "wage", "burden", "quantity", "per_quantity");
+
+                predictedValues = new Set([
+                    ...predictedValues,
+                    ...this._checkProperties(dependantValuesMap, lineItem.isPredicted.bind(lineItem)),
+                ]);
+                hasNullDependencyValues = new Set([
+                    ...hasNullDependencyValues,
+                    ...this._checkProperties(dependantValuesMap, lineItem.hasNullDependency.bind(lineItem)),
+                ]);
+                overrides = new Set([
+                    ...overrides,
+                    ...this._checkProperties(
+                        [...dependantValuesMap, "is_included"],
+                        lineItem.isOverridden.bind(lineItem)
+                    ),
+                ]);
             });
 
-            _.each(this.getSubComponents(), subComponent => {
+            _.each(this.getSubComponents(), (subComponent) => {
                 subComponent.assess();
                 cost += Helpers.confirmNumber(subComponent.cost);
                 price += Helpers.confirmNumber(subComponent.price);
@@ -473,25 +527,35 @@ export default class Component extends BidEntity {
                 totalLineItems += Helpers.confirmNumber(subComponent._data.included_count);
                 totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.included_labor_count);
 
-                const valuesToCheck = ["cost", "price", "markup", "tax", "taxable_cost", "labor_hours", "labor_cost", "non_labor_cost"];
-                this._applyPredictedDependencies(subComponent, predictedValues, valuesToCheck);
-                this._applyNullDependencies(subComponent, hasNullDependencyValues, valuesToCheck);
+                const valuesToCheck = ["cost", "price", "markup", "tax", "taxable_cost", "labor_hours", "labor_cost", "non_labor_cost", "base", "wage", "burden", "quantity", "per_quantity"];
+                predictedValues = new Set([
+                    ...predictedValues,
+                    ...this._checkProperties(valuesToCheck, subComponent.isPredicted.bind(subComponent)),
+                ]);
+                hasNullDependencyValues = new Set([
+                    ...hasNullDependencyValues,
+                    ...this._checkProperties(valuesToCheck, subComponent.hasNullDependency.bind(subComponent)),
+                ]);
+                overrides = new Set([
+                    ...overrides,
+                    ...this._checkProperties([...valuesToCheck, "is_included"], subComponent.isOverridden.bind(subComponent)),
+                ]);
             });
 
-            var markupPercent = 0;
+            let markupPercent = 0;
             if (this.bid.includeTaxInMarkup()) {
-                var adjCost = cost + tax;
+                const adjCost = cost + tax;
                 markupPercent = adjCost > 0 ? markup / adjCost * 100 : 0;
             } else {
                 markupPercent = cost > 0 ? markup / cost * 100 : 0;
             }
 
-            var taxPercent = taxableCost > 0 ? tax / taxableCost * 100 : 0;
-            var baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
-            var wageAvg = totalLaborLinetItems > 0 ? wage / totalLaborLinetItems : 0;
-            var burdenAvg = totalLaborLinetItems > 0 ? burden / totalLaborLinetItems : 0;
-            var quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
-            var perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
+            const taxPercent = taxableCost > 0 ? tax / taxableCost * 100 : 0;
+            const baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
+            const wageAvg = totalLaborLinetItems > 0 ? wage / totalLaborLinetItems : 0;
+            const burdenAvg = totalLaborLinetItems > 0 ? burden / totalLaborLinetItems : 0;
+            const quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
+            const perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
 
             isChanged = this._apply("cost", cost) || isChanged;
             isChanged = this._apply("price", price) || isChanged;
@@ -504,15 +568,9 @@ export default class Component extends BidEntity {
             isChanged = this._apply("labor_hours", laborHours) || isChanged;
             isChanged = this._apply("labor_cost", laborCosts) || isChanged;
 
-            if (!this.config.predicted_values || _.xor([...predictedValues.values()], this.config.predicted_values).length > 0) {
-                this._data.config.predicted_values = [...predictedValues.values()];
-                isChanged = true;
-            }
-
-            if (!this.config.undefined_prop_flags || _.xor([...hasNullDependencyValues.values()], this.config.undefined_prop_flags).length > 0) {
-                this._data.config.undefined_prop_flags = [...hasNullDependencyValues.values()];
-                isChanged = true;
-            }
+            isChanged = this._applyConfigFlags("predicted_values", [...predictedValues.values()]) || isChanged;
+            isChanged = this._applyConfigFlags("undefined_prop_flags", [...hasNullDependencyValues.values()]) || isChanged;
+            isChanged = this._applyOverrides([...overrides.values()]) || isChanged;
 
             this._applyVirtualProperty("base", base);
             this._applyVirtualProperty("burden", burden);
@@ -535,8 +593,8 @@ export default class Component extends BidEntity {
 
     /**
      * Gets a list of bid entities that relies on the component instance.
-     * 
-     * @returns {BidEntity[]} 
+     *
+     * @returns {BidEntity[]}
      */
     dependants() {
         return this.bid.entities.getDependants("component", this.id);
@@ -544,8 +602,8 @@ export default class Component extends BidEntity {
 
     /**
      * Removes a line item from the component.
-     * 
-     * @param {number} lineItemId 
+     *
+     * @param {number} lineItemId
      */
     removeLineItem(lineItemId) {
         _.pull(this.config.line_items, lineItemId);
@@ -557,7 +615,7 @@ export default class Component extends BidEntity {
      * Binds the "updated" event for all dependant bid entities.
      */
     bind() {
-        for (let lineItemId of this.config.line_items) {
+        for (const lineItemId of this.config.line_items) {
             const lineItem = this.bid.entities.lineItems(lineItemId);
             if (lineItem) {
                 lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
@@ -566,7 +624,7 @@ export default class Component extends BidEntity {
             }
         }
 
-        _.each(this.getSubComponents(), c => {
+        _.each(this.getSubComponents(), (c) => {
             c.onDelay("updated", 5, `component.${this.id}`, (requesterId, self) => {
                 waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.${requesterId}`);
             });
@@ -575,13 +633,13 @@ export default class Component extends BidEntity {
 
     /**
      * Gets an array of nested of subcomponents.
-     * 
+     *
      * @return {Component[]}
      */
     getSubComponents() {
-        var components = [];
+        const components = [];
 
-        _.each(this.config.components, subComponentId => {
+        _.each(this.config.components, (subComponentId) => {
             components.push(this.bid.entities.components(subComponentId));
         });
 
@@ -590,30 +648,30 @@ export default class Component extends BidEntity {
 
     /**
      * Gets the component's parent component, if exists.
-     * 
+     *
      * @returns {?Component}
      */
     getParent() {
         if (this.config.is_nested) {
             return this.bid.entities.components(this.config.parent_component_id);
-        } else return null;
+        } return null;
     }
 
     /**
      * Gets the level at which the component is nested: 0, 1, 2.
-     * 
+     *
      * @returns {number}
      */
     getNestedLevel() {
         const parent = this.getParent();
         if (parent) {
             return parent.config.is_nested ? 2 : 1;
-        } else return 0;
+        } return 0;
     }
 
     /**
      * Determines of component is a top parent component, in which is not nested.
-     * 
+     *
      * @returns {boolean}
      */
     isParent() {
@@ -621,8 +679,24 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Determine if any of the components children have been overriden
+     *
+     * @param {string} [property=null]
+     * @return {boolean}
+     */
+    isOverridden(property = null) {
+        if (!this.config.overrides) {
+            this.config.overrides = {};
+        }
+
+        return property === null
+            ? Object.values(this.config.overrides).some(o => o)
+            : !!this.config.overrides[property];
+    }
+
+    /**
      * Gets an array of nested line items.
-     * 
+     *
      * @param  {boolean} includeSubComponents
      * @return {array} Returns an array of line items in component.
      */
@@ -631,15 +705,15 @@ export default class Component extends BidEntity {
 
         let lines = [];
 
-        for (let lineItemId of this.config.line_items) {
-            var lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
+        for (const lineItemId of this.config.line_items) {
+            const lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
 
             if (lineItem) lines.push(lineItem);
         }
 
         if (includeSubComponents) {
-            for (let subComponentId of this.config.components) {
-                let subComponent = this.bid.entities.components(subComponentId);
+            for (const subComponentId of this.config.components) {
+                const subComponent = this.bid.entities.components(subComponentId);
                 lines = lines.concat(subComponent.getLineItems(includeSubComponents));
             }
         }
@@ -649,14 +723,14 @@ export default class Component extends BidEntity {
 
     /**
      * Sets the include status for all nested line items.
-     * 
-     * @param {boolean} isIncluded 
+     *
+     * @param {boolean} isIncluded
      */
     setIncludeStatus(isIncluded) {
         if (this.bid.isAssessable()) {
-            var lineItems = this.getLineItems(true);
+            const lineItems = this.getLineItems(true);
 
-            _.each(lineItems, function(lineItem) {
+            _.each(lineItems, (lineItem) => {
                 lineItem.isIncluded = isIncluded;
             });
         }
@@ -699,53 +773,49 @@ export default class Component extends BidEntity {
      */
     reset() {
         if (this.bid.isAssessable()) {
-            var lineItems = this.getLineItems(true);
+            const lineItems = this.getLineItems(true);
 
-            _.each(lineItems, function(lineItem) {
+            _.each(lineItems, (lineItem) => {
                 lineItem.reset();
             });
         }
     }
 
     /**
-     * Applies the component value change to the nested line items. 
-     * 
-     * @param {string} property 
-     * @param {number} oldValue 
-     * @param {number} newValue 
-     * @param {boolean} overrideAllLineItems 
+     * Applies the component value change to the nested line items.
+     *
+     * @param {string} property
+     * @param {number} oldValue
+     * @param {number} newValue
+     * @param {boolean} overrideAllLineItems
      */
     _applyComponentValue(property, oldValue, newValue, overrideAllLineItems) {
         newValue = Helpers.confirmNumber(newValue);
 
-        var lineItems = this.getLineItems(true);
-        var includedLineItemsOnly = _.filter(lineItems, function(li) {
-            return li.isIncluded;
-        });
+        let lineItems = this.getLineItems(true);
+        const includedLineItemsOnly = _.filter(lineItems, li => li.isIncluded);
 
         lineItems = includedLineItemsOnly.length === 0 || overrideAllLineItems ? lineItems : includedLineItemsOnly;
 
-        for (var i = 0; i < lineItems.length; i++) {
+        for (let i = 0; i < lineItems.length; i += 1) {
             if (["markupPercent", "taxPercent"].indexOf(property) >= 0 && parseFloat(oldValue) === 0) {
                 lineItems[i][property] = newValue;
+            } else if (Helpers.confirmNumber(oldValue) !== 0) {
+                const ratio = newValue / Helpers.confirmNumber(oldValue);
+                lineItems[i][property] = Helpers.confirmNumber(parseFloat(lineItems[i][property]) * ratio);
             } else {
-                if (Helpers.confirmNumber(oldValue) !== 0) {
-                    var ratio = newValue / Helpers.confirmNumber(oldValue);
-                    lineItems[i][property] = Helpers.confirmNumber(parseFloat(lineItems[i][property]) * ratio);
-                } else {
-                    lineItems[i][property] = newValue / lineItems.length;
-                }
+                lineItems[i][property] = newValue / lineItems.length;
             }
         }
     }
 
     /**
      * Exports component internal data structure.
-     * 
-     * @returns {object} 
+     *
+     * @returns {object}
      */
     exportData() {
-        let data = _.cloneDeep(this._data);
+        const data = _.cloneDeep(this._data);
         if (_.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
