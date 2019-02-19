@@ -1,5 +1,5 @@
 # CHANGELOG
-### 1.1.X (2019-02-XX)
+### 1.1.9 (2019-02-19)
 Features:
 * **Component:** Add an `isOverridden()` method that returns the override status of the component. A component is considered to be overridden if any of its sub-components or line items are overridden.
 
