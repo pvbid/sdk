@@ -149,17 +149,19 @@ describe("Line item OH&P", () => {
 describe("Line item markup percent", () => {
     describe("should update to an equally distributed ratio", () => {
         test("when bid markup changes and line item is included.", async () => {
-            expect.assertions(5);
+            expect.assertions(7);
 
             let lineItem = bid.entities.searchByTitle("line_item", "general line item")[0];
             expect(lineItem.isIncluded).toBe(true);
             expect(lineItem.markupPercent).toBe(15);
             expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden()).toBe(false);
 
             return new Promise(resolve => {
                 lineItem.once("updated", () => {
                     expect(_.round(lineItem.markupPercent, 2)).toBe(21.74);
                     expect(lineItem.isOverridden("markup_percent")).toBe(true);
+                    expect(lineItem.isOverridden()).toBe(true);
                     resolve();
                 });
                 bid.markup = 300;
@@ -167,7 +169,7 @@ describe("Line item markup percent", () => {
         });
 
         test("when bid margin changes and line item is included.", async () => {
-            expect.assertions(5);
+            expect.assertions(7);
             let lineItem = bid.entities.searchByTitle("line_item", "general line item")[0];
 
             await new Promise(resolve => {
@@ -178,11 +180,14 @@ describe("Line item markup percent", () => {
             expect(lineItem.isIncluded).toBe(true);
             expect(lineItem.markupPercent).toBe(15);
             expect(lineItem.isOverridden("markup_percent")).toBe(false);
+            expect(lineItem.isOverridden()).toBe(false);
+
 
             return new Promise(resolve => {
                 lineItem.once("updated", () => {
                     expect(_.round(lineItem.markupPercent, 2)).toBe(17.25);
                     expect(lineItem.isOverridden("markup_percent")).toBe(true);
+                    expect(lineItem.isOverridden()).toBe(true);
                     resolve();
                 });
                 bid.marginPercent = 20;

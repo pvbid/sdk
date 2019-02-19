@@ -1,4 +1,11 @@
 # CHANGELOG
+### 1.1.X (2019-02-XX)
+Features:
+* **Component:** Add an `isOverridden()` method that returns the override status of the component. A component is considered to be overridden if any of its sub-components or line items are overridden.
+
+Improvements:
+* **LineItem:** `isOverridden()`'s parameter is now optional. Calling `isOverridden` without a param returns the override status of the whole line item.
+
 ### 1.1.8 (2019-01-30)
 Documentation:
 * Added summary of bid and cost breakdown with code examples. 
@@ -43,7 +50,7 @@ Bug Fixes:
 ### 1.1.1 (2018-10-18)
 Features:
 * **Predictive Pricing:** Introduced services to handle the evaluation of prediction models
-* **LineItem:** Line items can now determine their value by evaluating a prediction model if configured to do so. A **predicted value** will be used if the `predictive_pricing` bid variable is `true` and the line item's value cannot be computed by evaluating it's dependencies. The computed value may be overriden by setting the `use_computed` bid variable to `false` or `lineItem.useComputedValueWhenAvailable` to `false`. The bid must have a non-zero value for Watts.
+* **LineItem:** Line items can now determine their value by evaluating a prediction model if configured to do so. A **predicted value** will be used if the `predictive_pricing` bid variable is `true` and the line item's value cannot be computed by evaluating its dependencies. The computed value may be overridden by setting the `use_computed` bid variable to `false` or `lineItem.useComputedValueWhenAvailable` to `false`. The bid must have a non-zero value for Watts.
 * **LineItem:** `LineItem.isWeighted` determine or set a line items weighted switch. Predicted line items can optionally be weighted by their total historic inclusion count
 * **LineItem:** `LineItem.getPredicted('cost')` determines the predicted cost of the line item using its prediction models
 * **Bid|LineItem|Component:** `Bid|LineItem|Component.isPredicted(property)` determines if a property is being predicted

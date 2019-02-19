@@ -372,7 +372,7 @@ export default class Bid extends BidEntity {
 
             this.dirty();
             this.emit("updated");
-        } else assess();
+        } else this.assess();
     }
 
     _resetSubMargins() {
@@ -445,31 +445,39 @@ export default class Bid extends BidEntity {
                 watts: 0
             };
 
-            const predictedValues = new Set();
-            const valuesWithNullDependency = new Set();
+            let predictedValues = new Set();
+            let valuesWithNullDependency = new Set();
 
             _.each(this.entities.lineItems(), li => {
                 if (li.isIncluded) {
+                    const dependantValuesMap = []; // track the values used for this line item
+
                     bidValues.cost += li.cost;
                     bidValues.price += li.price;
                     bidValues.tax += li.tax;
                     bidValues.markup += li.markup;
 
-                    this._applyPredictedDependencies(li, predictedValues, ['cost', 'price', 'tax', 'markup']);
-                    this._applyNullDependencies(li, valuesWithNullDependency, ['cost', 'price', 'tax', 'markup']);
+                    dependantValuesMap.push("cost", "price", "tax", "markup");
 
                     if (li.isLabor()) {
                         bidValues.labor_hours += li.laborHours;
                         bidValues.labor_cost += li.cost;
 
-                        this._applyPredictedDependencies(li, predictedValues, ['labor_hours', ['cost', 'labor_cost']]);
-                        this._applyNullDependencies(li, valuesWithNullDependency, ['labor_hours', ['cost', 'labor_cost']]);
+                        dependantValuesMap.push("labor_hours", ["cost", "labor_cost"]);
                     } else {
                         bidValues.taxable_cost += li.cost;
 
-                        this._applyPredictedDependencies(li, predictedValues, [['cost', 'taxable_cost']]);
-                        this._applyNullDependencies(li, valuesWithNullDependency, [['cost', 'taxable_cost']]);
+                        dependantValuesMap.push(["cost", "taxable_cost"]);
                     }
+
+                    predictedValues = new Set([
+                        ...predictedValues,
+                        ...this._checkProperties(dependantValuesMap, li.isPredicted.bind(li)),
+                    ]);
+                    valuesWithNullDependency = new Set([
+                        ...valuesWithNullDependency,
+                        ...this._checkProperties(dependantValuesMap, li.hasNullDependency.bind(li)),
+                    ]);
                 }
             });
 
