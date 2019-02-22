@@ -10,6 +10,13 @@ let project;
 let bid;
 let lineItem;
 
+const resetLineItem = ($lineItem) => {
+    return new Promise(resolve => {
+        $lineItem.bid.project.once("assessed", resolve);
+        $lineItem.reset();
+    });
+}
+
 beforeAll(() => {
     return init();
 }, 50000);
@@ -663,13 +670,43 @@ test("test markup not including tax", async () => {
     });
 });
 
+describe("When changing a line item's config values", () => {
+    let $lineItem;
+    beforeEach(async () => {
+        $lineItem = bid.entities.lineItems(49665);
+        await resetLineItem($lineItem);
+    });
+
+    afterAll(async () => {
+        $lineItem.config.formula = "1"; // reset to original value
+        await resetLineItem($lineItem);
+    });
+
+    test("should be set dirty when config is changed", () => {
+        $lineItem.config.formula = "1"; // ensure start with original value
+        $lineItem.assess();
+        $lineItem.pristine();
+
+        expect($lineItem.isDirty()).toBe(false);
+        $lineItem.config.formula = "2";
+        expect($lineItem.isDirty()).toBe(true);
+    });
+
+    test("should be set dirty when config is changed back to its original value", () => {
+        $lineItem.config.formula = "2";
+        $lineItem.assess();
+        $lineItem.pristine();
+
+        expect($lineItem.isDirty()).toBe(false);
+        $lineItem.config.formula = "1";
+        expect($lineItem.isDirty()).toBe(true);
+    });
+});
+
 describe("When line item is a labor type", () => {
     describe("changing the multiplier", () => {
         beforeAll(async () => {
-            await new Promise(resolve => {
-                lineItem.bid.project.once("assessed", resolve);
-                lineItem.reset();
-            });
+            await resetLineItem(lineItem);
 
             return new Promise(resolve => {
                 lineItem.bid.project.once("assessed", resolve);
@@ -704,10 +741,7 @@ describe("When line item is a labor type", () => {
     describe("and the subtotal is zero", () => {
         describe("changing the cost", () => {
             beforeAll(async () => {
-                await new Promise(resolve => {
-                    lineItem.bid.project.once("assessed", resolve);
-                    lineItem.reset();
-                });
+                await resetLineItem(lineItem);
 
                 return new Promise(resolve => {
                     lineItem.bid.project.once("assessed", resolve);
@@ -732,10 +766,7 @@ describe("When line item is a labor type", () => {
 
         describe("changing the labor hours", () => {
             beforeAll(async () => {
-                await new Promise(resolve => {
-                    lineItem.bid.project.once("assessed", resolve);
-                    lineItem.reset();
-                });
+                await resetLineItem(lineItem);
 
                 return new Promise(resolve => {
                     lineItem.bid.project.once("assessed", resolve);
@@ -769,10 +800,7 @@ describe("When line item is a labor type", () => {
     describe("and the subtotal is greater than zero", () => {
         describe("changing the cost", () => {
             beforeAll(async () => {
-                await new Promise(resolve => {
-                    lineItem.bid.project.once("assessed", resolve);
-                    lineItem.reset();
-                });
+                await resetLineItem(lineItem);
 
                 return new Promise(resolve => {
                     lineItem.bid.project.once("assessed", resolve);
@@ -799,10 +827,7 @@ describe("When line item is a labor type", () => {
 
         describe("changing the labor hours", () => {
             beforeAll(async () => {
-                await new Promise(resolve => {
-                    lineItem.bid.project.once("assessed", resolve);
-                    lineItem.reset();
-                });
+                await resetLineItem(lineItem);
 
                 return new Promise(resolve => {
                     lineItem.bid.project.once("assessed", resolve);

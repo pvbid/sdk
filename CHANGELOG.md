@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.10 (2019-02-20)
+Bug Fixes:
+* **LineItem:** `isDirty()` better indicates changes to the `config` property
+
 ### 1.1.9 (2019-02-19)
 Features:
 * **Component:** Add an `isOverridden()` method that returns the override status of the component. A component is considered to be overridden if any of its sub-components or line items are overridden.
@@ -22,7 +26,7 @@ Improvements:
 ### 1.1.6 (2019-01-14)
 Features:
 * **Bid Variable:** Add a new bid variables to a bid with `bid.addBidVariable()`.
-* **Line Item:** Labor type line items may now consider tax if the `taxable_labor` bid variable is set to true (false by default).
+* **LineItem:** Labor type line items may now consider tax if the `taxable_labor` bid variable is set to true (false by default).
 
 ### 1.1.5 (2019-01-11)
 Features:

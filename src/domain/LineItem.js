@@ -21,7 +21,8 @@ export default class LineItem extends BidEntity {
          */
         this.bid = bid;
         this.maxEvents = 25;
-        this._original = _.cloneDeep(entityData);
+        this._originalConfig = JSON.stringify(entityData.config);
+        this._hasConfigEverChanged = false;
         this._data = entityData;
         this._ruleService = new LineItemRuleService(this);
         this.onDelay("property.updated", 5, "self", () => this.assess(this, true));
@@ -772,13 +773,18 @@ export default class LineItem extends BidEntity {
      * @returns {boolean}
      */
     isDirty() {
-        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
+        return this._is_dirty || JSON.stringify(this._data.config) !== this._originalConfig;
     }
 
     /**
      * Flags the line item and corresponding bid as dirty and to be saved.
      */
     dirty() {
+        const currentConfigJson = JSON.stringify(this._data.config);
+        if (currentConfigJson !== this._originalConfig) {
+            this._originalConfig = currentConfigJson;
+            this._hasConfigEverChanged = true;
+        }
         this.bid.dirty();
         super.dirty();
     }
@@ -1501,14 +1507,15 @@ export default class LineItem extends BidEntity {
      * @returns {object}
      */
     exportData() {
-        let blacklist = [];
-
-        if (_.isEqual(this._data.config, this._original.config)) {
-            blacklist.push("config");
+        let data;
+        if (this._hasConfigEverChanged) {
+            data = this._data;
+        } else {
+            // improve save performance by removing config if its never been changed
+            const { config, ...noConfig } = this._data;
+            data = noConfig;
         }
-        let data = _.cloneDeep(_.omit(this._data, blacklist));
-
-        return data;
+        return _.cloneDeep(data);
     }
 
     /**
