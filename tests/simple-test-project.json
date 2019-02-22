@@ -681,6 +681,11 @@
                     ],
                     "rule_inclusion": "any",
                     "overrides": {},
+                    "is_predicted_labor_hours": false,
+                    "is_predicted_cost": false,
+                    "is_weighted": false,
+                    "tags": [],
+                    "undefined_prop_flags": [],
                     "short_code": "line:modules",
                     "description": ""
                 },
