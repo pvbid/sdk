@@ -1,5 +1,5 @@
 # CHANGELOG
-### 1.1.10 (2019-02-20)
+### 1.1.10 (2019-02-22)
 Bug Fixes:
 * **LineItem:** `isDirty()` better indicates changes to the `config` property
 
