@@ -258,7 +258,19 @@ export default class Component extends BidEntity {
      */
     set actualCost(val) {
         this._data.actual_cost = val;
+
+        // Note: API should handle responsibility of setting confidence. Remove once when api is updated
+        if (val === null || val === "" || val === undefined) {
+            this._data.actual_cost_confidence_factor = null;
+        } else {
+            this._data.actual_cost_confidence_factor = 1;
+        }
+
         this.dirty();
+    }
+
+    get actualCostConfidenceFactor() {
+        return this._data.actual_cost_confidence_factor;
     }
 
     /**
@@ -273,7 +285,19 @@ export default class Component extends BidEntity {
      */
     set actualHours(val) {
         this._data.actual_hours = val;
+
+        // Note: API should handle responsibility of setting confidence. Remove once when api is updated
+        if (val === null || val === "" || val === undefined) {
+            this._data.actual_hours_confidence_factor = null;
+        } else {
+            this._data.actual_hours_confidence_factor = 1;
+        }
+
         this.dirty();
+    }
+
+    get actualHoursConfidenceFactor() {
+        return this._data.actual_hours_confidence_factor;
     }
 
     /**

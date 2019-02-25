@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.11 (2019-02-25)
+Features:
+* **Component:** Expose `actualCostConfidenceFactor` and `actualHoursConfidenceFactor` which indicate the confidence of the `actualCost` and `actualHours`. The confidence values are set automatically when the actual values are imported. A confidence of `1` means the value was manually input. Confidence values of `2+` indicate that the actual value was propagated from a related actual value. Higher numbers mean lower confidence. A confidence of `0` indicates that no actual value was given or propagated and the actual value was taken from the bids estimation. 
+
 ### 1.1.10 (2019-02-22)
 Bug Fixes:
 * **LineItem:** `isDirty()` better indicates changes to the `config` property
