@@ -79,7 +79,7 @@ export default class ProjectService {
      *
      * @param {Project} project
      * @param {string} [title=New Bid]
-     * @returns {Promise<Project>}
+     * @returns {Promise<Bid>}
      */
     async createBid(project, title) {
         try {
@@ -89,7 +89,7 @@ export default class ProjectService {
             bid.isActive = true;
             project.attachBid(bid);
             project.assess();
-            return project;
+            return bid;
         } catch (error) {
             return Promise.reject(error);
         }
