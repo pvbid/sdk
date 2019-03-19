@@ -56,7 +56,8 @@ export default class ProjectSavingHelper {
                     id: bid.id,
                     title: bid.title,
                     account_id: bid._data.account_id,
-                    is_locked: bid.isLocked()
+                    is_locked: bid.isLocked(),
+                    is_active: bid._data.is_active,
                 };
             }
         });
