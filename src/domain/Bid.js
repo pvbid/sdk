@@ -78,6 +78,11 @@ export default class Bid extends BidEntity {
             this._data.is_active = val;
             this.dirty();
             this.assess(this, true);
+            if (!this.isAssessable()) {
+                // this is a special case. isActive can change while the bid is locked and should still
+                // cause a project reassessment even though the bid itself will not actually reassess
+                this.emit("assessed");
+            }
         }
     }
 
