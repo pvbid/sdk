@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.13 (2019-03-19)
+Bug Fixes:
+* **Bid:** Resolves an issue that prevented locked bids from saving their active/included status.
+
 ### 1.1.12 (2019-02-27)
 Bug Fixes:
 * **Project:** `createBid()` now returns the newly created Bid entity
