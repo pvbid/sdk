@@ -254,13 +254,14 @@ export default class Field extends BidEntity {
     }
 
     /**
-     * Exports internal data
+     * Exports internal data.
      * 
+     * @param {boolean} [alwaysIncludeConfig=false] Will include config object in export regardless of changed status.
      * @returns {object}
      */
-    exportData() {
+    exportData(alwaysIncludeConfig=false) {
         let data = _.cloneDeep(this._data);
-        if (_.isEqual(data.config, this._original.config)) delete data.config;
+        if (!alwaysIncludeConfig && _.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
     }

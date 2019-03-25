@@ -139,5 +139,6 @@ describe("Predictive pricing in use", () => {
         });
     });
 });
+
 // TODO: test when all line items in component are excluded that they all enable with an equally distributed value.
 // TODO: test when application of component value distrbutes to included line items only, unless there are no included line items.

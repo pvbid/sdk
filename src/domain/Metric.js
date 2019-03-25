@@ -289,12 +289,13 @@ export default class Metric extends BidEntity {
     /**
      * Exports intermal metric data.
      *
+     * @param {boolean} [alwaysIncludeConfig=false] Will include config object in export regardless of changed status.
      * @returns {object}
      */
-    exportData() {
+    exportData(alwaysIncludeConfig=false) {
         let blacklist = [];
 
-        if (_.isEqual(this._data.config, this._original.config)) {
+        if (!alwaysIncludeConfig && _.isEqual(this._data.config, this._original.config)) {
             blacklist.push("config");
         }
         let data = _.cloneDeep(_.omit(this._data, blacklist));

@@ -1203,6 +1203,7 @@
                 "account_id": 3,
                 "bid_id": 190,
                 "title": "Module Type",
+                "anchor": null,
                 "value": "mhzk",
                 "is_active": true,
                 "config": {
@@ -1235,6 +1236,7 @@
                 "account_id": 3,
                 "bid_id": 190,
                 "title": "Number of Modules",
+                "anchor": null,
                 "value": "3",
                 "is_active": true,
                 "config": {
@@ -1263,6 +1265,7 @@
                 "account_id": 3,
                 "bid_id": 190,
                 "title": "Boolean Field",
+                "anchor": null,
                 "value": "true",
                 "is_active": true,
                 "config": {
@@ -1283,6 +1286,7 @@
                 "account_id": 3,
                 "bid_id": 190,
                 "title": "Undefined Number",
+                "anchor": null,
                 "value": null,
                 "is_active": true,
                 "config": {
@@ -1300,6 +1304,35 @@
                     "is_auto_selected": false
                 },
                 "definition_id": 905,
+                "definition_version": 2,
+                "created_at": "2017-09-26T23:04:55+00:00",
+                "updated_at": "2017-09-27T01:10:55+00:00",
+                "actual_value": null,
+                "type": "field"
+            },
+            {
+                "id": 18265,
+                "account_id": 3,
+                "bid_id": 190,
+                "title": "In an assembly",
+                "anchor": "test_anchor",
+                "value": 0,
+                "is_active": true,
+                "config": {
+                    "type": "number",
+                    "constraint": "Whole",
+                    "short_code": "field:in_an_assembly",
+                    "description": "",
+                    "dependencies": {
+                        "auto_a": {
+                            "type": null,
+                            "field": null
+                        },
+                        "datatable": []
+                    },
+                    "is_auto_selected": false
+                },
+                "definition_id": 906,
                 "definition_version": 2,
                 "created_at": "2017-09-26T23:04:55+00:00",
                 "updated_at": "2017-09-27T01:10:55+00:00",
@@ -1513,6 +1546,23 @@
                 },
                 "definition_id": 109,
                 "definition_version": 4,
+                "created_at": "2017-09-26T23:04:55+00:00",
+                "updated_at": "2017-09-26T23:04:55+00:00",
+                "is_active": 1,
+                "type": "field_group"
+            },
+            {
+                "id": 4109,
+                "account_id": 3,
+                "bid_id": 190,
+                "title": "Basic Assembly",
+                "config": {
+                    "fields": [18265],
+                    "order_index": 0,
+                    "default_value": "true"
+                },
+                "definition_id": 110,
+                "definition_version": 1,
                 "created_at": "2017-09-26T23:04:55+00:00",
                 "updated_at": "2017-09-26T23:04:55+00:00",
                 "is_active": 1,
@@ -2066,7 +2116,28 @@
                 "updated_at": "2017-09-27 01:10:55"
             }
         ],
-        "assemblies": [],
+        "assemblies": [
+            {
+                "id": 84,
+                "account_id": 3,
+                "bid_id": 190,
+                "title": "Basic Assembly",
+                "config": {
+                    "fields": [18265],
+                    "metrics": [],
+                    "components": [],
+                    "line_items": [],
+                    "field_groups": [4109],
+                    "manipulated_metrics": []
+                },
+                "definition_id": 71,
+                "definition_version": 1,
+                "created_at": "2019-03-14T15:54:59+00:00",
+                "updated_at": "2019-03-14T15:55:00+00:00",
+                "is_active": 1,
+                "type": "assembly"
+            }
+        ],
         "assembly_maps": [],
         "user": {
             "id": 7,

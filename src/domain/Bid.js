@@ -193,12 +193,18 @@ export default class Bid extends BidEntity {
     get markupPercent() {
         return Helpers.confirmNumber(this._data.markup_percent);
     }
+
     /**
      * @type {number}
      */
     set markupPercent(val) {
         if (Helpers.isNumber(val) && this._data.markup_percent != Helpers.confirmNumber(val) && !this.isReadOnly()) {
             this._data.markup_percent = Helpers.confirmNumber(val);
+            Object.values(this.entities.lineItems()).forEach(lineItem => {
+                if (lineItem.isIncluded) {
+                    lineItem.markupPercent = this._data.markup_percent;
+                }
+            });
             this.dirty();
             this.emit("property.updated");
         }
@@ -359,10 +365,10 @@ export default class Bid extends BidEntity {
      * @param {number} newMarginPercent
      */
     _applyMarginPercentage(newMarginPercent) {
-        let bidCost = this.cost + this.tax,
-            oldMarkup = parseFloat(this.markup),
-            newPrice = parseFloat(bidCost) / (1 - Helpers.confirmNumber(newMarginPercent) / 100);
-        var newMarkup = newPrice - bidCost;
+        const bidCost = this.cost + this.tax;
+        const oldMarkup = parseFloat(this.markup);
+        const newPrice = parseFloat(bidCost) / (1 - Helpers.confirmNumber(newMarginPercent) / 100);
+        const newMarkup = newPrice - bidCost;
 
         if (newMarginPercent < 100) {
             this._data.margin_percent = Helpers.confirmNumber(newMarginPercent);
@@ -445,6 +451,7 @@ export default class Bid extends BidEntity {
                 tax: 0,
                 taxable_cost: 0,
                 margin_percent: 0,
+                markup_percent: 0,
                 labor_hours: 0,
                 labor_cost: 0,
                 watts: 0
@@ -489,8 +496,12 @@ export default class Bid extends BidEntity {
             bidValues.watts = this._getTotalWatts();
 
             bidValues.margin_percent = bidValues.price > 0 ? bidValues.markup / bidValues.price * 100 : 0;
-
             bidValues.margin_percent = Math.round(bidValues.margin_percent * 100) / 100;
+
+            if (bidValues.cost > 0) {
+                const subtotal = this.includeTaxInMarkup() ? bidValues.cost + bidValues.tax : bidValues.cost;
+                bidValues.markup_percent = (bidValues.markup / subtotal) * 100;
+            }
 
             var isChanged = false;
 
@@ -766,6 +777,34 @@ export default class Bid extends BidEntity {
         });
 
         return bid;
+    }
+
+    /**
+     * Exports the bid data along with all of the bid entities included.
+     *
+     * @return {object} Exported bid data with all its entities and their config objects.
+     */
+    exportDataWithEntities() {
+        const bidData = this.exportData();
+        bidData.assembly_maps = _.cloneDeep(this._data.assembly_maps);
+
+        const entitiesToExport = {
+            line_items: this.entities.lineItems(),
+            fields: this.entities.fields(),
+            components: this.entities.components(),
+            metrics: this.entities.metrics(),
+            component_groups: this.entities.componentGroups(),
+            assemblies: this.entities.assemblies(),
+            field_groups: this.entities.fieldGroups(),
+            datatables: this.entities.datatables(),
+        };
+
+        Object.keys(entitiesToExport).forEach(entityType => {
+            const entities = entitiesToExport[entityType];
+            bidData[entityType] = Object.values(entities).map(entity => entity.exportData(true));
+        });
+
+        return bidData;
     }
 
     /**

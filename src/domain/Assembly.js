@@ -1,4 +1,5 @@
 import BidEntity from "./BidEntity";
+import _ from "lodash";
 
 /**
  * Assembly Class
@@ -17,6 +18,7 @@ export default class Assembly extends BidEntity {
          */
         this.bid = bid;
         this._data = assemblyData;
+        this._fieldIdsKeyedByAnchor = this._keyFieldIdsByAnchor();
     }
 
     /**
@@ -28,7 +30,42 @@ export default class Assembly extends BidEntity {
     removeBidEntity(type, id) {
         const typeKey = type + "s";
         _.pull(this._data.config[typeKey], id);
+
+        if (type === "field") {
+            this._fieldIdsKeyedByAnchor = this._keyFieldIdsByAnchor();
+        }
+
         this.dirty();
+    }
+
+    /**
+     * Find a field by its anchor value. Returns undefined if a match is not found.
+     *
+     * @param {string} anchor
+     * @return {Field|undefined}
+     */
+    getFieldByAnchor(anchor) {
+        const fieldId = this._fieldIdsKeyedByAnchor[anchor];
+        if (!fieldId) return undefined;
+        return this.bid.entities.fields(fieldId);
+    }
+
+    /**
+     * Get the fields that have anchors keyed by their anchors
+     *
+     * @return {object} Field IDs keyed by anchor value
+     */
+    _keyFieldIdsByAnchor() {
+        if (!this._data.config.fields) return {};
+
+        const anchorMap = {};
+        this._data.config.fields.forEach(id => {
+            const field = this.bid.entities.fields(id);
+            if (field && field.anchor) {
+                anchorMap[field.anchor] = id;
+            }
+        });
+        return anchorMap;
     }
 
     /**

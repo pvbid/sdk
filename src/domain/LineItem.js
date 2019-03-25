@@ -27,6 +27,7 @@ export default class LineItem extends BidEntity {
         this._ruleService = new LineItemRuleService(this);
         this.onDelay("property.updated", 5, "self", () => this.assess(this, true));
         this._predictionService = new PredictionService(this.bid);
+        this._cacheValues = {};
     }
 
     /**
@@ -641,10 +642,10 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Determines if a property is predicted by recursively checking the
+     * Determines if the line item or a property is predicted by recursively checking the
      *  properties calculation dependencies prediction status.
      *
-     * @param {string} property snake case property name
+     * @param {string} [property] snake case property name
      * @returns {boolean}
      */
     isPredicted(property) {
@@ -657,6 +658,9 @@ export default class LineItem extends BidEntity {
             price_watt: ['price'],
             cost_with_tax: ['cost', 'tax'],
         };
+        if (!property) {
+            return [...Object.keys(calcDependencyMap), 'labor_hours'].map(prop => this.isPredicted(prop)).some(val => val);
+        }
         if (this.isOverridden(property)) {
             return false;
         }
@@ -735,6 +739,7 @@ export default class LineItem extends BidEntity {
             this.bid.emit("assessing");
             let isChanged = false;
             this._resetUndefinedPropFlags();
+            this._invalidateCachedValues();
 
             isChanged = this._applyProperty("base", this._getBaseValue()) || isChanged;
             isChanged = this._applyProperty("burden", this._getBurdenValue()) || isChanged;
@@ -1391,6 +1396,13 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Clear the locally cached values
+     */
+    _invalidateCachedValues() {
+        this._cacheValues = {};
+    }
+
+    /**
      * Reset the flags for props that rely on undefined dependencies in assessment
      */
     _resetUndefinedPropFlags() {
@@ -1475,14 +1487,18 @@ export default class LineItem extends BidEntity {
      * @return {number} The predicted cost value
      */
     getPredictedCost() {
+        if (this._cacheValues.predictedCost !== undefined) {
+            return this._cacheValues.predictedCost;
+        }
+
         // there are no prediciton models for line items without definition.
         if (this.definitionId && this._predictionService.hasPredictionModels(this.definitionId)) {
             const models = this._predictionService.getCostPredictionModels(this.definitionId);
             if (models && models.length > 0) {
-                return _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4);
+                return (this._cacheValues.predictedCost = _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4));
             }
         }
-        return 0;
+        return (this._cacheValues.predictedCost = 0);
     }
 
     /**
@@ -1491,24 +1507,32 @@ export default class LineItem extends BidEntity {
      * @return {number} The predicted cost value
      */
     getPredictedLaborHours() {
+        if (this._cacheValues.predictedLabor !== undefined) {
+            return this._cacheValues.predictedLabor;
+        }
+
         // there are no prediciton models for line items without definition
         if (this.definitionId && this._predictionService.hasPredictionModels(this.definitionId)) {
             const models = this._predictionService.getLaborPredictionModels(this.definitionId);
             if (models && models.length > 0) {
-                return  _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4);
+                return (this._cacheValues.predictedLabor = _.round(Helpers.confirmNumber(this._predictionService.evaluateModels(models)), 4));
             }
         }
-        return 0;
+        return (this._cacheValues.predictedLabor = 0);
     }
 
     /**
      * Exports the line item's internal data structure.
      *
+     * @param {boolean} [alwaysIncludeConfig=false]
+     *      Flag to include config object regardless of whether it has changed or not. The config
+     *      is always included if it has been modified but is omitted by to improve save performance
+     *      if there have been no changes by default to improve save performance.
      * @returns {object}
      */
-    exportData() {
+    exportData(alwaysIncludeConfig=false) {
         let data;
-        if (this._hasConfigEverChanged) {
+        if (alwaysIncludeConfig || this._hasConfigEverChanged) {
             data = this._data;
         } else {
             // improve save performance by removing config if its never been changed
