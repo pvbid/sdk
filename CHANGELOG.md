@@ -1,10 +1,12 @@
 # CHANGELOG
-### 1.1.XX (2019-03-XX)
+### 1.1.14 (2019-03-25)
 Bug Fixes:
-**LineItem:** `isPredicted(prop)` now checks all properties prediction statuses if the prop is omitted.
+* **LineItem:** `isPredicted(prop)` now checks all properties prediction statuses if the prop is omitted.
+* **Bid:** `markupPecent` is calculated based on the bids line items and can be dynamically overridden.
 
 Features:
-**PVBid:** It is now possible to generate virtual clones/copies of a project instance. These virtual clones are fully assessable but have restricted access to repository and persistence related methods. They are useful for "what if" scenarios. For instance, you could make a virtual clone and reset all line items and metrics to see what the bid total would be had you not made any overwrites without affecting the original bid. To generate a virtual clone from a project instance: `pvbid.getVirtualProjectClone(projectInstance)`. Optionally, you can limit the bids that will be included in the clone by passing an inclusive array of bid ids as the second parameter. 
+* **PVBid:** It is now possible to generate virtual clones/copies of a project instance. These virtual clones are fully assessable but have restricted access to repository and persistence related methods. They are useful for "what if" scenarios. For instance, you could make a virtual clone and reset all line items and metrics to see what the bid total would be had you not made any overwrites without affecting the original bid. To generate a virtual clone from a project instance: `pvbid.getVirtualProjectClone(projectInstance)`. Optionally, you can limit the bids that will be included in the clone by passing an inclusive array of bid ids as the second parameter.
+* **Assembly:** `getFieldByAnchor(anchor)` is now available to quickly find a field belonging to an assembly by it's anchor string value.
 
 Improvements:
 * **Bid:** The bid data object can now be exported from a Bid instance including all its entities with `bid.exportDataWithEntities()`
