@@ -1504,11 +1504,15 @@ export default class LineItem extends BidEntity {
     /**
      * Exports the line item's internal data structure.
      *
+     * @param {boolean} [alwaysIncludeConfig=false]
+     *      Flag to include config object regardless of whether it has changed or not. The config
+     *      is always included if it has been modified but is omitted by to improve save performance
+     *      if there have been no changes by default to improve save performance.
      * @returns {object}
      */
-    exportData() {
+    exportData(alwaysIncludeConfig=false) {
         let data;
-        if (this._hasConfigEverChanged) {
+        if (alwaysIncludeConfig || this._hasConfigEverChanged) {
             data = this._data;
         } else {
             // improve save performance by removing config if its never been changed

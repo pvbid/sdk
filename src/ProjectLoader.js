@@ -41,6 +41,39 @@ export default class ProjectLoader {
     }
 
     /**
+     * Generate a new project instance based on the original data from the given project.
+     * For safety, any methods involving repositories or peristance are absent in the clone.
+     *
+     * @param {Project} project The project instance to make a virtual clone of.
+     * @param {number[]} bidIds Optionally limit the bids that get cloned into the virtual project clone by giving their IDs here.
+     * @return {Project}
+     */
+    loadVirtualClone(project, bidIds=null) {
+        const projectData = _.cloneDeep(project._original);
+        const projectService = new ProjectService(this.context);
+        const virtualProject = new Project(projectData, projectService);
+
+        // remove dangerous properties and methods that allow for persistance or repo access
+        const dangerousMethods = ["attachUser", "detachUser", "createBid", "save", "clone"];
+        dangerousMethods.forEach(method => {
+            virtualProject[method] = undefined;
+        });
+
+        // load the bids
+        let originalBids = bidIds
+            ? bidIds.map(id => project.bids[id])
+            : Object.values(project.bids);
+
+        const bids = this._loadVirtualBids(originalBids, virtualProject);
+        bids.forEach(bid => {
+            virtualProject.attachBid(bid);
+        });
+
+        virtualProject.bind();
+        return virtualProject;
+    }
+
+    /**
      * Loads a bid instance.
      * 
      * @param {number} bidId 
@@ -85,6 +118,39 @@ export default class ProjectLoader {
             .catch(err => {
                 console.log(err);
             });
+    }
+
+    /**
+     * Generates virtual bid clones for the virtual project clone.
+     *
+     * @param {Bid[]} originalBids Bid instances from the original project
+     * @param {Project} virtualProject The virtual project clone to attatch bid clones too
+     * @return {Bid[]} Clones of the given bids
+     */
+    _loadVirtualBids(originalBids, virtualProject) {
+        let bids = [];
+        const dangerousMethods = [
+            "removeAssembly",
+            "addAssemblies",
+            "recover",
+            "clone",
+            "delete",
+            "addLineItem",
+            "addMetric",
+            "addField"
+        ];
+        originalBids.forEach(originalBid => {
+            const bidObject = originalBid.exportDataWithEntities();
+            const bid = new BidFactory().create(bidObject, this.context, virtualProject);
+
+            // remove dangerous methods from the bid (dangerous methods involve repositories and persistance)
+            dangerousMethods.forEach(method => {
+                bid[method] = undefined;
+            });
+
+            bids.push(bid);
+        });
+        return bids;
     }
 
     /**

@@ -769,6 +769,34 @@ export default class Bid extends BidEntity {
     }
 
     /**
+     * Exports the bid data along with all of the bid entities included.
+     *
+     * @return {object} Exported bid data with all its entities and their config objects.
+     */
+    exportDataWithEntities() {
+        const bidData = this.exportData();
+        bidData.assembly_maps = _.cloneDeep(this._data.assembly_maps);
+
+        const entitiesToExport = {
+            line_items: this.entities.lineItems(),
+            fields: this.entities.fields(),
+            components: this.entities.components(),
+            metrics: this.entities.metrics(),
+            component_groups: this.entities.componentGroups(),
+            assemblies: this.entities.assemblies(),
+            field_groups: this.entities.fieldGroups(),
+            datatables: this.entities.datatables(),
+        };
+
+        Object.keys(entitiesToExport).forEach(entityType => {
+            const entities = entitiesToExport[entityType];
+            bidData[entityType] = Object.values(entities).map(entity => entity.exportData(true));
+        });
+
+        return bidData;
+    }
+
+    /**
      * Returns new shallow copy of object with omitted properties
      *
      * @param {*} obj

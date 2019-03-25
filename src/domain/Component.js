@@ -836,11 +836,12 @@ export default class Component extends BidEntity {
     /**
      * Exports component internal data structure.
      *
+     * @param {boolean} [alwaysIncludeConfig=false] Will include config object in export regardless of changed status.
      * @returns {object}
      */
-    exportData() {
+    exportData(alwaysIncludeConfig=false) {
         const data = _.cloneDeep(this._data);
-        if (_.isEqual(data.config, this._original.config)) delete data.config;
+        if (!alwaysIncludeConfig && _.isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
     }

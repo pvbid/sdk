@@ -1,4 +1,12 @@
 # CHANGELOG
+### 1.1.XX (2019-XX-XX)
+Features:
+**PVBid:** It is now possible to generate virtual clones/copies of a project instance. These virtual clones are fully assessable but have restricted access to repository and persistence related methods. They are useful for "what if" scenarios. For instance, you could make a virtual clone and reset all line items and metrics to see what the bid total would be had you not made any overwrites without affecting the original bid. To generate a virtual clone from a project instance: `pvbid.getVirtualProjectClone(projectInstance)`. Optionally, you can limit the bids that will be included in the clone by passing an inclusive array of bid ids as the second parameter. 
+
+Improvements:
+* **Bid:** The bid data object can now be exported from a Bid instance including all its entities with `bid.exportDataWithEntities()`
+* **BidEntity:** The `exportData()` method now accepts a boolean parameter to ensure that the entity's config object is included in the export if set to true. If false, the config will only be included if a change has been detected (this helps with save performance). This parameter is false by default.
+
 ### 1.1.13 (2019-03-19)
 Bug Fixes:
 * **Bid:** Resolves an issue that prevented locked bids from saving their active/included status.

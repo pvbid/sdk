@@ -88,6 +88,18 @@ export default class PVBidContext {
     }
 
     /**
+     * Create a virtual clone of a project.
+     * For safety, any methods involving repositories or peristance are absent in the clone.
+     *
+     * @param {Project} project The project to make a virtual clone of.
+     * @param {number[]} [bidIds] Optionally limit the bids that will be cloned into the virtual project. Helps with performance.
+     * @return {Project}
+     */
+    getVirtualProjectClone(project, bidIds=null) {
+        return new ProjectLoader(this).loadVirtualClone(project, bidIds);
+    }
+
+    /**
      * Loads the authorized user for this context.  Calling {@link PVBidContext.getProject} auto loads the authorized user.
      * 
      * @returns  {Promise<User>}
