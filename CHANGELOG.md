@@ -1,5 +1,8 @@
 # CHANGELOG
-### 1.1.XX (2019-XX-XX)
+### 1.1.XX (2019-03-XX)
+Bug Fixes:
+**LineItem:** `isPredicted(prop)` now checks all properties prediction statuses if the prop is omitted.
+
 Features:
 **PVBid:** It is now possible to generate virtual clones/copies of a project instance. These virtual clones are fully assessable but have restricted access to repository and persistence related methods. They are useful for "what if" scenarios. For instance, you could make a virtual clone and reset all line items and metrics to see what the bid total would be had you not made any overwrites without affecting the original bid. To generate a virtual clone from a project instance: `pvbid.getVirtualProjectClone(projectInstance)`. Optionally, you can limit the bids that will be included in the clone by passing an inclusive array of bid ids as the second parameter. 
 
