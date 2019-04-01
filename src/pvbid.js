@@ -33,6 +33,7 @@ export const createContext = function(config) {
 export const getAuthToken = function(username, password, config) {
     config = config ? config : {};
     config.base_uri = config.base_uri ? config.base_uri : "https://api.pvbid.com/v2";
+    delete config.token; // auth header not required for token request
 
     const repo = new UserRepository(config);
     return repo.getAuthToken(username, password);

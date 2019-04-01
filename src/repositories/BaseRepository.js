@@ -13,7 +13,9 @@ export default class BaseRepository {
      * @param {string} multiMap The plural noun for the entity (ie. 'bids' or 'assemblies')
      */
     constructor(endpoint, singleMap, multiMap, httpConfig) {
-        axios.defaults.headers.common["Authorization"] = httpConfig.token;
+        if (httpConfig.token) {
+            axios.defaults.headers.common["Authorization"] = httpConfig.token;
+        }
         this.httpConfig = httpConfig;
         this.metaData = null;
         this.params = {};

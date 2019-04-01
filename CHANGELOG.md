@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.15 (2019-04-01)
+Bug Fixes:
+* **pvbid.getAuthToken:** Skips setting the auth token for this request
+
 ### 1.1.14 (2019-03-25)
 Bug Fixes:
 * **LineItem:** `isPredicted(prop)` now checks all properties prediction statuses if the prop is omitted.
