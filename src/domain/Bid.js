@@ -636,6 +636,7 @@ export default class Bid extends BidEntity {
      * It does not remove any event listeners for the bid itself.
      */
     clearEntityBindings() {
+        this._wattMetricDef = null;
         for (let f of Object.values(this.entities.fields())) {
             f.removeAllListeners();
         }
@@ -1026,7 +1027,6 @@ export default class Bid extends BidEntity {
      * @returns {Promise<null>}
      */
     async addAssemblies(assemblyMapIds) {
-        this._wattMetricDef = null; //clears cached reference due to bug.
         return this._bidService.addAssemblies(this, assemblyMapIds);
     }
 

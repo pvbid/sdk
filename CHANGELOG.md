@@ -1,7 +1,11 @@
 # CHANGELOG
+### 1.1.16 (2019-04-04)
+Bug Fixes:
+* **Bid:** Fixes bug that prevented watts from automatically recalculating after removing assemblies on some occasions.
+
 ### 1.1.15 (2019-04-01)
 Bug Fixes:
-* **pvbid.getAuthToken:** Skips setting the auth token for this request
+* **pvbid.getAuthToken:** Skips setting the auth token for this request.
 
 ### 1.1.14 (2019-03-25)
 Bug Fixes:
