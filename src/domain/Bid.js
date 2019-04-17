@@ -1152,4 +1152,40 @@ export default class Bid extends BidEntity {
             c.dirty();
         });
     }
+
+    /**
+     * Helper method to re-assess the bid until price converges. Returns a promise that will resolve once the price has stabilized.
+     *
+     * @return {Promise<void>} Resolves once the bid has been assessed twice in a row with the same price. Rejects if the price does not stabilize.
+     */
+    async reassessAsync() {
+        const maxCount = 5;
+        const wasStabilized = await this._reassessAllAsync(maxCount);
+        if (!wasStabilized) {
+            throw new Error(`Bid ${this.id} price did not stabilize after ${maxCount} attempts to reassess`);
+        }
+    }
+
+    /**
+     * Recursively reassess the bid until the price stabilizes or a maximum number of attempts is reached.
+     *
+     * @param {number} maxCount Maximum number of recursion attempts allowed
+     * @param {[number]} currentCount For tracking the number of iterations performed
+     * @return {Promise<boolean>} Whether or not the count is within the allowable max count range (determines a stable result)
+     */
+    async _reassessAllAsync(maxCount, currentCount) {
+        let count = currentCount ? currentCount : 0;
+        if (count >= maxCount) return false;
+        count += 1;
+
+        let price = this.price;
+        await new Promise((res) => {
+            this.project.once('assessed', () => res());
+            this.reassessAll(true);
+        });
+        if (Math.round(price) !== Math.round(this.price)) {
+            return this._reassessAllAsync(maxCount, count);
+        }
+        return true;
+    }
 }

@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.XX (2019-XX-XX)
+Improvements:
+* **Bid:** `reassessAsync` will force assess the bid and all its entities until the price has converged. It returns a promise that resolves when the reassessment is complete. It rejects if the price has not converged within a limited number of reassessments.
+
 ### 1.1.16 (2019-04-04)
 Bug Fixes:
 * **Bid:** Fixes bug that prevented watts from automatically recalculating after removing assemblies on some occasions.
