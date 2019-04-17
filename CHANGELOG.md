@@ -1,5 +1,5 @@
 # CHANGELOG
-### 1.1.XX (2019-XX-XX)
+### 1.1.17 (2019-04-17)
 Improvements:
 * **Bid:** `reassessAsync` will force assess the bid and all its entities until the price has converged. It returns a promise that resolves when the reassessment is complete. It rejects if the price has not converged within a limited number of reassessments.
 
@@ -14,7 +14,7 @@ Bug Fixes:
 ### 1.1.14 (2019-03-25)
 Bug Fixes:
 * **LineItem:** `isPredicted(prop)` now checks all properties prediction statuses if the prop is omitted.
-* **Bid:** `markupPecent` is calculated based on the bids line items and can be dynamically overridden.
+* **Bid:** `markupPercent` is calculated based on the bids line items and can be dynamically overridden.
 
 Features:
 * **PVBid:** It is now possible to generate virtual clones/copies of a project instance. These virtual clones are fully assessable but have restricted access to repository and persistence related methods. They are useful for "what if" scenarios. For instance, you could make a virtual clone and reset all line items and metrics to see what the bid total would be had you not made any overwrites without affecting the original bid. To generate a virtual clone from a project instance: `pvbid.getVirtualProjectClone(projectInstance)`. Optionally, you can limit the bids that will be included in the clone by passing an inclusive array of bid ids as the second parameter.
@@ -125,7 +125,7 @@ Bug Fixes:
 ### 1.0.35 (2018-06-21)
 Improvements:
 * **LineItem & Component** Added new editable and computable `costWatt` and `priceWatt` properties.
-* **LineItem & Component** Added new readonly `costWithTax` property.
+* **LineItem & Component** Added new read-only `costWithTax` property.
 
 
 ### 1.0.34 (2018-06-19)
