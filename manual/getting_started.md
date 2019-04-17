@@ -49,7 +49,7 @@ const project = await pvbid.getProject(newProject.id); // gets the self assessin
 
 **Create a new bid in a project**
 ```javascript
-await project.createBid("Bid Title");
+const newBid = await project.createBid("Bid Title");
 ```
 
 **Choose a bid to modify**
