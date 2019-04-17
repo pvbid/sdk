@@ -414,6 +414,7 @@ export default class Project extends BidEntity {
         let project = Object.assign({}, this._data);
         delete project.bids;
         delete project.components;
+        delete project.prediction_models;
         return project;
     }
 
