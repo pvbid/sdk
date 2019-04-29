@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.18 (2019-04-29)
+Improvements:
+* **Bid:** Immediately trigger a save upon toggling the bid's active state.
+
 ### 1.1.17 (2019-04-17)
 Improvements:
 * **Bid:** `reassessAsync` will force assess the bid and all its entities until the price has converged. It returns a promise that resolves when the reassessment is complete. It rejects if the price has not converged within a limited number of reassessments.
