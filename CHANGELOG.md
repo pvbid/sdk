@@ -1,4 +1,11 @@
 # CHANGELOG
+### 1.1.19 (2019-04-30)
+Features:
+**Repositories:** `datatables.findById` and `datatables.save` methods are now supported.
+**Datatable:** Introducing _Inventory Links_. Datatables may now contain reference to items in a shared PVBid inventory. If a datatable is linked, the `inventoryLink` property will indicate which inventory the datatable is linked to. Linked datatables will be able to reference the _columns_ of the linked inventory and rows within the datatable that reference specific inventory items will contain all the data associated with that item. All the existing datatable methods (`getValue`, `getOptions`, `getColumnValues`) support this feature. To access the raw row or column data, the `datatable.columns` and `datatable.rows` properties must be used. Rows and columns should NOT be accessed through the `datatable.config` property.
+**Datatable:** `datatable.reload()` is an async method that persists and reloads the datatable entity. This is useful in scenarios where an inventory link changes and fresh data is required. Modifying inventory links on a datatable instance is not recommended but it is possible with a Bulk Update in the PVBid application.
+**Datatable:** add `datatable.findRowByExternalPartId` method to lookup a row in a datatable by its linked part's 3rd party vendor ID. This is useful for making field list selections based on information coming from an external source.
+
 ### 1.1.18 (2019-04-29)
 Improvements:
 * **Bid:** Immediately trigger a save upon toggling the bid's active state.

@@ -12,6 +12,7 @@ import LineItemRepository from "./repositories/LineItemRepository";
 import MetricRepository from "./repositories/MetricRepository";
 import FieldRepository from "./repositories/FieldRepository";
 import PredictionModelRepository from './repositories/PredictionModelRepository';
+import DatatableRepository from './repositories/DatatableRepository';
 
 /**
  * 
@@ -68,6 +69,7 @@ export default class PVBidContext {
             metrics: new MetricRepository(this._httpConfig),
             fields: new FieldRepository(this._httpConfig),
             predictionModels: new PredictionModelRepository(this._httpConfig),
+            datatables: new DatatableRepository(this._httpConfig),
         };
     }
 

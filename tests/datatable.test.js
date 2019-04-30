@@ -9,7 +9,7 @@ var MockAdapter = require("axios-mock-adapter");
 import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
 
 let context = PVBid.createContext({ token: "Bearer Token", base_uri: "http://api.pvbid.local/v2" });
-let project, bid, field, datatable;
+let project, bid, datatable;
 
 beforeAll(() => {
     return init();
@@ -73,4 +73,49 @@ test("test get cell value", () => {
     expect(datatable.getValue("clpa", "be6f")).toBe("250");
     expect(datatable.getValue("tp7q", "mhzk")).toBe("400.00");
     expect(datatable.getValue("tp7q", "be6f")).toBe("300.00");
+});
+
+test("get options", () => {
+    const expected = [
+        { row_id: "mhzk", title: "Module 1" },
+        { row_id: "be6f", title: "Module 2" },
+    ];
+    expect(datatable.getOptions()).toEqual(expected);
+});
+
+describe("Datatable with linked inventory", () => {
+    let linkedDatatable;
+    beforeAll(() => {
+        linkedDatatable = bid.entities.datatables(7581);
+    });
+
+    test("get column values", () => {
+        const expected = [
+            { id: "6nq6", value: "1000" },
+            { id: "w0wb", value: "" },
+            { id: "3t2n", value: "" },
+        ];
+        const values = linkedDatatable.getColumnValues("pvlink_example_prop");
+        expect(values).toEqual(expected);
+    });
+
+    test("get cell values", () => {
+        expect(linkedDatatable.getValue("pvlink_example_prop", "6nq6")).toBe("1000");
+        expect(linkedDatatable.getValue("pvlink_pvbid_part_name", "6nq6")).toBe("Test Manufacturer - Test Module I");
+        expect(linkedDatatable.getValue("pvbid_inventory_item_id", "6nq6")).toBe("5c9be3b759e8a459715c82ae");
+        expect(linkedDatatable.getValue("pvlink_example_prop", "w0wb")).toBe("");
+        expect(linkedDatatable.getValue("pvlink_pvbid_part_name", "w0wb")).toBe("");
+        expect(linkedDatatable.getValue("pvbid_inventory_item_id", "w0wb")).toBe("");
+    });
+
+    describe("get row id by linked external part ID", () => {
+        it("should return the row id of the row containing the linked part", () => {
+            expect(linkedDatatable.findRowByExternalPartId("test_vendor_a", "9876")).toBe("6nq6");
+            expect(linkedDatatable.findRowByExternalPartId("test_vendor_b", "1234")).toBe("6nq6");
+        });
+
+        it("should return undefined if no matching part is found", () => {
+            expect(linkedDatatable.findRowByExternalPartId("test_vendor_b", "8888")).toBeUndefined();
+        });
+    });
 });

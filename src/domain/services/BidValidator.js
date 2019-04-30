@@ -473,14 +473,17 @@ export default class BidValidator {
     }
 
     _testLineItemDatatableLink(sourceBidEntity, dependencyContract, dependencyKey) {
-        if (sourceBidEntity.type === "line_item" && dependencyContract.type === "field") {
+        if (
+            ["line_item", "metric"].includes(sourceBidEntity.type) &&
+            dependencyContract.type === "field"
+        ) {
             var fieldDependency = this._bid.entities.getDependency(dependencyContract);
 
             if (!_.isUndefined(fieldDependency) && !_.isNull(fieldDependency)) {
                 if (fieldDependency.config.type === "list") {
                     var datatable = this._bid.entities.getDependency(fieldDependency.config.dependencies.datatable);
 
-                    var datatableColumnKeys = _.map(datatable.config.columns, c => {
+                    var datatableColumnKeys = _.map(datatable.columns, c => {
                         return c.id;
                     });
 
@@ -507,7 +510,10 @@ export default class BidValidator {
     }
 
     _testDatatableKey(sourceBidEntity, dependencyContract, dependencyKey) {
-        if (sourceBidEntity.type === "line_item" && dependencyContract.type === "field") {
+        if (
+            ["line_item", "metric"].includes(sourceBidEntity.type) &&
+            dependencyContract.type === "field"
+        ) {
             var fieldDef = this._bid.entities.fields(dependencyContract.bid_entity_id);
             if (!_.isUndefined(fieldDef) && !_.isNull(fieldDef)) {
                 if (fieldDef.config.type === "list") {
@@ -531,7 +537,7 @@ export default class BidValidator {
         var datatable = this._bid.entities.datatables(datatableId);
 
         function getColumnKeys(datatable) {
-            return _.map(datatable.config.columns, c => {
+            return _.map(datatable.columns, c => {
                 return c.id;
             });
         }
