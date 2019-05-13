@@ -135,7 +135,7 @@ test(
 
                 expect(_.round(lineItem.base, 2)).toBe(0);
                 expect(_.round(lineItem.quantity, 2)).toBe(0);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+                expect(_.round(lineItem.perQuantity, 2)).toBe(1);
 
                 expect(_.round(lineItem.multiplier, 2)).toBe(1);
                 expect(_.round(lineItem.escalator, 2)).toBe(1);
@@ -195,7 +195,7 @@ test(
 
                 expect(_.round(lineItem.base, 2)).toBe(0);
                 expect(_.round(lineItem.quantity, 2)).toBe(0);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+                expect(_.round(lineItem.perQuantity, 2)).toBe(1);
 
                 resolve();
             });
@@ -491,7 +491,7 @@ test("reset line item", () => {
 
             expect(_.round(lineItem.base, 2)).toBe(0);
             expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
             expect(_.round(lineItem.subtotal, 2)).toBe(0);
 
             expect(_.round(lineItem.laborHours, 2)).toBe(0);
@@ -535,7 +535,7 @@ test("test multiplier", () => {
 
             expect(_.round(lineItem.base, 2)).toBe(5);
             expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
             expect(_.round(lineItem.subtotal, 2)).toBe(5);
 
             expect(_.round(lineItem.laborHours, 2)).toBe(0);
@@ -587,7 +587,7 @@ test("test markup not including tax", async () => {
 
             expect(_.round(lineItem.base, 2)).toBe(0);
             expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
             expect(_.round(lineItem.subtotal, 2)).toBe(0);
 
             expect(_.round(lineItem.laborHours, 2)).toBe(0);
@@ -643,7 +643,7 @@ test("test markup not including tax", async () => {
 
             expect(_.round(lineItem.base, 2)).toBe(5);
             expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(0);
+            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
             expect(_.round(lineItem.subtotal, 2)).toBe(5);
 
             expect(_.round(lineItem.laborHours, 2)).toBe(5);

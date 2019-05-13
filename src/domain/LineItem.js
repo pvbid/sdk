@@ -203,6 +203,7 @@ export default class LineItem extends BidEntity {
     /**
      * Per Quantity Property
      * @type {number}
+     * @deprecated Please use Scalar instead.
      */
     get perQuantity() {
         return Helpers.confirmNumber(this._data.per_quantity);
@@ -210,6 +211,7 @@ export default class LineItem extends BidEntity {
 
     /**
      * @type {number}
+     * @deprecated Please use Scalar instead.
      */
     set perQuantity(val) {
         if (Helpers.isNumber(val) && this._data.per_quantity != Helpers.confirmNumber(val)) {

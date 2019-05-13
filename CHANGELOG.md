@@ -1,4 +1,8 @@
 # CHANGELOG
+### 1.1.20 (2019-XX-XX)
+Improvements:
+* **LineItem:** The default value of perQuantity has been changed from 0 to 1. This is a step to encourage users to favor Scalar over perQuantity. PerQuantity will be deprecated in a future release due to its limitations compared to Scalar.
+
 ### 1.1.19 (2019-04-30)
 Features:
 **Repositories:** `datatables.findById` and `datatables.save` methods are now supported.
