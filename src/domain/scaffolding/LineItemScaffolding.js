@@ -22,7 +22,7 @@ export default class LineItemScaffolding {
             markup: 0,
             markup_percent: 0,
             quantity: 0,
-            per_quantity: 0,
+            per_quantity: 1,
             multiplier: 1,
             wage: 0,
             burden: 0,
@@ -42,7 +42,7 @@ export default class LineItemScaffolding {
                 type: "dollar",
                 per_quantity: {
                     type: "value",
-                    value: 0
+                    value: 1
                 },
                 quantity: {
                     type: "value",
