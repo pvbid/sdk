@@ -1,5 +1,5 @@
 # CHANGELOG
-### 1.1.20 (2019-XX-XX)
+### 1.1.20 (2019-05-13)
 Improvements:
 * **LineItem:** The default value of perQuantity has been changed from 0 to 1. This is a step to encourage users to favor Scalar over perQuantity. PerQuantity will be deprecated in a future release due to its limitations compared to Scalar.
 
