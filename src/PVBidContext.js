@@ -74,16 +74,18 @@ export default class PVBidContext {
     }
 
     /**
-     * Gets an initiated {@link Project} instance witn included bids.
+     * Gets an initiated {@link Project} instance with included bids.
      * 
      * @param {number} projectId The project id in which to retrieve.
-     * @param {boolean} forceReload Flags system to skip cache.
+     * @param {object} options
+     * @param {boolean} [options.allowCache=false] Flags system to use cache if available.
+     * @param {boolean} [options.loadBidEntities=true] Flag to load the bid entities with the bids. If false, the entities may be loaded later with bid.load().
      * @returns {Promise<Project>}
      */
-    async getProject(projectId, forceReload) {
+    async getProject(projectId, { allowCache = false, loadBidEntities = true } = {}) {
         try {
             await this.loadAuthorizedUser();
-            return new ProjectLoader(this).load(projectId, forceReload);
+            return new ProjectLoader(this).load(projectId, { allowCache, loadBidEntities });
         } catch (error) {
             return Promise.reject(error);
         }
@@ -97,7 +99,7 @@ export default class PVBidContext {
      * @param {number[]} [bidIds] Optionally limit the bids that will be cloned into the virtual project. Helps with performance.
      * @return {Project}
      */
-    getVirtualProjectClone(project, bidIds=null) {
+    getVirtualProjectClone(project, bidIds = null) {
         return new ProjectLoader(this).loadVirtualClone(project, bidIds);
     }
 

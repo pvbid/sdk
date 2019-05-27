@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { keyBy, cloneDeep } from "lodash";
 import Bid from "../Bid";
 import Field from "../Field";
 import Metric from "../Metric";
@@ -45,9 +45,13 @@ export default class BidFactory {
       */
     create(bidData, context, project) {
         const bidService = new BidService(context);
+        const includesEntities = this._hasAllEntities(bidData);
         this._keyBidEntities(bidData);
         let bid = new Bid(bidData, bidService);
         this._createBidEntities(bid, bidData);
+        if (includesEntities) {
+            bid._isLoaded = true;
+        }
         bid.project = project;
         bid.bind();
 
@@ -66,15 +70,29 @@ export default class BidFactory {
      */
     reload(bid, bidData) {
         bid.clearEntityBindings();
+        const includesEntities = this._hasAllEntities(bidData);
         this._keyBidEntities(bidData);
         bid._data = bidData;
-        bid._original = _.cloneDeep(bidData);
+        bid._original = cloneDeep(bidData);
+        delete bid.validationResults;
         this._createBidEntities(bid, bidData);
+        if (includesEntities) {
+            bid._isLoaded = true;
+        }
         bid.bind();
 
         if (bid.isAssessable()) {
             bid.reassessAll(true);
         }
+    }
+
+    _hasAllEntities(bidData) {
+        for (let key of this._entities) {
+            if (key !== "variables" && !bidData[key]) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**
@@ -85,7 +103,7 @@ export default class BidFactory {
     _keyBidEntities(bidData) {
         for (let key of this._entities) {
             if (key !== "variables") {
-                bidData[key] = _.keyBy(bidData[key], "id");
+                bidData[key] = keyBy(bidData[key], "id");
             }
         }
     }
@@ -98,6 +116,9 @@ export default class BidFactory {
      */
     _createBidEntities(bid, bidData) {
         for (let key of this._entities) {
+            if (!bidData[key]) {
+                bidData[key] = [];
+            }
             switch (key) {
                 case "line_items":
                     for (let i in bidData[key]) {
@@ -143,7 +164,7 @@ export default class BidFactory {
                     for (const i in bidData[key]) {
                         bidData[key][i] = new BidVariable(bidData[key][i], bid);
                     }
-
+                    break;
                 default:
                     break;
             }

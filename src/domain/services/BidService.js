@@ -30,7 +30,7 @@ export default class BidService {
     async clone(bid) {
         await bid.project.save();
         const res = await this.repositories.bids.clone(bid.id);
-        const bidObject = await this.repositories.bids.findById(res.id, true);
+        const bidObject = await this.repositories.bids.findById(res.id);
         const clonedBid = new BidFactory().create(bidObject, this.context, bid.project);
         bid.project.attachBid(clonedBid);
         bid.project.assess();
@@ -147,8 +147,7 @@ export default class BidService {
         try {
             await bid.project.save();
             await this.repositories.assemblies.delete(bid.id, assemblyId);
-            const bidObject = await this.repositories.bids.findById(bid.id, true);
-            new BidFactory().reload(bid, bidObject);
+            await this.reload(bid);
             return;
         } catch (error) {
             return Promise.reject(error);
@@ -170,8 +169,7 @@ export default class BidService {
                 const res = await this.repositories.assemblies.implement(bid.id, aId);
                 entities.push(res.data.data.bid_entities);
             }
-            const bidObject = await this.repositories.bids.findById(bid.id, true);
-            new BidFactory().reload(bid, bidObject);
+            await this.reload(bid);
             return entities;
         } catch (error) {
             return Promise.reject(error);
@@ -189,8 +187,7 @@ export default class BidService {
         try {
             await bid.project.save();
             await this.repositories.snapshots.recover(bid.id, snapshotId);
-            const bidObject = await this.repositories.bids.findById(bid.id, true);
-            new BidFactory().reload(bid, bidObject);
+            await this.reload(bid);
             return;
         } catch (error) {
             return Promise.reject(error);
@@ -210,5 +207,17 @@ export default class BidService {
         bid.removeAllListeners();
         bid.project = null;
         return;
+    }
+
+    /**
+     * Reload a bid with all of its entities while maintaining the same instance.
+     *
+     * @param {Bid} bid
+     * @return {Bid}
+     */
+    async reload(bid) {
+        const bidObject = await this.repositories.bids.findById(bid.id);
+        new BidFactory().reload(bid, bidObject);
+        return bid;
     }
 }
