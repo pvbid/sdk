@@ -1,10 +1,10 @@
 # CHANGELOG
 
-### 1.1.XX (2019-XX-XX)
+### 1.1.21 (2019-05-27)
 
 Improvements:
 
-- **PVBid.getProject():** Now accepts options as a second parameter. The `loadBidEntities` option determines if the full bid instance (with all entities) should be loaded for each bid in the project. Performance can be increased by setting this flag to false when loading a project with many bids. `loadBidEntities` is set to true by default. Bids loaded without entities may still be renamed, cloned, activated/deactivated, and deleted. They CANNOT be assessed or edited.
+- **PVBid.getProject():** Now accepts options as a second parameter. The `loadBidEntities` option flag determines if the full bid instance (with all entities) should be loaded for each bid in the project. Performance can be increased by setting this flag to false when loading a project with many bids. `loadBidEntities` is set to true by default. Bids loaded without entities may still be renamed, cloned, activated/deactivated, and deleted. They CANNOT be assessed or edited.
 - **Bid:** Bids will need to be loaded before they can be edited or assessed if they are loaded without entities using the `loadBidEntities = false` flag detailed above. The asynchronous `bid.load()` method will fetch the full bid and return a promise which resolves once loading is complete.
 - **Bid:** Bids now have an `isLoaded` property to indicate whether it has been loaded yet or not.
 
