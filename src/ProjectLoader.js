@@ -1,4 +1,4 @@
-import _ from "lodash";
+import { cloneDeep, keyBy, mapValues } from "lodash";
 import Project from "./domain/Project";
 import BidFactory from "./domain/factories/BidFactory";
 import ProjectService from "./domain/services/ProjectService";
@@ -20,19 +20,30 @@ export default class ProjectLoader {
     /**
      * Loads a project and bid instances.
      * 
-     * @param {number} projectId 
-     * @param {boolean} forceReload Forces underlying system to skip the cache.
+     * @param {number} projectId The id of the project to be loaded
+     * @param {object} options Loading options
+     * @param {boolean} [options.loadBidEntities=true] Determines if the bids should be loaded with their entities. They can be loaded later with bid.load() if 
      * @returns {Promise<Project>}
      */
-    async load(projectId, forceReload) {
+    async load(projectId, { loadBidEntities = true } = {}) {
         try {
-            const projectData = await this.context.repositories.projects.findById(projectId, forceReload);
-            const bidIds = projectData.bids.map(b => b.id);
-            const projectService = new ProjectService(this.context);
+            // load project data
+            const projectData = await this.context.repositories.projects.findById(projectId);
             projectData.prediction_models = await this._loadPredictionModels();
-            const project = new Project(projectData, projectService);
-            const bids = await this._loadBids(bidIds, project, forceReload);
-            _.each(bids, b => project.attachBid(b));
+
+            // instantiate project and bids
+            const project = new Project(projectData, new ProjectService(this.context));
+            projectData.bids.forEach(bidData => {
+                const bid = new BidFactory().create(bidData, this.context, project);
+                project.attachBid(bid);
+            });
+
+            // load bid data
+            if (loadBidEntities) {
+                const loadingPromises = Object.values(project.bids).map(bid => bid.load({ skipSave: true }));
+                await Promise.all(loadingPromises);
+            }
+
             project.bind();
             return project;
         } catch (error) {
@@ -42,16 +53,15 @@ export default class ProjectLoader {
 
     /**
      * Generate a new project instance based on the original data from the given project.
-     * For safety, any methods involving repositories or peristance are absent in the clone.
+     * For safety, any methods involving repositories or persistance are absent in the clone.
      *
      * @param {Project} project The project instance to make a virtual clone of.
      * @param {number[]} bidIds Optionally limit the bids that get cloned into the virtual project clone by giving their IDs here.
      * @return {Project}
      */
     loadVirtualClone(project, bidIds=null) {
-        const projectData = _.cloneDeep(project._original);
-        const projectService = new ProjectService(this.context);
-        const virtualProject = new Project(projectData, projectService);
+        const projectData = cloneDeep(project._original);
+        const virtualProject = new Project(projectData, new ProjectService(this.context));
 
         // remove dangerous properties and methods that allow for persistance or repo access
         const dangerousMethods = ["attachUser", "detachUser", "createBid", "save", "clone"];
@@ -74,57 +84,10 @@ export default class ProjectLoader {
     }
 
     /**
-     * Loads a bid instance.
-     * 
-     * @param {number} bidId 
-     * @param {Project} project 
-     * @param {boolean} forceReload Forces underlying system to skeip the cache.
-     * @returns {Promise<Bid>}
-     */
-    async _loadBid(bidId, project, forceReload) {
-        try {
-            const bidObject = await this.context.repositories.bids.findById(bidId, forceReload);
-            return new BidFactory().create(bidObject, this.context, project);
-        } catch (error) {
-            return Promise.reject(error);
-        }
-    }
-
-    /**
-     * Loads all bid instances for a project.
-     * 
-     * @param {array} bidIds 
-     * @param {Project} project 
-     * @param {boolean} forceReload Forces underlying system to skeip the cache.
-     * @returns {Promise<Bid[]>}
-     */
-    async _loadBids(bidIds, project, forceReload) {
-        let promises = [];
-
-        _.each(bidIds, id => {
-            promises.push(this.context.repositories.bids.findById(id, forceReload));
-        });
-
-        return Promise.all(promises)
-            .then(bidsJson => {
-                let bids = {};
-                for (let bidObject of bidsJson) {
-                    const bid = new BidFactory().create(bidObject, this.context, project);
-                    bids[bid.id] = bid;
-                }
-
-                return bids;
-            })
-            .catch(err => {
-                console.log(err);
-            });
-    }
-
-    /**
      * Generates virtual bid clones for the virtual project clone.
      *
      * @param {Bid[]} originalBids Bid instances from the original project
-     * @param {Project} virtualProject The virtual project clone to attatch bid clones too
+     * @param {Project} virtualProject The virtual project clone to attach bid clones too
      * @return {Bid[]} Clones of the given bids
      */
     _loadVirtualBids(originalBids, virtualProject) {
@@ -156,12 +119,12 @@ export default class ProjectLoader {
     /**
      * Load a formatted list of prediction models keyed by their line item def id
      *
-     * @return {Promise<Object>} Prediction models keyed by thier line item def id
+     * @return {Promise<Object>} Prediction models keyed by their line item def id
      */
     async _loadPredictionModels() {
         const predictionModels = await this.context.repositories.predictionModels.get();
-        const keyedPredictionModels = _.keyBy(predictionModels, 'line_item_def_id');
-        const formattedPredictionModels = _.mapValues(keyedPredictionModels, (model) => ({
+        const keyedPredictionModels = keyBy(predictionModels, 'line_item_def_id');
+        const formattedPredictionModels = mapValues(keyedPredictionModels, (model) => ({
             models: model.models,
             contribution_weight: model.contribution_weight,
             use_count: model.use_count,

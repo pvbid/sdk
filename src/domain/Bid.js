@@ -21,6 +21,7 @@ export default class Bid extends BidEntity {
    */
   constructor(bidData, bidService) {
     super();
+    this._isLoaded = false;
     this._calcRounds = 0;
     this._data = bidData;
     this._bidService = bidService;
@@ -66,6 +67,17 @@ export default class Bid extends BidEntity {
    */
   get isActive() {
     return this._data.is_active;
+  }
+
+  /**
+   * Determine if the full bid and all its entities are currently loaded.
+   * A bid cannot be edited or assessed until it is loaded.
+   * Bid can be loaded with bid.load().
+   *
+   * @type {boolean}
+   */
+  get isLoaded() {
+    return this._isLoaded;
   }
 
   /**
@@ -1003,7 +1015,7 @@ export default class Bid extends BidEntity {
   }
 
   /**
-   * Determines if bid is updateable by the user.
+   * Determines if bid is updatable by the user.
    * This method is deprecated. Use {@link Bid.isReadOnly} instead.
    *
    * @deprecated
@@ -1023,6 +1035,7 @@ export default class Bid extends BidEntity {
     //TODO: add in user permission logic.
     return (
       this.isLocked() ||
+      !this.isLoaded ||
       !_.isNull(this.project.closedAt) ||
       !this._bidService.context.user.can("edit-bid")
     );
@@ -1097,6 +1110,22 @@ export default class Bid extends BidEntity {
   }
 
   /**
+   * Fully loads the bid with its entities (if not already loaded).
+   *
+   * @param {object} options
+   * @param {boolean} [options.forceReload = false] Force the bid to reload even if the entities are already loaded. 
+   * @param {boolean} [options.skipSave = false] Saves the current project state before loading by default. Set this flag to skip.
+   */
+  async load({ skipSave = false, forceReload = false } = {}) {
+    if (this.isLoaded && !forceReload) return;
+  
+    if (!skipSave && this.isDirty()) {
+      await this.project.save();
+    }
+    await this._bidService.reload(this);
+  }
+
+  /**
    * Removes assembly from a bid. A wrapper function for {@link BidService.removeAssembly}
    *
    * @param {number} assemblyId
@@ -1168,8 +1197,13 @@ export default class Bid extends BidEntity {
 
   /**
    * Adds a new bid variable to the bid
+   *
+   * @throws {Error} If bid is read only
    */
   addBidVariable() {
+    if (this.isReadOnly()) {
+      throw new Error(`Bid ${this.id} is read only. Cannot add a new variable.`);
+    }
     const newVar = new BidVariable(
       {
         type: "number",
@@ -1177,7 +1211,6 @@ export default class Bid extends BidEntity {
         value: 0,
         is_reserved: false
       },
-      this
     );
 
     // generate a random unique key for the variable
@@ -1197,9 +1230,13 @@ export default class Bid extends BidEntity {
    * This is a wrapper function for {@link BidService.addLineItem}
    *
    * @param {string} [title=New Line Item]
+   * @throws {Error} If bid is read only
    * @returns {Promise<LineItem>}
    */
   async addLineItem(title) {
+    if (this.isReadOnly()) {
+      throw new Error(`Bid ${this.id} is read only. Cannot add a new line item.`);
+    }
     return this._bidService.addLineItem(this, title);
   }
 
@@ -1208,9 +1245,13 @@ export default class Bid extends BidEntity {
    * This is a wrapper function for {@link BidService.addMetric}
    *
    * @param {string} [title=New Metric]
+   * @throws {Error} If bid is read only
    * @returns {Promise<Metric>}
    */
   async addMetric(title) {
+    if (this.isReadOnly()) {
+      throw new Error(`Bid ${this.id} is read only. Cannot add a new metric.`);
+    }
     return this._bidService.addMetric(this, title);
   }
 
@@ -1220,9 +1261,13 @@ export default class Bid extends BidEntity {
    *
    * @param {string} [title=New Field]
    * @param {string} [type=number]
+   * @throws {Error} If bid is read only
    * @returns {Promise<Field>}
    */
   async addField(title, type) {
+    if (this.isReadOnly()) {
+      throw new Error(`Bid ${this.id} is read only. Cannot add a new field.`);
+    }
     return this._bidService.addField(this, title, type);
   }
 
@@ -1250,6 +1295,9 @@ export default class Bid extends BidEntity {
    * @return {Promise<void>} Resolves once the bid has been assessed twice in a row with the same price. Rejects if the price does not stabilize.
    */
   async reassessAsync() {
+    if (!this.isAssessable()) {
+      return;
+    }
     const maxCount = 5;
     const wasStabilized = await this._reassessAllAsync(maxCount);
     if (!wasStabilized) {

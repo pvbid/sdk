@@ -58,6 +58,18 @@ Project instances contain a list of their child bids.
 ```javascript 
 let bid = project.bids[bidId];
 ```
+
+**Load bids only when you need them**
+You can defer loading all the bids in a project. This can save load time.
+```javascript
+const project = await pvbid.getProject(projectId, { loadBidEntities: false });
+
+// load a bid's data when you need it...
+const bid = project.bids[bidId];
+await bid.load();
+// self assessing bid is ready to use!
+```
+
 **Making changes to the bid's properties**
 
 Many properties will trigger the bid to self assess. For example setting the `bid.cost` property will fire its `assessing` event.  `bid.title` will not assess, but will flag the bid as dirty.

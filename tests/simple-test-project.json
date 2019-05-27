@@ -88,7 +88,8 @@
         "bids": [
             {
                 "id": 190,
-                "project_id": 461
+                "project_id": 461,
+                "is_active": true
             }
         ]
     },
