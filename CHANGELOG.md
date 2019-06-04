@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 1.1.22 (2019-06-04)
+
+Features:
+**Repositories:** Account definition can now be accessed (read-only) through the PVBid SDK's repository. Please see the repository documentation for more information.
+
 ### 1.1.21 (2019-05-27)
 
 Improvements:
