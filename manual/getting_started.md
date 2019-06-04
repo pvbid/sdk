@@ -91,6 +91,11 @@ if(fields.length > 0){
 let metric = bid.entities.metrics(metricId);
 if (metric) metric.value = 123.45;
 ```
+**Get a datatable row key by a linked part**
+```javascript
+const rowKey = datatable.findRowByExternalPartId('sundat', 75); // 'x4gw' (datatable row key)
+field.value = rowKey; // for a list type field connected to datatable
+```
 **Manually assessing the bid**
 
 It is a good idea to assess (calculate) the bid after making changes to Metrics, Fields and Variables.
