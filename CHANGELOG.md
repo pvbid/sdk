@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 1.1.23 (2019-06-06)
+
+Bug Fixes:
+**Datatable:** `findRowByExternalPartId` updated due to data structure changes.
+
 ### 1.1.22 (2019-06-04)
 
 Features:
