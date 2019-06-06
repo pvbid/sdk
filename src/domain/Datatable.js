@@ -180,7 +180,7 @@ export default class Datatable extends BidEntity {
      * Find the first row in the datatable which has the given vendor part linked.
      *
      * @param {string} vendorName
-     * @param {string} vendorPartId
+     * @param {string|number} vendorPartId
      * @return {string|undefined} The row ID of the row containing the matching part. Undefined if none found.
      */
     findRowByExternalPartId(vendorName, vendorPartId) {
@@ -194,7 +194,9 @@ export default class Datatable extends BidEntity {
                 partData.external_sources[vendorName]
             )) return false;
 
-            return partData.external_sources[vendorName].id.toString() === vendorPartId;
+            return partData.external_sources[vendorName].ids
+                .map(id => id.toString())
+                .includes(vendorPartId.toString());
         });
 
         return row ? row.id : undefined;

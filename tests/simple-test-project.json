@@ -1552,8 +1552,8 @@
                                     "example_prop": 1000,
                                     "null_prop": null,
                                     "external_sources": {
-                                        "test_vendor_a": { "id": 9876 },
-                                        "test_vendor_b": { "id": 1234 }
+                                        "test_vendor_a": { "ids": [9876] },
+                                        "test_vendor_b": { "ids": [1234] }
                                     }
                                 }
                             ]
