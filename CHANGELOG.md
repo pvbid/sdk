@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 1.1.24 (2019-06-19)
+
+Bug Fixes:
+**Bid:** Fixed bug preventing bid's active status from persisting before bid.load is called.
+
 ### 1.1.23 (2019-06-06)
 
 Bug Fixes:

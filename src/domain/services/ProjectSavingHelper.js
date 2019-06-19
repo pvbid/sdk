@@ -15,7 +15,7 @@ export default class ProjectSavingHelper {
             datatables: {}
         };
         _.each(project.bids, bid => {
-            if (bid.isUpdateable()) {
+            if (!bid.isReadOnly()) {
                 if (bid.isDirty()) {
                     extracted.bids[bid.id] = bid.exportData();
 
@@ -51,7 +51,7 @@ export default class ProjectSavingHelper {
                         if (item.isDirty()) extracted.datatables[item.id] = item.exportData();
                     });
                 }
-            } else if (bid.isLocked() && bid.isDirty()) {
+            } else if ((bid.isLocked() || !bid.isLoaded) && bid.isDirty()) {
                 extracted.bids[bid.id] = {
                     id: bid.id,
                     title: bid.title,
