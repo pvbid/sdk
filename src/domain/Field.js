@@ -1,5 +1,6 @@
-import _ from "lodash";
+import { cloneDeep, isNil, isUndefined, isEmpty, isEqual } from "lodash";
 import BidEntity from "./BidEntity";
+import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
 import FieldAutoPopulateService from "./services/FieldAutoPopulateService";
 
 /**
@@ -19,7 +20,7 @@ export default class Field extends BidEntity {
          */
         this.bid = bid;
         this._data = fieldData;
-        this._original = _.cloneDeep(fieldData);
+        this._original = cloneDeep(fieldData);
         this._autoPopulateService = new FieldAutoPopulateService(this);
     }
 
@@ -37,7 +38,7 @@ export default class Field extends BidEntity {
             }
 
             val = val == true || val == "1" || val == "true" ? true : false;
-        } else if (this.fieldType === "number" && !_.isNil(val)) {
+        } else if (this.fieldType === "number" && !isNil(val)) {
             val = +val; // cast to number
         }
         return val;
@@ -133,7 +134,7 @@ export default class Field extends BidEntity {
      * @type {boolean}
      */
     get isAutoSelected() {
-        return !_.isUndefined(this.config.is_auto_selected) && this.config.is_auto_selected;
+        return !isUndefined(this.config.is_auto_selected) && this.config.is_auto_selected;
     }
 
     /**
@@ -162,13 +163,45 @@ export default class Field extends BidEntity {
      */
     bind() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
-            if (!_.isEmpty(dependencyContract)) {
+            if (!isEmpty(dependencyContract)) {
                 const dependency = this.bid.entities.getDependency(dependencyContract);
                 if (dependency) {
                     dependency.on("updated", `field.${this.id}`, (requesterId, self) => this.assess(self));
                 }
             }
         }
+    }
+
+    /**
+     * Get the field's assembly if it has one
+     *
+     * @return {Assembly|undefined}
+     */
+    getAssembly() {
+        return getAssembly(this);
+    }
+
+    /**
+     * Adds the field to an assembly.
+     *
+     * @param {Assembly|string} assembly The assembly entity or an assembly ref id
+     * @return {Assembly} the new assembly setting
+     */
+    setAssembly(assembly) {
+        if (!assembly) throw new Error('Assembly reference was not provided.');
+        setAssembly(this, assembly);
+        this.dirty();
+        return this.getAssembly();
+    }
+
+    /**
+     * Removes any assembly reference from the field.
+     *
+     * @return {void}
+     */
+    unsetAssembly() {
+        setAssembly(this, null);
+        this.dirty();
     }
 
     /**
@@ -180,7 +213,7 @@ export default class Field extends BidEntity {
         let contracts = Object.values(this.config.dependencies);
         let dependencies = [];
 
-        _.each(contracts, ctrct => {
+        contracts.forEach(ctrct => {
             const dependency = this.bid.entities.getDependency(ctrct);
             if (dependency) {
                 dependencies.push(dependency);
@@ -234,7 +267,7 @@ export default class Field extends BidEntity {
     getSelectedOption() {
         const datatable = this.getDatatable();
         if (datatable) {
-            return _.find(datatable.getOptions(), el => {
+            return datatable.getOptions().find(el => {
                 return el.row_id === this.value;
             });
         } else return null;
@@ -260,8 +293,8 @@ export default class Field extends BidEntity {
      * @returns {object}
      */
     exportData(alwaysIncludeConfig=false) {
-        let data = _.cloneDeep(this._data);
-        if (!alwaysIncludeConfig && _.isEqual(data.config, this._original.config)) delete data.config;
+        let data = cloneDeep(this._data);
+        if (!alwaysIncludeConfig && isEqual(data.config, this._original.config)) delete data.config;
 
         return data;
     }
@@ -279,7 +312,7 @@ export default class Field extends BidEntity {
      * @returns {boolean} 
      */
     isDirty() {
-        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
+        return this._is_dirty || !isEqual(this._data.config, this._original.config);
     }
 
     /**

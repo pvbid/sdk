@@ -3,6 +3,7 @@ import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
 import LineItemRuleService from "./services/LineItemRuleService";
+import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
 
 /**
  * Represents line item data.
@@ -1597,6 +1598,38 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Get the line item's assembly if it has one
+     *
+     * @return {Assembly|undefined}
+     */
+    getAssembly() {
+        return getAssembly(this);
+    }
+
+    /**
+     * Adds the line item to an assembly.
+     *
+     * @param {Assembly|string} assembly The assembly entity or an assembly ref id
+     * @return {Assembly} the new assembly setting
+     */
+    setAssembly(assembly) {
+        if (!assembly) throw new Error('Assembly reference was not provided.');
+        setAssembly(this, assembly);
+        this.dirty();
+        return this.getAssembly();
+    }
+
+    /**
+     * Removes any assembly reference from the line item.
+     *
+     * @return {void}
+     */
+    unsetAssembly() {
+        setAssembly(this, null);
+        this.dirty();
+    }
+
+    /**
      * Deletes line item.
      *
      * @returns {Promise<void>}
@@ -1608,8 +1641,8 @@ export default class LineItem extends BidEntity {
                 c.removeLineItem(this.id);
             });
 
-            if (this.config.assembly_id) {
-                const assembly = this.bid.entities.assemblies(this.config.assembly_id);
+            if (this.hasAssembly) {
+                const assembly = this.getAssembly();
                 assembly.removeBidEntity(this.type, this.id);
             }
 

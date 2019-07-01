@@ -1,5 +1,6 @@
+import { cloneDeep, isEqual } from "lodash";
 import BidEntity from "./BidEntity";
-import _ from "lodash";
+import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
 
 /**
  * Field Group Class
@@ -17,7 +18,7 @@ export default class FieldGroup extends BidEntity {
          * @type {Bid}
          */
         this.bid = bid;
-        this._original = _.cloneDeep(fieldGroupData);
+        this._original = cloneDeep(fieldGroupData);
         this._data = fieldGroupData;
     }
 
@@ -30,12 +31,44 @@ export default class FieldGroup extends BidEntity {
     }
 
     /**
+     * Get the field group's assembly if it has one
+     *
+     * @return {Assembly|undefined}
+     */
+    getAssembly() {
+        return getAssembly(this);
+    }
+
+    /**
+     * Adds the field group to an assembly.
+     *
+     * @param {Assembly|string} assembly The assembly entity or an assembly ref id
+     * @return {Assembly} the new assembly setting
+     */
+    setAssembly(assembly) {
+        if (!assembly) throw new Error('Assembly reference was not provided.');
+        setAssembly(this, assembly);
+        this.dirty();
+        return this.getAssembly();
+    }
+
+    /**
+     * Removes any assembly reference from the field group.
+     *
+     * @return {void}
+     */
+    unsetAssembly() {
+        setAssembly(this, null);
+        this.dirty();
+    }
+
+    /**
      * Determines if the field group is changed for it's original data.
      * 
      * @returns {boolean} 
      */
     isDirty() {
-        return this._is_dirty || !_.isEqual(this._data.config, this._original.config);
+        return this._is_dirty || !isEqual(this._data.config, this._original.config);
     }
 
     /**
