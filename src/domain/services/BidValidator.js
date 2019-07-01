@@ -345,7 +345,7 @@ export default class BidValidator {
     }
 
     _testLineItemScalarFormulaReferences(sourceBidEntity) {
-        var params = {};
+        var params = { workup: 1 };
 
         var scalarContracts = _.pickBy(sourceBidEntity.config.dependencies, (el, key) => {
             return key.indexOf("scalar_") === 0;

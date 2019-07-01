@@ -176,6 +176,20 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * @type {number}
+     */
+    get workup() {
+        if (
+            this.config.workups[0] &&
+            this.config.workups[0].value !== undefined &&
+            this.config.workups[0].value !== null
+        ) {
+            return Helpers.confirmNumber(this.config.workups[0].value);
+        }
+        return null;
+    }
+
+    /**
      * Scalar Property
      * @type {number}
      */
@@ -195,6 +209,9 @@ export default class LineItem extends BidEntity {
         if (formulaArgs.indexOf('x') >= 0) {
             const val = this._evaluateDependency(this.config.dependencies.scalar, "scalar");
             valueMap.x = Helpers.confirmNumber(val, 1);
+        }
+        if (formulaArgs.indexOf('workup') >= 0) {
+            valueMap.workup = Helpers.confirmNumber(this.workup, 0);
         }
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return Helpers.confirmNumber(results, 1);

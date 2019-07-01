@@ -159,7 +159,7 @@ describe("Line item markup percent", () => {
 
             return new Promise(resolve => {
                 lineItem.once("updated", () => {
-                    expect(_.round(lineItem.markupPercent, 2)).toBe(21.74);
+                    expect(_.round(lineItem.markupPercent, 2)).toBe(19.32);
                     expect(lineItem.isOverridden("markup_percent")).toBe(true);
                     expect(lineItem.isOverridden()).toBe(true);
                     resolve();
@@ -185,7 +185,7 @@ describe("Line item markup percent", () => {
 
             return new Promise(resolve => {
                 lineItem.once("updated", () => {
-                    expect(_.round(lineItem.markupPercent, 2)).toBe(17.25);
+                    expect(_.round(lineItem.markupPercent, 2)).toBe(19.41);
                     expect(lineItem.isOverridden("markup_percent")).toBe(true);
                     expect(lineItem.isOverridden()).toBe(true);
                     resolve();
