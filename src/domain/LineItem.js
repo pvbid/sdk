@@ -3,6 +3,7 @@ import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
 import LineItemRuleService from "./services/LineItemRuleService";
+import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
 
 /**
  * Represents line item data.
@@ -176,6 +177,20 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * @type {number}
+     */
+    get workup() {
+        if (
+            this.config.workups[0] &&
+            this.config.workups[0].value !== undefined &&
+            this.config.workups[0].value !== null
+        ) {
+            return Helpers.confirmNumber(this.config.workups[0].value);
+        }
+        return null;
+    }
+
+    /**
      * Scalar Property
      * @type {number}
      */
@@ -195,6 +210,9 @@ export default class LineItem extends BidEntity {
         if (formulaArgs.indexOf('x') >= 0) {
             const val = this._evaluateDependency(this.config.dependencies.scalar, "scalar");
             valueMap.x = Helpers.confirmNumber(val, 1);
+        }
+        if (formulaArgs.indexOf('workup') >= 0) {
+            valueMap.workup = Helpers.confirmNumber(this.workup, 0);
         }
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
         return Helpers.confirmNumber(results, 1);
@@ -1580,6 +1598,38 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Get the line item's assembly if it has one
+     *
+     * @return {Assembly|undefined}
+     */
+    getAssembly() {
+        return getAssembly(this);
+    }
+
+    /**
+     * Adds the line item to an assembly.
+     *
+     * @param {Assembly|string} assembly The assembly entity or an assembly ref id
+     * @return {Assembly} the new assembly setting
+     */
+    setAssembly(assembly) {
+        if (!assembly) throw new Error('Assembly reference was not provided.');
+        setAssembly(this, assembly);
+        this.dirty();
+        return this.getAssembly();
+    }
+
+    /**
+     * Removes any assembly reference from the line item.
+     *
+     * @return {void}
+     */
+    unsetAssembly() {
+        setAssembly(this, null);
+        this.dirty();
+    }
+
+    /**
      * Deletes line item.
      *
      * @returns {Promise<void>}
@@ -1591,8 +1641,8 @@ export default class LineItem extends BidEntity {
                 c.removeLineItem(this.id);
             });
 
-            if (this.config.assembly_id) {
-                const assembly = this.bid.entities.assemblies(this.config.assembly_id);
+            if (this.hasAssembly) {
+                const assembly = this.getAssembly();
                 assembly.removeBidEntity(this.type, this.id);
             }
 

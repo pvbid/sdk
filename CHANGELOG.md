@@ -1,19 +1,35 @@
 # CHANGELOG
 
+### 1.1.25 (2019-07-01)
+
+Features:
+
+- **LineItem:** Now has a "workup" value that can contribute to perQuantity through the formula as `WORKUP`. The current workup value can be accessed via `lineItem.workup`. The workup value cannot be set directly at this time and must be edited via a calculator in the PVBid UI.
+
+Improvements:
+
+- **BidEntity:** Added a `hasAssembly` property which indicates whether or not the entity is in an assembly. Line Items, Metrics, Fields, and Field Groups may be in an assembly.
+- **LineItem|Metric|Field|FieldGroup:** added several methods to make working with assemblies easier and more consistent. To get the assembly that the entity belongs to, just call `entity.getAssembly()`. Methods for adding or removing the entity from an assembly have been added as well (`setAssembly(assembly)` and `unsetAssembly()`).
+- **FieldGroup:** Add `getFields()` method that returns the `Field` entities belonging to that group keyed by their reference id.
+- **ComponentGroup:** Add `getComponents()` method that returns the components belonging to that group keyed by their reference id. Pass `componentGroup.getComponents(true)` (passing true as an arg) with return just the top-level components in the group.
+
 ### 1.1.24 (2019-06-19)
 
 Bug Fixes:
-**Bid:** Fixed bug preventing bid's active status from persisting before bid.load is called.
+
+- **Bid:** Fixed bug preventing bid's active status from persisting before bid.load is called.
 
 ### 1.1.23 (2019-06-06)
 
 Bug Fixes:
-**Datatable:** `findRowByExternalPartId` updated due to data structure changes.
+
+- **Datatable:** `findRowByExternalPartId` updated due to data structure changes.
 
 ### 1.1.22 (2019-06-04)
 
 Features:
-**Repositories:** Account definition can now be accessed (read-only) through the PVBid SDK's repository. Please see the repository documentation for more information.
+
+- **Repositories:** Account definition can now be accessed (read-only) through the PVBid SDK's repository. Please see the repository documentation for more information.
 
 ### 1.1.21 (2019-05-27)
 
@@ -32,10 +48,11 @@ Improvements:
 ### 1.1.19 (2019-04-30)
 
 Features:
-**Repositories:** `datatables.findById` and `datatables.save` methods are now supported.
-**Datatable:** Introducing _Inventory Links_. Datatables may now contain reference to items in a shared PVBid inventory. If a datatable is linked, the `inventoryLink` property will indicate which inventory the datatable is linked to. Linked datatables will be able to reference the _columns_ of the linked inventory and rows within the datatable that reference specific inventory items will contain all the data associated with that item. All the existing datatable methods (`getValue`, `getOptions`, `getColumnValues`) support this feature. To access the raw row or column data, the `datatable.columns` and `datatable.rows` properties must be used. Rows and columns should NOT be accessed through the `datatable.config` property.
-**Datatable:** `datatable.reload()` is an async method that persists and reloads the datatable entity. This is useful in scenarios where an inventory link changes and fresh data is required. Modifying inventory links on a datatable instance is not recommended but it is possible with a Bulk Update in the PVBid application.
-**Datatable:** add `datatable.findRowByExternalPartId` method to lookup a row in a datatable by its linked part's 3rd party vendor ID. This is useful for making field list selections based on information coming from an external source.
+
+- **Repositories:** `datatables.findById` and `datatables.save` methods are now supported.
+- **Datatable:** Introducing _Inventory Links_. Datatables may now contain reference to items in a shared PVBid inventory. If a datatable is linked, the `inventoryLink` property will indicate which inventory the datatable is linked to. Linked datatables will be able to reference the _columns_ of the linked inventory and rows within the datatable that reference specific inventory items will contain all the data associated with that item. All the existing datatable methods (`getValue`, `getOptions`, `getColumnValues`) support this feature. To access the raw row or column data, the `datatable.columns` and `datatable.rows` properties must be used. Rows and columns should NOT be accessed through the `datatable.config` property.
+- **Datatable:** `datatable.reload()` is an async method that persists and reloads the datatable entity. This is useful in scenarios where an inventory link changes and fresh data is required. Modifying inventory links on a datatable instance is not recommended but it is possible with a Bulk Update in the PVBid application.
+- **Datatable:** add `datatable.findRowByExternalPartId` method to lookup a row in a datatable by its linked part's 3rd party vendor ID. This is useful for making field list selections based on information coming from an external source.
 
 ### 1.1.18 (2019-04-29)
 

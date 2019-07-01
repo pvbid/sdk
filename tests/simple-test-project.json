@@ -1196,6 +1196,96 @@
                 "type": "line_item",
                 "created_at": "2017-09-26 23:04:55",
                 "updated_at": "2017-09-27 01:10:55"
+            },
+            {
+                "id": 49974,
+                "bid_id": 190,
+                "account_id": 3,
+                "title": "Workup Item",
+                "is_active": true,
+                "is_included": true,
+                "config": {
+                    "comments": [],
+                    "order_index": 0,
+                    "assembly_id": null,
+                    "type": "dollar",
+                    "quantity": {
+                        "type": "value",
+                        "value": 1
+                    },
+                    "per_quantity": {
+                        "type": "value",
+                        "value": 1
+                    },
+                    "base": 0,
+                    "formula": "WORKUP",
+                    "dependencies": {
+                        "tax": {
+                            "type": "bid_variable",
+                            "field": "tax",
+                            "bid_entity_id": "bid_variable"
+                        },
+                        "wage": {
+                            "type": "bid_variable",
+                            "field": "wage",
+                            "bid_entity_id": "bid_variable"
+                        },
+                        "burden": {
+                            "type": "bid_variable",
+                            "field": "burden",
+                            "bid_entity_id": "bid_variable"
+                        },
+                        "markup": {
+                            "type": "bid_variable",
+                            "field": "markup",
+                            "bid_entity_id": "bid_variable"
+                        },
+                        "scalar": [],
+                        "quantity": [],
+                        "escalator": {
+                            "type": "bid_variable",
+                            "field": "escalator",
+                            "bid_entity_id": "bid_variable"
+                        },
+                        "per_quantity": []
+                    },
+                    "workups": [{
+                        "value": 150.12345,
+                        "unit": "units"
+                    }],
+                    "rules": [
+                        {
+                            "type": "always_include",
+                            "title": "Always Include"
+                        }
+                    ],
+                    "rule_inclusion": "any",
+                    "overrides": {},
+                    "short_code": "line:no_models_line_item",
+                    "description": ""
+                },
+                "cost": 0,
+                "taxable_cost": 0,
+                "price": 0,
+                "tax": 0,
+                "tax_percent": 15,
+                "markup": 0,
+                "markup_percent": 15,
+                "quantity": 0,
+                "per_quantity": 0,
+                "multiplier": 1,
+                "burden": 5,
+                "wage": 35,
+                "base": 0,
+                "escalator": 1,
+                "labor_hours": 0,
+                "actual_cost": null,
+                "acutal_hours": null,
+                "definition_id": 1584,
+                "definition_version": 2,
+                "type": "line_item",
+                "created_at": "2017-09-26 23:04:55",
+                "updated_at": "2017-09-27 01:10:55"
             }
         ],
         "fields": [

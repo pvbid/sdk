@@ -564,6 +564,25 @@ test("test multiplier", () => {
     });
 });
 
+describe("Using a workup", () => {
+    let $lineItem;
+    beforeAll(async () => {
+        $lineItem = bid.entities.searchByTitle("line_item", "Workup Item")[0];
+        await new Promise(res => {
+            $lineItem.once("assessed", () => { res() });
+            $lineItem.assess();
+        });
+    });
+
+    test("can read workup value", () => {
+        expect($lineItem.workup).toBe(150.12345);
+    });
+
+    test("workup value used to evaluate cost", () => {
+        expect($lineItem.cost).toBe(150.1235);
+    })
+});
+
 test("test markup not including tax", async () => {
     expect.assertions(26);
 

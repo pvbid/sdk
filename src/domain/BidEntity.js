@@ -1,5 +1,6 @@
 import { cloneDeep } from "lodash";
 import AdvanceEventEmitter from "../utils/AdvanceEventEmitter";
+import { hasAssembly } from "./services/BidEntityAssemblyService";
 
 /**
  * A base class for all other bid entities to extend.
@@ -59,6 +60,15 @@ export default class BidEntity extends AdvanceEventEmitter {
      */
     get type() {
         return this._data.type;
+    }
+
+    /**
+     * Determine if the entity is in an assembly
+     *
+     * @type {boolean}
+     */
+    get hasAssembly() {
+        return hasAssembly(this);
     }
 
     /**

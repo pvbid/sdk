@@ -1,6 +1,7 @@
 import _ from "lodash";
 import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
+import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
 
 /**
  * Metric Class
@@ -198,6 +199,38 @@ export default class Metric extends BidEntity {
      */
     dependants() {
         return this.bid.entities.getDependants("metric", this.id);
+    }
+
+    /**
+     * Get the metric assembly if it has one
+     *
+     * @return {Assembly|undefined}
+     */
+    getAssembly() {
+        return getAssembly(this);
+    }
+
+    /**
+     * Adds the metric to an assembly.
+     *
+     * @param {Assembly|string} assembly The assembly entity or an assembly ref id
+     * @return {Assembly} the new assembly setting
+     */
+    setAssembly(assembly) {
+        if (!assembly) throw new Error('Assembly reference was not provided.');
+        setAssembly(this, assembly);
+        this.dirty();
+        return this.getAssembly();
+    }
+
+    /**
+     * Removes any assembly reference from the metric.
+     *
+     * @return {void}
+     */
+    unsetAssembly() {
+        setAssembly(this, null);
+        this.dirty();
     }
 
     /**

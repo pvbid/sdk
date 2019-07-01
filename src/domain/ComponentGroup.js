@@ -35,6 +35,23 @@ export default class ComponentGroup extends BidEntity {
     }
 
     /**
+     * Retrieves the bid components that belong to the component group
+     *
+     * @param {boolean} topLevelOnly get only the top level components in the group
+     * @return {object} components keyed by their reference
+     */
+    getComponents(topLevelOnly = false) {
+        const components = {};
+        Object.keys(this.bid.entities.components()).forEach(key => {
+            const component = this.bid.entities.components(key);
+            if (component.componentGroupId !== this.id) return;
+            if (topLevelOnly && !component.isParent()) return;
+            components[key] = component;
+        });
+        return components;
+    }
+
+    /**
      * Flags the component group and corresponding bid as dirty and to be saved.
      */
     dirty() {
