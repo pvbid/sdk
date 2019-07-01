@@ -11,6 +11,7 @@ Improvements:
 - **BidEntity:** Added a `hasAssembly` property which indicates whether or not the entity is in an assembly. Line Items, Metrics, Fields, and Field Groups may be in an assembly.
 - **LineItem|Metric|Field|FieldGroup:** added several methods to make working with assemblies easier and more consistent. To get the assembly that the entity belongs to, just call `entity.getAssembly()`. Methods for adding or removing the entity from an assembly have been added as well (`setAssembly(assembly)` and `unsetAssembly()`).
 - **FieldGroup:** Add `getFields()` method that returns the `Field` entities belonging to that group keyed by their reference id.
+- **ComponentGroup:** Add `getComponents()` method that returns the components belonging to that group keyed by their reference id. Pass `componentGroup.getComponents(true)` (passing true as an arg) with return just the top-level components in the group.
 
 ### 1.1.24 (2019-06-19)
 
