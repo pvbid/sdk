@@ -1,8 +1,5 @@
 var path = require("path");
 var webpack = require("webpack");
-const MinifyPlugin = require("babel-minify-webpack-plugin");
-var CompressionPlugin = require("compression-webpack-plugin");
-const HappyPack = require("happypack");
 var S3Plugin = require("webpack-s3-plugin");
 require("dotenv").config();
 
@@ -26,36 +23,6 @@ if (process.env.DOCS) {
     );
 }
 
-plugins.push(
-    new HappyPack({
-        // 3) re-add the loaders you replaced above in #1:
-        loaders: [
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: "babel",
-                query: {
-                    presets: [["es2015", { modules: false }], "stage-1"],
-                    plugins: ["lodash", "transform-runtime", "syntax-async-functions", "transform-regenerator"]
-                }
-            }
-        ]
-    })
-);
-if(!process.env.SKIP_MIN) plugins.push(new MinifyPlugin({}, { comments: false }));
-//plugins.push(new LodashModuleReplacementPlugin());
-/*
-plugins.push(
-    new CompressionPlugin({
-        asset: "[path].gz[query]",
-        algorithm: "gzip",
-        test: /\.js$|\.css$|\.html$/,
-        threshold: 10240,
-        minRatio: 0.8
-    })
-);
-*/
-
 module.exports = {
     entry: ["./src/pvbid.js"],
     output: {
@@ -64,32 +31,24 @@ module.exports = {
         library: "PVBid",
         libraryTarget: "umd"
     },
-    resolveLoader: {
-        moduleExtensions: ["-loader"]
+    resolve: {
+        extensions: ['.js', '.ts'],
+        alias: {
+            '@': path.resolve(__dirname, 'src'),
+        },
     },
     module: {
         rules: [
             {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: "happypack/loader", //"babel",
-                query: {
-                    presets: [["es2015", { modules: false }], "stage-1"],
-                    plugins: ["lodash", "transform-runtime", "syntax-async-functions", "transform-regenerator"]
-                }
-            }
-        ]
-        /* loaders: [
-            {
-                test: /\.js$/,
+                test: /\.(ts|js)x?$/,
                 exclude: /node_modules/,
                 loader: "babel-loader",
                 query: {
-                    presets: [["es2015", { modules: false }], "stage-1"],
-                    plugins: ["syntax-async-functions", "transform-regenerator", "transform-runtime"]
+                    presets: [['@babel/env', { 'targets': { 'node': 6 } }], "@babel/typescript"],
+                    plugins: ["lodash", "@babel/plugin-transform-runtime", "syntax-async-functions", "@babel/plugin-transform-regenerator"]
                 }
-            }
-        ]*/
+            },
+        ]
     },
     stats: {
         colors: true
