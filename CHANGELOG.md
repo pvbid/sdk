@@ -1,5 +1,10 @@
 # CHANGELOG
 
+### 1.1.25 (2019-07-XX)
+
+Features:
+**LineItem:** Now has a "workup" value that can contribute to perQuantity through the formula as `WORKUP`. The current workup value can be accessed via `lineItem.workup`. The workup value cannot be set directly at this time and must be edited via a calculator in the PVBid UI.
+
 ### 1.1.24 (2019-06-19)
 
 Bug Fixes:
