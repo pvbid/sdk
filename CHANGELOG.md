@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.1.26 (2019-07-11)
+
+Improvements:
+
+- **Bid:** Indicative prices for indicative bids have been "shifted" upwards by 25% of the margin of error.
+
 ### 1.1.25 (2019-07-01)
 
 Features:
