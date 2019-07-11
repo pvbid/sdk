@@ -31,11 +31,15 @@ export default class IndicativePricingHelper {
      * @return {number}
      */
     getIndicativePrice(value, isLow) {
-        var marginOfError = this.getMarginOfError();
-        if (marginOfError > 0) {
-            marginOfError = marginOfError / 100;
-            return isLow ? value * (1 - marginOfError) : value * (1 + marginOfError);
-        } else return value;
+        const marginOfError = this.getMarginOfError();
+
+        if (marginOfError <= 0) return value;
+
+        const errorAdjustedMarginMultiplier = isLow
+            ? 1 - ((marginOfError * 0.75) / 100)
+            : 1 + ((marginOfError * 1.25) / 100);
+
+        return value * errorAdjustedMarginMultiplier;
     }
 
     /**
