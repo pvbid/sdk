@@ -4,6 +4,8 @@ import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
 import LineItemRuleService from "./services/LineItemRuleService";
 import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
+import WorkupService from "./services/WorkupService";
+import Workup from "./Workup";
 
 /**
  * Represents line item data.
@@ -212,6 +214,9 @@ export default class LineItem extends BidEntity {
             valueMap.x = Helpers.confirmNumber(val, 1);
         }
         if (formulaArgs.indexOf('workup') >= 0) {
+            if (this._getWorkup() && WorkupService.hasNullDependency(this._getWorkup(), this.bid)) {
+                this._undefinedPropFlags.push("scalar");
+            }
             valueMap.workup = Helpers.confirmNumber(this.workup, 0);
         }
         const results = Helpers.calculateFormula(this.config.formula, valueMap);
@@ -746,6 +751,31 @@ export default class LineItem extends BidEntity {
     }
 
     /**
+     * Bind a field dependency to the workup
+     *
+     * @param {Field} [field=null] The field entity to bind to the workup. Must be a 'list' type field.
+     */
+    setWorkupField(field = null) {
+        if (field && (field.type !== "field" || field.fieldType !== "list")) {
+            throw new Error("Workup field must be a \"list\" type field");
+        }
+
+        const workup = this.getWorkup();
+        const currentField = workup.getField();
+
+        workup.field_id = field ? field.id : null;
+        
+        if (currentField && field !== currentField) {
+            currentField.removeListenerByRequester("updated", `line_item.${this.id}`);
+        }
+
+        this.config.workups[0] = workup.getWorkup();
+        this._bindWorkupDependencies();
+        this.dirty();
+        this.assess();
+    }
+
+    /**
      * Assess line item for changes.
      *
      * @emits {assessing} fires event before assessement.
@@ -820,34 +850,47 @@ export default class LineItem extends BidEntity {
     bind() {
         this._bindLineItemDependencies();
         this._bindLineItemRuleDependencies();
+        this._bindWorkupDependencies();
         this._bindLineItemPredictionDependencies();
         this._bindPredictionBidVariables();
         this._bindMarkupStrategy();
         this._bindTaxableLabor();
     }
 
+    getWorkup() {
+        return new Workup(this.bid, this._getWorkup());
+    }
+
+    _getWorkup() {
+        return (!this.config.workups || !this.config.workups[0]) ? null : this.config.workups[0];
+    }
+
     /**
-     * Gets a list of bid entities that the line item instance relys on.
+     * Gets a list of bid entities that the line item instance relies on.
      *
      * @returns {BidEntity[]}
      */
     dependencies() {
-        let dependencies = [];
-        let contracts = [];
-        contracts = contracts.concat(Object.values(this.config.dependencies));
+        const dependencies = [];
+        const contracts = Object.values(this.config.dependencies);
 
-        for (let rule of Object.values(this.config.rules)) {
+        Object.values(this.config.rules).forEach(rule => {
             if (rule.dependencies) {
-                contracts = contracts.concat(Object.values(rule.dependencies));
+                contracts.push(...Object.values(rule.dependencies));
             }
-        }
+        });
 
-        _.each(contracts, ctrct => {
-            const dependency = this.bid.entities.getDependency(ctrct);
+        contracts.forEach(contract => {
+            const dependency = this.bid.entities.getDependency(contract);
             if (dependency) {
                 dependencies.push(dependency);
             }
         });
+
+        if (this._getWorkup()) {
+          const workupField = WorkupService.getDependency(this._getWorkup(), this.bid);
+          if (workupField) dependencies.push(workupField);
+        }
 
         return dependencies;
     }
@@ -861,9 +904,6 @@ export default class LineItem extends BidEntity {
         return this.bid.entities.getDependants("line_item", this.id);
     }
 
-    /**
-     *
-     */
     _bindLineItemDependencies() {
         for (let dependencyContract of Object.values(this.config.dependencies)) {
             if (!_.isEmpty(dependencyContract)) {
@@ -875,9 +915,6 @@ export default class LineItem extends BidEntity {
         }
     }
 
-    /**
-     *
-     */
     _bindLineItemRuleDependencies() {
         for (let rule of Object.values(this.config.rules)) {
             if (rule.dependencies) {
@@ -890,6 +927,14 @@ export default class LineItem extends BidEntity {
                     }
                 }
             }
+        }
+    }
+
+    _bindWorkupDependencies() {
+        const workup = this._getWorkup();
+        const dependency = workup ? WorkupService.getDependency(workup, this.bid) : null;
+        if (dependency) {
+            dependency.on("updated", `line_item.${this.id}`, () => this.assessWorkup());
         }
     }
 
@@ -943,6 +988,18 @@ export default class LineItem extends BidEntity {
                 .on("updated", `line_item.${this.id}`, (requesterId, self) => {
                     if (this.isLabor()) this.assess(self);
                 });
+        }
+    }
+
+    assessWorkup() {
+        const workup = this._getWorkup();
+        if (workup) {
+            const value = WorkupService.evaluateWorkup(workup, this.bid);
+            if (workup.value !== value) {
+                workup.value = value;
+                this.dirty();
+            }
+            this.assess();
         }
     }
 
@@ -1445,7 +1502,7 @@ export default class LineItem extends BidEntity {
             }
             return false;
         }
-        return this.config.undefined_prop_flags > 0;
+        return this.config.undefined_prop_flags.length > 0;
     }
 
     /**
@@ -1461,7 +1518,7 @@ export default class LineItem extends BidEntity {
     }
 
     /**
-     * Determine is the undefined props flags have changed during the assesment. If so update the config var
+     * Determine if the undefined props flags have changed during the assesment. If so update the config var.
      *
      * @return {boolean} Whether or not there has been a change
      */

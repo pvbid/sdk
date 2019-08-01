@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.1.27 (2019-08-01)
+
+Features:
+
+- **LineItem:** Workups have been improved to allow per quantity values to be a reference. Use `lineItem.setWorkupField(field)` to link the workup to a field (list fields only - ie connected to a datatable). Once connected, any workup item's per quantity value can be set to the 4 character string value of the datatable column. Then call `lineItem.assessWorkup()` to recalculate the workup value using the reference. To gain access to a line item's workup instance, use `lineItem.getWorkup()`.
+
 ### 1.1.26 (2019-07-11)
 
 Improvements:
