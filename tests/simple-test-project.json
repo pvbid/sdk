@@ -1251,7 +1251,12 @@
                     },
                     "workups": [{
                         "value": 150.12345,
-                        "unit": "units"
+                        "reference_quantity": "1",
+                        "unit": "units",
+                        "items": [{
+                            "quantity": 1,
+                            "per_quantity": 150.12345
+                        }]
                     }],
                     "rules": [
                         {
@@ -1568,13 +1573,11 @@
                     "rows": [
                         {
                             "id": "mhzk",
-                            "values": ["Module 1", "400.00", "450"],
-                            "$$hashKey": "object:527"
+                            "values": ["Module 1", "400.00", "450", ""]
                         },
                         {
                             "id": "be6f",
-                            "values": ["Module 2", "300.00", "250"],
-                            "$$hashKey": "object:528"
+                            "values": ["Module 2", "300.00", "250", ""]
                         }
                     ],
                     "columns": [
@@ -1582,22 +1585,25 @@
                             "id": "at57",
                             "type": "string",
                             "title": "Module",
-                            "is_key": true,
-                            "$$hashKey": "object:521"
+                            "is_key": true
                         },
                         {
                             "id": "tp7q",
                             "type": "string",
                             "title": "Unit Price",
-                            "is_key": false,
-                            "$$hashKey": "object:522"
+                            "is_key": false
                         },
                         {
                             "id": "clpa",
                             "type": "string",
                             "title": "Watts",
-                            "is_key": false,
-                            "$$hashKey": "object:523"
+                            "is_key": false
+                        },
+                        {
+                            "id": "d674",
+                            "type": "string",
+                            "title": "Empty",
+                            "is_key": false
                         }
                     ]
                 },

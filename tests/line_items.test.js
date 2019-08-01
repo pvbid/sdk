@@ -1,11 +1,6 @@
-import _ from "lodash";
-var axios = require("axios");
-var jsonfile = require("jsonfile");
-const PVBid = require("../src/pvbid.js");
-var MockAdapter = require("axios-mock-adapter");
-import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
+import { round, cloneDeep } from "lodash";
+import { loadTestProject } from "./TestProjectLoader";
 
-let context = PVBid.createContext({ token: "Bearer Token", base_uri: "http://api.pvbid.local/v2" });
 let project;
 let bid;
 let lineItem;
@@ -17,54 +12,12 @@ const resetLineItem = ($lineItem) => {
     });
 }
 
-beforeAll(() => {
-    return init();
-}, 50000);
+beforeAll(async () => {
+  project = await loadTestProject();
+  bid = project.bids[190];
+  await bid.reassessAsync();
+});
 
-async function init() {
-    // This sets the mock adapter on the default instance
-    var mock = new MockAdapter(axios);
-
-    // Mock any GET request to /users
-    // arguments for reply are (status, data, headers)
-    let mockedLineItem = LineItemScaffolding.create(190, "The New Line Item");
-    mockedLineItem.id = 1000001;
-    mock.onPost("http://api.pvbid.local/v2/bids/190/line_items/").reply(200, {
-        data: {
-            line_item: mockedLineItem
-        }
-    });
-
-    project = await new Promise(resolve => {
-        jsonfile.readFile("./tests/simple-test-project.json", (err, data) => {
-            mock.onGet("http://api.pvbid.local/v2/projects/461").reply(200, {
-                data: { project: data.project }
-            });
-            mock.onGet("http://api.pvbid.local/v2/bids/190").reply(200, {
-                data: { bid: data.bid }
-            });
-
-            mock.onGet("http://api.pvbid.local/v2/users/me").reply(200, {
-                data: { user: data.user }
-            });
-
-            mock.onGet("http://api.pvbid.local/v2/predictions/").reply(200, {
-                data: { prediction_models: data.prediction_models }
-            });
-
-            context.getProject(461).then(p => {
-                resolve(p);
-            });
-        });
-    });
-    return new Promise(resolve => {
-        bid = _.toArray(project.bids)[0];
-        project.once("assessed", () => {
-            resolve();
-        });
-        bid.reassessAll(true);
-    });
-}
 test("add new null tag and ensure config.tags is empty array", () => {
     expect.assertions(1);
 
@@ -124,24 +77,24 @@ test(
 
         return new Promise(resolve => {
             lineItem.once("assessed", () => {
-                expect(_.round(lineItem.cost, 3)).toBe(10);
-                expect(_.round(lineItem.costWatt, 3)).toBe(0.007); // test bid is 1350 watt
+                expect(round(lineItem.cost, 3)).toBe(10);
+                expect(round(lineItem.costWatt, 3)).toBe(0.007); // test bid is 1350 watt
 
-                expect(_.round(lineItem.markup, 3)).toBe(1.944);
-                expect(_.round(lineItem.tax, 1)).toBe(0.8);
-                expect(_.round(lineItem.price, 2)).toBe(12.74);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
-                expect(_.round(lineItem.costWithTax, 3)).toBe(10.8);
+                expect(round(lineItem.markup, 3)).toBe(1.944);
+                expect(round(lineItem.tax, 1)).toBe(0.8);
+                expect(round(lineItem.price, 2)).toBe(12.74);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
+                expect(round(lineItem.costWithTax, 3)).toBe(10.8);
 
-                expect(_.round(lineItem.base, 2)).toBe(0);
-                expect(_.round(lineItem.quantity, 2)).toBe(0);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(1);
+                expect(round(lineItem.base, 2)).toBe(0);
+                expect(round(lineItem.quantity, 2)).toBe(0);
+                expect(round(lineItem.perQuantity, 2)).toBe(1);
 
-                expect(_.round(lineItem.multiplier, 2)).toBe(1);
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.multiplier, 2)).toBe(1);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
                 expect(lineItem.isOverridden("cost")).toBe(true);
                 expect(lineItem.isOverridden("price")).toBe(false);
@@ -179,23 +132,23 @@ test(
                 expect(lineItem.isOverridden("quantity")).toBe(false);
                 expect(lineItem.isOverridden("per_quantity")).toBe(false);
 
-                expect(_.round(lineItem.price, 2)).toBe(15);
-                expect(_.round(lineItem.markup, 2)).toBe(4.2);
-                expect(_.round(lineItem.markupPercent, 2)).toBe(38.89);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.011); // test bid is 1350 watt
+                expect(round(lineItem.price, 2)).toBe(15);
+                expect(round(lineItem.markup, 2)).toBe(4.2);
+                expect(round(lineItem.markupPercent, 2)).toBe(38.89);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.011); // test bid is 1350 watt
 
-                expect(_.round(lineItem.tax, 2)).toBe(0.8);
-                expect(_.round(lineItem.cost, 2)).toBe(10.0); // cost remains 10 as it is overridden.
+                expect(round(lineItem.tax, 2)).toBe(0.8);
+                expect(round(lineItem.cost, 2)).toBe(10.0); // cost remains 10 as it is overridden.
 
-                expect(_.round(lineItem.multiplier, 2)).toBe(1);
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.multiplier, 2)).toBe(1);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
-                expect(_.round(lineItem.base, 2)).toBe(0);
-                expect(_.round(lineItem.quantity, 2)).toBe(0);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(1);
+                expect(round(lineItem.base, 2)).toBe(0);
+                expect(round(lineItem.quantity, 2)).toBe(0);
+                expect(round(lineItem.perQuantity, 2)).toBe(1);
 
                 resolve();
             });
@@ -224,24 +177,24 @@ test(
                 expect(lineItem.isOverridden("quantity")).toBe(true);
                 expect(lineItem.isOverridden("per_quantity")).toBe(true);
 
-                expect(_.round(lineItem.cost, 2)).toBe(15.0); // cost remains 10 as it is overridden.
-                expect(_.round(lineItem.tax, 2)).toBe(1.2);
-                expect(_.round(lineItem.markup, 2)).toBe(6.3);
-                expect(_.round(lineItem.markupPercent, 2)).toBe(38.89);
+                expect(round(lineItem.cost, 2)).toBe(15.0); // cost remains 10 as it is overridden.
+                expect(round(lineItem.tax, 2)).toBe(1.2);
+                expect(round(lineItem.markup, 2)).toBe(6.3);
+                expect(round(lineItem.markupPercent, 2)).toBe(38.89);
 
-                expect(_.round(lineItem.price, 2)).toBe(22.5);
-                expect(_.round(lineItem.subtotal, 2)).toBe(15);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.017); // test bid is 1350 watt
+                expect(round(lineItem.price, 2)).toBe(22.5);
+                expect(round(lineItem.subtotal, 2)).toBe(15);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.017); // test bid is 1350 watt
 
-                expect(_.round(lineItem.multiplier, 2)).toBe(1);
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.multiplier, 2)).toBe(1);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
-                expect(_.round(lineItem.base, 2)).toBe(5);
-                expect(_.round(lineItem.quantity, 2)).toBe(1);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(10);
+                expect(round(lineItem.base, 2)).toBe(5);
+                expect(round(lineItem.quantity, 2)).toBe(1);
+                expect(round(lineItem.perQuantity, 2)).toBe(10);
 
                 resolve();
             });
@@ -272,25 +225,25 @@ test(
                 expect(lineItem.isOverridden("quantity")).toBe(true);
                 expect(lineItem.isOverridden("per_quantity")).toBe(true);
 
-                expect(_.round(lineItem.cost, 2)).toBe(20.0);
-                expect(_.round(lineItem.multiplier, 2)).toBe(1.33);
+                expect(round(lineItem.cost, 2)).toBe(20.0);
+                expect(round(lineItem.multiplier, 2)).toBe(1.33);
 
-                expect(_.round(lineItem.tax, 2)).toBe(1.6);
-                expect(_.round(lineItem.markup, 2)).toBe(8.4);
-                expect(_.round(lineItem.markupPercent, 2)).toBe(38.89);
+                expect(round(lineItem.tax, 2)).toBe(1.6);
+                expect(round(lineItem.markup, 2)).toBe(8.4);
+                expect(round(lineItem.markupPercent, 2)).toBe(38.89);
 
-                expect(_.round(lineItem.price, 2)).toBe(30);
-                expect(_.round(lineItem.subtotal, 2)).toBe(15);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.022); // test bid is 1350 watt
+                expect(round(lineItem.price, 2)).toBe(30);
+                expect(round(lineItem.subtotal, 2)).toBe(15);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.022); // test bid is 1350 watt
 
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
-                expect(_.round(lineItem.base, 2)).toBe(5);
-                expect(_.round(lineItem.quantity, 2)).toBe(1);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(10);
+                expect(round(lineItem.base, 2)).toBe(5);
+                expect(round(lineItem.quantity, 2)).toBe(1);
+                expect(round(lineItem.perQuantity, 2)).toBe(10);
 
                 resolve();
             });
@@ -319,25 +272,25 @@ test(
                 expect(lineItem.isOverridden("quantity")).toBe(true);
                 expect(lineItem.isOverridden("per_quantity")).toBe(true);
 
-                expect(_.round(lineItem.cost, 2)).toBe(20.0);
-                expect(_.round(lineItem.multiplier, 2)).toBe(1.33);
+                expect(round(lineItem.cost, 2)).toBe(20.0);
+                expect(round(lineItem.multiplier, 2)).toBe(1.33);
 
-                expect(_.round(lineItem.tax, 2)).toBe(1.6);
-                expect(_.round(lineItem.markup, 2)).toBe(10.8);
-                expect(_.round(lineItem.markupPercent, 2)).toBe(50);
+                expect(round(lineItem.tax, 2)).toBe(1.6);
+                expect(round(lineItem.markup, 2)).toBe(10.8);
+                expect(round(lineItem.markupPercent, 2)).toBe(50);
 
-                expect(_.round(lineItem.price, 2)).toBe(32.4);
-                expect(_.round(lineItem.subtotal, 2)).toBe(15);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
+                expect(round(lineItem.price, 2)).toBe(32.4);
+                expect(round(lineItem.subtotal, 2)).toBe(15);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
 
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
-                expect(_.round(lineItem.base, 2)).toBe(5);
-                expect(_.round(lineItem.quantity, 2)).toBe(1);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(10);
+                expect(round(lineItem.base, 2)).toBe(5);
+                expect(round(lineItem.quantity, 2)).toBe(1);
+                expect(round(lineItem.perQuantity, 2)).toBe(10);
 
                 resolve();
             });
@@ -364,27 +317,27 @@ test(
                 expect(lineItem.isOverridden("quantity")).toBe(true);
                 expect(lineItem.isOverridden("per_quantity")).toBe(true);
 
-                expect(_.round(lineItem.base, 2)).toBe(5);
-                expect(_.round(lineItem.quantity, 2)).toBe(1);
-                expect(_.round(lineItem.perQuantity, 2)).toBe(10);
-                expect(_.round(lineItem.subtotal, 2)).toBe(15);
+                expect(round(lineItem.base, 2)).toBe(5);
+                expect(round(lineItem.quantity, 2)).toBe(1);
+                expect(round(lineItem.perQuantity, 2)).toBe(10);
+                expect(round(lineItem.subtotal, 2)).toBe(15);
 
-                expect(_.round(lineItem.laborHours, 2)).toBe(0);
-                expect(_.round(lineItem.wage, 2)).toBe(35);
-                expect(_.round(lineItem.burden, 2)).toBe(5);
+                expect(round(lineItem.laborHours, 2)).toBe(0);
+                expect(round(lineItem.wage, 2)).toBe(35);
+                expect(round(lineItem.burden, 2)).toBe(5);
 
-                expect(_.round(lineItem.multiplier, 2)).toBe(1.33);
-                expect(_.round(lineItem.escalator, 2)).toBe(1);
-                expect(_.round(lineItem.cost, 2)).toBe(20.0);
+                expect(round(lineItem.multiplier, 2)).toBe(1.33);
+                expect(round(lineItem.escalator, 2)).toBe(1);
+                expect(round(lineItem.cost, 2)).toBe(20.0);
 
-                expect(_.round(lineItem.tax, 2)).toBe(2.0);
-                expect(_.round(lineItem.taxPercent, 2)).toBe(10.0);
+                expect(round(lineItem.tax, 2)).toBe(2.0);
+                expect(round(lineItem.taxPercent, 2)).toBe(10.0);
 
-                expect(_.round(lineItem.markup, 2)).toBe(11.0);
-                expect(_.round(lineItem.markupPercent, 2)).toBe(50);
+                expect(round(lineItem.markup, 2)).toBe(11.0);
+                expect(round(lineItem.markupPercent, 2)).toBe(50);
 
-                expect(_.round(lineItem.price, 2)).toBe(33);
-                expect(_.round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
+                expect(round(lineItem.price, 2)).toBe(33);
+                expect(round(lineItem.priceWatt, 3)).toBe(0.024); // test bid is 1350 watt
 
                 resolve();
             });
@@ -409,27 +362,27 @@ test("change line item escalator", () => {
             expect(lineItem.isOverridden("quantity")).toBe(true);
             expect(lineItem.isOverridden("per_quantity")).toBe(true);
 
-            expect(_.round(lineItem.base, 2)).toBe(5);
-            expect(_.round(lineItem.quantity, 2)).toBe(1);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(10);
-            expect(_.round(lineItem.subtotal, 2)).toBe(15);
+            expect(round(lineItem.base, 2)).toBe(5);
+            expect(round(lineItem.quantity, 2)).toBe(1);
+            expect(round(lineItem.perQuantity, 2)).toBe(10);
+            expect(round(lineItem.subtotal, 2)).toBe(15);
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(0);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
+            expect(round(lineItem.laborHours, 2)).toBe(0);
+            expect(round(lineItem.wage, 2)).toBe(35);
+            expect(round(lineItem.burden, 2)).toBe(5);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(1.33);
-            expect(_.round(lineItem.escalator, 2)).toBe(1.5);
-            expect(_.round(lineItem.cost, 2)).toBe(30.0);
+            expect(round(lineItem.multiplier, 2)).toBe(1.33);
+            expect(round(lineItem.escalator, 2)).toBe(1.5);
+            expect(round(lineItem.cost, 2)).toBe(30.0);
 
-            expect(_.round(lineItem.tax, 2)).toBe(3.0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(10.0);
+            expect(round(lineItem.tax, 2)).toBe(3.0);
+            expect(round(lineItem.taxPercent, 2)).toBe(10.0);
 
-            expect(_.round(lineItem.markup, 2)).toBe(16.5);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(50);
+            expect(round(lineItem.markup, 2)).toBe(16.5);
+            expect(round(lineItem.markupPercent, 2)).toBe(50);
 
-            expect(_.round(lineItem.price, 2)).toBe(49.5);
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0.037); // test bid is 1350 watt
+            expect(round(lineItem.price, 2)).toBe(49.5);
+            expect(round(lineItem.priceWatt, 3)).toBe(0.037); // test bid is 1350 watt
 
             resolve();
         });
@@ -445,8 +398,8 @@ test("change line item cost per watt", () => {
 
     return new Promise(resolve => {
         lineItem.once("assessed", () => {
-            expect(_.round(lineItem.costWatt, 3)).toBe(0.025); // 1350 watt bid
-            expect(_.round(lineItem.cost, 3)).toBe(33.75);
+            expect(round(lineItem.costWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(round(lineItem.cost, 3)).toBe(33.75);
 
             expect(lineItem.isOverridden("cost")).toBe(true);
 
@@ -462,8 +415,8 @@ test("change line item price per watt", () => {
 
     return new Promise(resolve => {
         lineItem.once("assessed", () => {
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0.025); // 1350 watt bid
-            expect(_.round(lineItem.price, 3)).toBe(33.75);
+            expect(round(lineItem.priceWatt, 3)).toBe(0.025); // 1350 watt bid
+            expect(round(lineItem.price, 3)).toBe(33.75);
 
             expect(lineItem.isOverridden("price")).toBe(true);
 
@@ -489,27 +442,27 @@ test("reset line item", () => {
             expect(lineItem.isOverridden("quantity")).toBe(false);
             expect(lineItem.isOverridden("per_quantity")).toBe(false);
 
-            expect(_.round(lineItem.base, 2)).toBe(0);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
-            expect(_.round(lineItem.subtotal, 2)).toBe(0);
+            expect(round(lineItem.base, 2)).toBe(0);
+            expect(round(lineItem.quantity, 2)).toBe(0);
+            expect(round(lineItem.perQuantity, 2)).toBe(1);
+            expect(round(lineItem.subtotal, 2)).toBe(0);
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(0);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
+            expect(round(lineItem.laborHours, 2)).toBe(0);
+            expect(round(lineItem.wage, 2)).toBe(35);
+            expect(round(lineItem.burden, 2)).toBe(5);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(1);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(0);
+            expect(round(lineItem.multiplier, 2)).toBe(1);
+            expect(round(lineItem.escalator, 2)).toBe(1);
+            expect(round(lineItem.cost, 2)).toBe(0);
 
-            expect(_.round(lineItem.tax, 2)).toBe(0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+            expect(round(lineItem.tax, 2)).toBe(0);
+            expect(round(lineItem.taxPercent, 2)).toBe(8);
 
-            expect(_.round(lineItem.markup, 2)).toBe(0);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+            expect(round(lineItem.markup, 2)).toBe(0);
+            expect(round(lineItem.markupPercent, 2)).toBe(18);
 
-            expect(_.round(lineItem.price, 2)).toBe(0);
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0);
+            expect(round(lineItem.price, 2)).toBe(0);
+            expect(round(lineItem.priceWatt, 3)).toBe(0);
 
             resolve();
         });
@@ -533,27 +486,27 @@ test("test multiplier", () => {
             expect(lineItem.isOverridden("quantity")).toBe(false);
             expect(lineItem.isOverridden("per_quantity")).toBe(false);
 
-            expect(_.round(lineItem.base, 2)).toBe(5);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
-            expect(_.round(lineItem.subtotal, 2)).toBe(5);
+            expect(round(lineItem.base, 2)).toBe(5);
+            expect(round(lineItem.quantity, 2)).toBe(0);
+            expect(round(lineItem.perQuantity, 2)).toBe(1);
+            expect(round(lineItem.subtotal, 2)).toBe(5);
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(0);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
+            expect(round(lineItem.laborHours, 2)).toBe(0);
+            expect(round(lineItem.wage, 2)).toBe(35);
+            expect(round(lineItem.burden, 2)).toBe(5);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(2);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(10);
+            expect(round(lineItem.multiplier, 2)).toBe(2);
+            expect(round(lineItem.escalator, 2)).toBe(1);
+            expect(round(lineItem.cost, 2)).toBe(10);
 
-            expect(_.round(lineItem.tax, 2)).toBe(0.8);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+            expect(round(lineItem.tax, 2)).toBe(0.8);
+            expect(round(lineItem.taxPercent, 2)).toBe(8);
 
-            expect(_.round(lineItem.markup, 2)).toBe(1.94);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+            expect(round(lineItem.markup, 2)).toBe(1.94);
+            expect(round(lineItem.markupPercent, 2)).toBe(18);
 
-            expect(_.round(lineItem.price, 2)).toBe(12.74);
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
+            expect(round(lineItem.price, 2)).toBe(12.74);
+            expect(round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
 
             resolve();
         });
@@ -580,7 +533,68 @@ describe("Using a workup", () => {
 
     test("workup value used to evaluate cost", () => {
         expect($lineItem.cost).toBe(150.1235);
-    })
+    });
+
+    describe("Workup with a field reference", () => {
+        const fieldId = 18262;
+        let $field;
+        let $datatable;
+
+        beforeAll(() => {
+            $field = bid.entities.fields(fieldId);
+            $datatable = $field.getDatatable();
+        });
+
+        test("can add a list field reference to a workup", () => {
+            expect($lineItem.config.workups[0].field_id).toBe(undefined);
+            $lineItem.setWorkupField($field);
+            expect($lineItem.config.workups[0].field_id).toBe(fieldId);
+        });
+
+        test("cannot add a non-list type field", () => {
+            const nonListField = bid.entities.fields(18263);
+            expect(() => { $lineItem.setWorkupField(nonListField) }).toThrow();
+            expect($lineItem.config.workups[0].field_id).not.toBe(18263);
+        });
+
+        test("cannot add a non-field", () => {
+            const metric = bid.entities.metrics(36093);
+            expect(() => { $lineItem.setWorkupField(metric) }).toThrow();
+            expect($lineItem.config.workups[0].field_id).not.toBe(36093);
+        });
+
+        test("should re-evaluate workup when datatable updates", async () => {
+            await new Promise(res => {
+                $lineItem.once("assessed", () => { res() });
+                $lineItem.config.workups[0].items[0].per_quantity_ref = "clpa"; // 450
+                $datatable.emit("updated");
+            });
+
+            expect($lineItem.workup).toBe(450);
+            expect($lineItem.hasNullDependency()).toBe(false);
+        });
+
+        test("should have null dependency flag if the field evaluates to null", async () => {
+            await new Promise(res => {
+              $lineItem.once("assessed", () => {
+                res();
+              });
+              $lineItem.config.workups[0].field_id = fieldId;
+              $lineItem.config.workups[0].items.push({ per_quantity_ref: "d674" }); // undefined
+              $lineItem.assessWorkup();
+            });
+            
+            expect($lineItem.workup).toBe(450);
+            expect($lineItem.hasNullDependency()).toBe(true);
+            $lineItem.config.workups[0].items.pop();
+        });
+
+        test("should remove references in items when the field reference is removed", () => {
+            $lineItem.setWorkupField();
+            expect($lineItem.config.workups[0].field_id).toBeFalsy();
+            expect($lineItem.config.workups[0].items[0].per_quantity_ref).toBeUndefined();
+        });
+    });
 });
 
 test("test markup not including tax", async () => {
@@ -604,27 +618,27 @@ test("test markup not including tax", async () => {
             expect(lineItem.isOverridden("quantity")).toBe(false);
             expect(lineItem.isOverridden("per_quantity")).toBe(false);
 
-            expect(_.round(lineItem.base, 2)).toBe(0);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
-            expect(_.round(lineItem.subtotal, 2)).toBe(0);
+            expect(round(lineItem.base, 2)).toBe(0);
+            expect(round(lineItem.quantity, 2)).toBe(0);
+            expect(round(lineItem.perQuantity, 2)).toBe(1);
+            expect(round(lineItem.subtotal, 2)).toBe(0);
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(0);
-            expect(_.round(lineItem.wage, 2)).toBe(35);
-            expect(_.round(lineItem.burden, 2)).toBe(5);
+            expect(round(lineItem.laborHours, 2)).toBe(0);
+            expect(round(lineItem.wage, 2)).toBe(35);
+            expect(round(lineItem.burden, 2)).toBe(5);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(1);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(10);
+            expect(round(lineItem.multiplier, 2)).toBe(1);
+            expect(round(lineItem.escalator, 2)).toBe(1);
+            expect(round(lineItem.cost, 2)).toBe(10);
 
-            expect(_.round(lineItem.tax, 2)).toBe(0.8);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+            expect(round(lineItem.tax, 2)).toBe(0.8);
+            expect(round(lineItem.taxPercent, 2)).toBe(8);
 
-            expect(_.round(lineItem.markup, 2)).toBe(1.8);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+            expect(round(lineItem.markup, 2)).toBe(1.8);
+            expect(round(lineItem.markupPercent, 2)).toBe(18);
 
-            expect(_.round(lineItem.price, 2)).toBe(12.6);
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
+            expect(round(lineItem.price, 2)).toBe(12.6);
+            expect(round(lineItem.priceWatt, 3)).toBe(0.009); // test bid is 1350 watt
 
             resolve();
         });
@@ -660,27 +674,27 @@ test("test markup not including tax", async () => {
             expect(lineItem.isOverridden("wage")).toBe(true);
             expect(lineItem.isOverridden("burden")).toBe(true);
 
-            expect(_.round(lineItem.base, 2)).toBe(5);
-            expect(_.round(lineItem.quantity, 2)).toBe(0);
-            expect(_.round(lineItem.perQuantity, 2)).toBe(1);
-            expect(_.round(lineItem.subtotal, 2)).toBe(5);
+            expect(round(lineItem.base, 2)).toBe(5);
+            expect(round(lineItem.quantity, 2)).toBe(0);
+            expect(round(lineItem.perQuantity, 2)).toBe(1);
+            expect(round(lineItem.subtotal, 2)).toBe(5);
 
-            expect(_.round(lineItem.laborHours, 2)).toBe(5);
-            expect(_.round(lineItem.wage, 2)).toBe(15);
-            expect(_.round(lineItem.burden, 2)).toBe(6);
+            expect(round(lineItem.laborHours, 2)).toBe(5);
+            expect(round(lineItem.wage, 2)).toBe(15);
+            expect(round(lineItem.burden, 2)).toBe(6);
 
-            expect(_.round(lineItem.multiplier, 2)).toBe(1);
-            expect(_.round(lineItem.escalator, 2)).toBe(1);
-            expect(_.round(lineItem.cost, 2)).toBe(105);
+            expect(round(lineItem.multiplier, 2)).toBe(1);
+            expect(round(lineItem.escalator, 2)).toBe(1);
+            expect(round(lineItem.cost, 2)).toBe(105);
 
-            expect(_.round(lineItem.tax, 2)).toBe(0);
-            expect(_.round(lineItem.taxPercent, 2)).toBe(8);
+            expect(round(lineItem.tax, 2)).toBe(0);
+            expect(round(lineItem.taxPercent, 2)).toBe(8);
 
-            expect(_.round(lineItem.markup, 2)).toBe(18.9);
-            expect(_.round(lineItem.markupPercent, 2)).toBe(18);
+            expect(round(lineItem.markup, 2)).toBe(18.9);
+            expect(round(lineItem.markupPercent, 2)).toBe(18);
 
-            expect(_.round(lineItem.price, 2)).toBe(123.9);
-            expect(_.round(lineItem.priceWatt, 3)).toBe(0.092); // test bid is 1350 watt
+            expect(round(lineItem.price, 2)).toBe(123.9);
+            expect(round(lineItem.priceWatt, 3)).toBe(0.092); // test bid is 1350 watt
 
             resolve();
         });
@@ -772,10 +786,10 @@ describe("When line item is a labor type", () => {
                 expect(lineItem.isOverridden("cost")).toBe(true);
                 expect(lineItem.isOverridden("multiplier")).toBe(false);
                 expect(lineItem.isOverridden("labor_hours")).toBe(true);
-                expect(_.round(lineItem.subtotal, 2)).toBe(0);
-                expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
-                expect(_.round(lineItem.cost, 2)).toBe(300);
-                expect(_.round(lineItem.price, 2)).toBe(354);
+                expect(round(lineItem.subtotal, 2)).toBe(0);
+                expect(round(lineItem.laborHours, 2)).toBe(7.5);
+                expect(round(lineItem.cost, 2)).toBe(300);
+                expect(round(lineItem.price, 2)).toBe(354);
             });
 
             test("should have a multiplier of 1", () => {
@@ -798,9 +812,9 @@ describe("When line item is a labor type", () => {
 
             test("should override the labor hours", () => {
                 expect(lineItem.isOverridden("labor_hours")).toBe(true);
-                expect(_.round(lineItem.subtotal, 2)).toBe(0);
-                expect(_.round(lineItem.laborHours, 2)).toBe(10);
-                expect(_.round(lineItem.cost, 2)).toBe(400);
+                expect(round(lineItem.subtotal, 2)).toBe(0);
+                expect(round(lineItem.laborHours, 2)).toBe(10);
+                expect(round(lineItem.cost, 2)).toBe(400);
             });
             test("should release the cost override, if exists", () => {
                 expect(lineItem.isOverridden("price")).toBe(false);
@@ -836,11 +850,11 @@ describe("When line item is a labor type", () => {
             });
             test("should back calculate the multipler.", () => {
                 expect(lineItem.isOverridden("cost")).toBe(true);
-                expect(_.round(lineItem.subtotal, 2)).toBe(50);
-                expect(_.round(lineItem.laborHours, 2)).toBe(7.5);
-                expect(_.round(lineItem.multiplier, 2)).toBe(0.15);
-                expect(_.round(lineItem.cost, 2)).toBe(300);
-                expect(_.round(lineItem.price, 2)).toBe(354);
+                expect(round(lineItem.subtotal, 2)).toBe(50);
+                expect(round(lineItem.laborHours, 2)).toBe(7.5);
+                expect(round(lineItem.multiplier, 2)).toBe(0.15);
+                expect(round(lineItem.cost, 2)).toBe(300);
+                expect(round(lineItem.price, 2)).toBe(354);
             });
         });
 
@@ -859,11 +873,11 @@ describe("When line item is a labor type", () => {
 
             test("should override the labor hours", () => {
                 expect(lineItem.isOverridden("labor_hours")).toBe(true);
-                expect(_.round(lineItem.laborHours, 2)).toBe(10);
-                expect(_.round(lineItem.cost, 2)).toBe(400);
+                expect(round(lineItem.laborHours, 2)).toBe(10);
+                expect(round(lineItem.cost, 2)).toBe(400);
             });
             test("should persist the original subtotal", () => {
-                expect(_.round(lineItem.subtotal, 2)).toBe(5);
+                expect(round(lineItem.subtotal, 2)).toBe(5);
             });
             test("should back calculate and override the multiplier", () => {
                 expect(lineItem.isOverridden("multiplier")).toBe(true);
@@ -915,16 +929,16 @@ describe("Consider whether a line item property depends on an undefined dependen
     let originalLineItemDependencies;
     beforeAll(() => {
         $lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
-        originalLineItemDependencies = _.cloneDeep($lineItem.config.dependencies);
+        originalLineItemDependencies = cloneDeep($lineItem.config.dependencies);
     });
 
     afterEach(() => {
-        $lineItem.config.dependencies = _.cloneDeep(originalLineItemDependencies);
+        $lineItem.config.dependencies = cloneDeep(originalLineItemDependencies);
         $lineItem.config.formula = '1';
         $lineItem.reset();
     });
 
-    test("should not be considered to have null depenency if not referencing null dependencies", () => {
+    test("should not be considered to have null dependency if not referencing null dependencies", () => {
         expect.assertions(4);
 
         expect($lineItem.hasNullDependency("cost")).toBe(false);
@@ -933,7 +947,7 @@ describe("Consider whether a line item property depends on an undefined dependen
         expect($lineItem.hasNullDependency("price")).toBe(false);
     });
 
-    test("should be considered to have null depenency for markup and price if markup references a null dependency", () => {
+    test("should be considered to have null dependency for markup and price if markup references a null dependency", () => {
         expect.assertions(4);
         $lineItem.config.dependencies.markup = {
             field: "value",
@@ -948,7 +962,7 @@ describe("Consider whether a line item property depends on an undefined dependen
         expect($lineItem.hasNullDependency("price")).toBe(true);
     });
 
-    test("should be considered to have null depenency for cost, tax, markup and price if scalar references a null dependency", () => {
+    test("should be considered to have null dependency for cost, tax, markup and price if scalar references a null dependency", () => {
         expect.assertions(4);
         $lineItem.config.dependencies.scalar = {
             field: "value",
@@ -965,7 +979,7 @@ describe("Consider whether a line item property depends on an undefined dependen
         expect($lineItem.hasNullDependency("cost")).toBe(true);
     });
 
-    test("should not be considered to have null depenency if scalar references a null dependency but not used in formula", () => {
+    test("should not be considered to have null dependency if scalar references a null dependency but not used in formula", () => {
         expect.assertions(4);
         $lineItem.config.dependencies.scalar = {
             field: "value",
@@ -980,7 +994,7 @@ describe("Consider whether a line item property depends on an undefined dependen
         expect($lineItem.hasNullDependency("price")).toBe(false);
     });
 
-    test("should not be considered to have null depenency if undefined references is overridden", () => {
+    test("should not be considered to have null dependency if undefined references is overridden", () => {
         expect.assertions(4);
         $lineItem.config.dependencies.scalar = {
             field: "value",
