@@ -167,11 +167,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set markup(val) {
-    if (
-      Helpers.isNumber(val) &&
-      this._data.markup != Helpers.confirmNumber(val) &&
-      !this.isReadOnly()
-    ) {
+    if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val) && !this.isReadOnly()) {
       const newValue = Helpers.confirmNumber(val);
       const oldValue = Helpers.confirmNumber(this._data.markup);
       const changePercent = 1 + (newValue - oldValue) / oldValue;
@@ -245,11 +241,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set price(val) {
-    if (
-      Helpers.isNumber(val) &&
-      this._data.price != Helpers.confirmNumber(val) &&
-      !this.isReadOnly()
-    ) {
+    if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val) && !this.isReadOnly()) {
       const oldPrice = Helpers.confirmNumber(this._data.price);
       const newPrice = Helpers.confirmNumber(val);
       const changePercent = (newPrice - oldPrice) / oldPrice;
@@ -331,10 +323,7 @@ export default class Bid extends BidEntity {
 
     _.each(this.entities.components(), component => {
       if (component.config.component_group_id === componentGroupId) {
-        categorizedLineItemIds = _.concat(
-          categorizedLineItemIds,
-          component.config.line_items
-        );
+        categorizedLineItemIds = _.concat(categorizedLineItemIds, component.config.line_items);
       }
     });
 
@@ -364,15 +353,10 @@ export default class Bid extends BidEntity {
   _getTotalWatts() {
     if (_.isNull(this._wattMetricDef)) {
       this._wattMetricDef = _.find(this.entities.metrics(), function(el) {
-        return el.title.toLowerCase() === "watt" ||
-          el.title.toLowerCase() === "watts"
-          ? true
-          : false;
+        return el.title.toLowerCase() === "watt" || el.title.toLowerCase() === "watts" ? true : false;
       });
 
-      return !this._wattMetricDef
-        ? 0
-        : Math.max(parseFloat(this._wattMetricDef.value), 1);
+      return !this._wattMetricDef ? 0 : Math.max(parseFloat(this._wattMetricDef.value), 1);
     } else return Math.max(parseFloat(this._wattMetricDef.value), 1);
   }
 
@@ -395,8 +379,7 @@ export default class Bid extends BidEntity {
    */
   includeTaxInMarkup() {
     return (
-      this.entities.variables().markup_strategy &&
-      this.entities.variables().markup_strategy.value === true
+      this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true
     );
   }
 
@@ -408,8 +391,7 @@ export default class Bid extends BidEntity {
   _applyMarginPercentage(newMarginPercent) {
     const bidCost = this.cost + this.tax;
     const oldMarkup = parseFloat(this.markup);
-    const newPrice =
-      parseFloat(bidCost) / (1 - Helpers.confirmNumber(newMarginPercent) / 100);
+    const newPrice = parseFloat(bidCost) / (1 - Helpers.confirmNumber(newMarginPercent) / 100);
     const newMarkup = newPrice - bidCost;
 
     if (newMarginPercent < 100) {
@@ -440,13 +422,9 @@ export default class Bid extends BidEntity {
 
       _.each(this.entities.variables().sub_margins.value, subMargin => {
         if (totalSubMargins > 0) {
-          subMargin.value =
-            (bidMarginPercent * Helpers.confirmNumber(subMargin.value)) /
-            totalSubMargins;
+          subMargin.value = (bidMarginPercent * Helpers.confirmNumber(subMargin.value)) / totalSubMargins;
         } else {
-          subMargin.value =
-            bidMarginPercent /
-            this.entities.variables().sub_margins.value.length;
+          subMargin.value = bidMarginPercent / this.entities.variables().sub_margins.value.length;
         }
       });
     }
@@ -500,7 +478,7 @@ export default class Bid extends BidEntity {
         markup_percent: 0,
         labor_hours: 0,
         labor_cost: 0,
-        watts: 0
+        watts: 0,
       };
 
       let predictedValues = new Set();
@@ -530,32 +508,22 @@ export default class Bid extends BidEntity {
 
           predictedValues = new Set([
             ...predictedValues,
-            ...this._checkProperties(
-              dependantValuesMap,
-              li.isPredicted.bind(li)
-            )
+            ...this._checkProperties(dependantValuesMap, li.isPredicted.bind(li)),
           ]);
           valuesWithNullDependency = new Set([
             ...valuesWithNullDependency,
-            ...this._checkProperties(
-              dependantValuesMap,
-              li.hasNullDependency.bind(li)
-            )
+            ...this._checkProperties(dependantValuesMap, li.hasNullDependency.bind(li)),
           ]);
         }
       });
 
       bidValues.watts = this._getTotalWatts();
 
-      bidValues.margin_percent =
-        bidValues.price > 0 ? (bidValues.markup / bidValues.price) * 100 : 0;
-      bidValues.margin_percent =
-        Math.round(bidValues.margin_percent * 100) / 100;
+      bidValues.margin_percent = bidValues.price > 0 ? (bidValues.markup / bidValues.price) * 100 : 0;
+      bidValues.margin_percent = Math.round(bidValues.margin_percent * 100) / 100;
 
       if (bidValues.cost > 0) {
-        const subtotal = this.includeTaxInMarkup()
-          ? bidValues.cost + bidValues.tax
-          : bidValues.cost;
+        const subtotal = this.includeTaxInMarkup() ? bidValues.cost + bidValues.tax : bidValues.cost;
         bidValues.markup_percent = (bidValues.markup / subtotal) * 100;
       }
 
@@ -563,10 +531,7 @@ export default class Bid extends BidEntity {
 
       _.each(bidValues, (value, key) => {
         const roundPoint = ["price", "cost"].indexOf(key) >= 0 ? 1 : 3;
-        var originalVal = _.round(
-          Helpers.confirmNumber(this._data[key]),
-          roundPoint
-        );
+        var originalVal = _.round(Helpers.confirmNumber(this._data[key]), roundPoint);
         var updatedVal = _.round(Helpers.confirmNumber(value), roundPoint);
 
         if (originalVal !== updatedVal) {
@@ -577,8 +542,7 @@ export default class Bid extends BidEntity {
 
       if (
         !this._data.config.predicted_values ||
-        _.xor([...predictedValues.values()], this._data.config.predicted_values)
-          .length > 0
+        _.xor([...predictedValues.values()], this._data.config.predicted_values).length > 0
       ) {
         this._data.config.predicted_values = [...predictedValues.values()];
         isChanged = true;
@@ -586,14 +550,9 @@ export default class Bid extends BidEntity {
 
       if (
         !this._data.config.undefined_prop_flags ||
-        _.xor(
-          [...valuesWithNullDependency.values()],
-          this._data.config.undefined_prop_flags
-        ).length > 0
+        _.xor([...valuesWithNullDependency.values()], this._data.config.undefined_prop_flags).length > 0
       ) {
-        this._data.config.undefined_prop_flags = [
-          ...valuesWithNullDependency.values()
-        ];
+        this._data.config.undefined_prop_flags = [...valuesWithNullDependency.values()];
         isChanged = true;
       }
 
@@ -721,6 +680,9 @@ export default class Bid extends BidEntity {
     for (let c of Object.values(this.entities.components())) {
       c.removeAllListeners();
     }
+    for (let dg of Object.values(this.entities.dynamicGroups())) {
+      dg.removeAllListeners();
+    }
   }
 
   /**
@@ -730,39 +692,30 @@ export default class Bid extends BidEntity {
     if (this.isAssessable()) {
       for (let f of Object.values(this.entities.fields())) {
         f.bind();
-        f.on("assessed", `bid.${this.id}`, () =>
-          this._handleAssessmentCompleteEvent()
-        );
+        f.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
       }
       for (let m of Object.values(this.entities.metrics())) {
         m.bind();
-        m.on("assessed", `bid.${this.id}`, () =>
-          this._handleAssessmentCompleteEvent()
-        );
+        m.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
       }
       for (let li of Object.values(this.entities.lineItems())) {
         li.bind();
         li.on("assessed", "line_item." + li.id, () => {
-          waitForFinalEvent(
-            () => this.assess(),
-            15,
-            `bid.${this.id}.line_item`
-          );
+          waitForFinalEvent(() => this.assess(), 15, `bid.${this.id}.line_item`);
         });
-        li.on("assessed", `bid.${this.id}`, () =>
-          this._handleAssessmentCompleteEvent()
-        );
+        li.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
       }
       for (let c of Object.values(this.entities.components())) {
         c.bind();
-        c.on("assessed", `bid.${this.id}`, () =>
-          this._handleAssessmentCompleteEvent()
-        );
+        c.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
       }
 
-      this.on("assessed", `bid.${this.id}`, () =>
-        this._handleAssessmentCompleteEvent()
-      );
+      for (let dg of Object.values(this.entities.dynamicGroups())) {
+        dg.bind();
+        dg.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
+      }
+
+      this.on("assessed", `bid.${this.id}`, () => this._handleAssessmentCompleteEvent());
     }
   }
 
@@ -851,7 +804,8 @@ export default class Bid extends BidEntity {
       "assembly_maps",
       "field_groups",
       "datatables",
-      "variables"
+      "variables",
+      "dynamic_groups",
     ];
 
     let bidToClone = this._omit(this._data, blacklist);
@@ -883,14 +837,12 @@ export default class Bid extends BidEntity {
       component_groups: this.entities.componentGroups(),
       assemblies: this.entities.assemblies(),
       field_groups: this.entities.fieldGroups(),
-      datatables: this.entities.datatables()
+      datatables: this.entities.datatables(),
     };
 
     Object.keys(entitiesToExport).forEach(entityType => {
       const entities = entitiesToExport[entityType];
-      bidData[entityType] = Object.values(entities).map(entity =>
-        entity.exportData(true)
-      );
+      bidData[entityType] = Object.values(entities).map(entity => entity.exportData(true));
     });
 
     return bidData;
@@ -928,7 +880,7 @@ export default class Bid extends BidEntity {
       "assemblies",
       "fieldGroups",
       "componentGroups",
-      "datatables"
+      "datatables",
     ];
 
     _.each(properties, prop => {
@@ -984,10 +936,7 @@ export default class Bid extends BidEntity {
    */
   isPredicted(property) {
     if (property) {
-      if (
-        this._data.config.predicted_values &&
-        this._data.config.predicted_values.indexOf(property) >= 0
-      ) {
+      if (this._data.config.predicted_values && this._data.config.predicted_values.indexOf(property) >= 0) {
         return true;
       }
       return false;
@@ -1113,12 +1062,12 @@ export default class Bid extends BidEntity {
    * Fully loads the bid with its entities (if not already loaded).
    *
    * @param {object} options
-   * @param {boolean} [options.forceReload = false] Force the bid to reload even if the entities are already loaded. 
+   * @param {boolean} [options.forceReload = false] Force the bid to reload even if the entities are already loaded.
    * @param {boolean} [options.skipSave = false] Saves the current project state before loading by default. Set this flag to skip.
    */
   async load({ skipSave = false, forceReload = false } = {}) {
     if (this.isLoaded && !forceReload) return;
-  
+
     if (!skipSave && this.isDirty()) {
       await this.project.save();
     }
@@ -1143,6 +1092,16 @@ export default class Bid extends BidEntity {
    */
   async addAssemblies(assemblyMapIds) {
     return this._bidService.addAssemblies(this, assemblyMapIds);
+  }
+
+  /**
+   * Adds Dynamic Groups to bid. A wrapper function for {@link BidService.addDynamicGroup}
+   *
+   * @param {string} title The title of the Dynamic Group to add
+   * @returns {Promise<DynamicGroup>}
+   */
+  async addDynamicGroup(title) {
+    return this._bidService.addDynamicGroup(this, title);
   }
 
   /**
@@ -1204,22 +1163,18 @@ export default class Bid extends BidEntity {
     if (this.isReadOnly()) {
       throw new Error(`Bid ${this.id} is read only. Cannot add a new variable.`);
     }
-    const newVar = new BidVariable(
-      {
-        type: "number",
-        title: "New Variable",
-        value: 0,
-        is_reserved: false
-      },
-    );
+    const newVar = new BidVariable({
+      type: "number",
+      title: "New Variable",
+      value: 0,
+      is_reserved: false,
+    });
 
     // generate a random unique key for the variable
     const currentKeys = Object.keys(this.entities.variables());
     let newKey;
     do {
-      newKey = (
-        "0000" + ((Math.random() * Math.pow(36, 4)) << 0).toString(36)
-      ).slice(-4);
+      newKey = ("0000" + ((Math.random() * Math.pow(36, 4)) << 0).toString(36)).slice(-4);
     } while (currentKeys.includes(newKey));
 
     this._data.variables[newKey] = newVar;
@@ -1301,11 +1256,7 @@ export default class Bid extends BidEntity {
     const maxCount = 5;
     const wasStabilized = await this._reassessAllAsync(maxCount);
     if (!wasStabilized) {
-      throw new Error(
-        `Bid ${
-          this.id
-        } price did not stabilize after ${maxCount} attempts to reassess`
-      );
+      throw new Error(`Bid ${this.id} price did not stabilize after ${maxCount} attempts to reassess`);
     }
   }
 

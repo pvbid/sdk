@@ -1,36 +1,50 @@
 {
-    "source": "./src",
-    "destination": "./docs",
-    "plugins": [
-        {
-            "name": "esdoc-standard-plugin",
-            "option": {
-                "lint": { "enable": true },
-                "coverage": { "enable": false },
-                "accessor": { "access": ["public", "protected"], "autoPrivate": true },
-                "undocumentIdentifier": { "enable": true },
-                "unexportedIdentifier": { "enable": false },
-                "typeInference": { "enable": true },
-                "manual": {
-                    "index": "./manual/getting_started.md",
-                    "asset": "./manual/asset",
-                    "files": [
-                        "./manual/getting_started.md",
-                        "./manual/repositories.md",
-                        "./manual/data_models.md",
-                        "./CHANGELOG.md",
-                        "./LICENSE.md"
-                    ]
-                }
-            }
-        },
-        { "name": "esdoc-exclude-source-plugin" },
-        {
-            "name": "esdoc-coverage-plugin",
-            "option": {
-                "enable": false,
-                "kind": ["class", "method", "member", "get", "set", "constructor", "function"]
-            }
+  "source": "./src",
+  "destination": "./docs",
+  "plugins": [
+    {
+      "name": "esdoc-standard-plugin",
+      "option": {
+        "lint": { "enable": true },
+        "coverage": { "enable": false },
+        "accessor": { "access": ["public", "protected"], "autoPrivate": true },
+        "undocumentIdentifier": { "enable": true },
+        "unexportedIdentifier": { "enable": false },
+        "typeInference": { "enable": true },
+        "manual": {
+          "index": "./manual/getting_started.md",
+          "asset": "./manual/asset",
+          "files": [
+            "./manual/getting_started.md",
+            "./manual/repositories.md",
+            "./manual/data_models.md",
+            "./CHANGELOG.md",
+            "./LICENSE.md"
+          ]
         }
-    ]
+      }
+    },
+    { "name": "esdoc-exclude-source-plugin" },
+    {
+      "name": "esdoc-coverage-plugin",
+      "option": {
+        "enable": false,
+        "kind": ["class", "method", "member", "get", "set", "constructor", "function"]
+      }
+    },
+    {
+      "name": "esdoc-ecmascript-proposal-plugin",
+      "option": {
+        "classProperties": true,
+        "objectRestSpread": true,
+        "doExpressions": true,
+        "functionBind": true,
+        "functionSent": true,
+        "asyncGenerators": true,
+        "decorators": true,
+        "exportExtensions": true,
+        "dynamicImport": true
+      }
+    }
+  ]
 }

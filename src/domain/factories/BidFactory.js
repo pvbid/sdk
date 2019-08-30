@@ -8,6 +8,7 @@ import Component from "../Component";
 import Datatable from "../Datatable";
 import FieldGroup from "../FieldGroup";
 import BidVariable from "../BidVariable";
+import DynamicGroup from "../DynamicGroup";
 import ComponentGroup from "../ComponentGroup";
 import BidService from "../services/BidService";
 
@@ -31,7 +32,8 @@ export default class BidFactory {
             "field_groups",
             "assemblies",
             "assembly_maps",
-            "variables"
+            "variables",
+            "dynamic_groups",
         ];
     }
 
@@ -41,7 +43,7 @@ export default class BidFactory {
       * @param {object} bidData 
       * @param {PVBidContext} context       
       * @param {Project} project 
-      * @returns  
+      * @returns {Bid}
       */
     create(bidData, context, project) {
         const bidService = new BidService(context);
@@ -133,6 +135,11 @@ export default class BidFactory {
                 case "components":
                     for (const i in bidData[key]) {
                         bidData[key][i] = new Component(bidData[key][i], bid);
+                    }
+                    break;
+                case "dynamic_groups":
+                    for (const i in bidData[key]) {
+                        bidData[key][i] = new DynamicGroup(bidData[key][i], bid);
                     }
                     break;
                 case "fields":

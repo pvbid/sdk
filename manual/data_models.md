@@ -1,6 +1,7 @@
 # Data Models
 
 ### Project
+
 ```
 {
     "id": 461,
@@ -45,6 +46,7 @@
 ```
 
 ### Bid
+
 ```
 {
     "id": 190,
@@ -284,6 +286,7 @@
 ```
 
 ### Field
+
 ```
 {
     "id": 18262,
@@ -411,7 +414,9 @@
     "type": "datatable"
 }
 ```
+
 ### Component
+
 ```
 {
     "id": 62470,
@@ -525,6 +530,7 @@
     "updated_at": "2017-09-27 01:10:55"
 }
 ```
+
 ### Component Group
 
 ```
@@ -543,7 +549,39 @@
 }
 ```
 
+### Dynamic Group
+
+```
+{
+    "bid_id": 556
+    "burden": {"value": 8.3, "is_overridden": false, "has_null_dependency": false, "is_predicted": false}
+    "components": []
+    "cost": {"value": 1000, "is_overridden": true, "has_null_dependency": false, "is_predicted": false}
+    "created_at": "2019-08-27 11:06:44"
+    "definition_id": null
+    "dynamic_groups": ["5d680c53b8e45d471141d1d2", "5d680c50b8e45d41af5d2ef2", "5d680c4cb8e45d41b030d844"]
+    "id": "5d650ec4b8e45d03471a7d54"
+    "included_count": 1
+    "is_included": {"value": true, "is_overridden": false}
+    "is_rootable": true
+    "line_items": [1234, 55]
+    "markup": {"value": 150, "is_overridden": false, "has_null_dependency": false, "is_predicted": false}
+    "markup_percent": {"value": 15}
+    "non_labor_cost": {"value": 1000, "is_overridden": true, "has_null_dependency": false, "is_predicted": false}
+    "order_index": 0
+    "price": {"value": 1210, "is_overridden": false, "has_null_dependency": false, "is_predicted": false}
+    "tax": {"value": 60, "is_overridden": false, "has_null_dependency": false, "is_predicted": false}
+    "tax_percent": {"value": 6}
+    "taxable_cost": {"value": 1000, "is_overridden": true, "has_null_dependency": false, "is_predicted": false}
+    "title": "Racking labor DG"
+    "type": "dynamic_group"
+    "updated_at": "2019-08-30 20:44:19"
+    "wage": {"value": 22, "is_overridden": false, "has_null_dependency": false, "is_predicted": false}
+}
+```
+
 ### Field Group
+
 ```
 {
     "id": 4108,

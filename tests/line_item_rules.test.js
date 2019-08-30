@@ -72,7 +72,7 @@ describe("Testing Line Item Rules", () => {
         });
     });
 
-    describe("Rule type 'always_include'", async () => {
+    describe("Rule type 'always_include'", () => {
         test("should always include when enabled.", () => {
             expect.assertions(3);
             // line item should have no rules due to previous test.
@@ -195,7 +195,7 @@ describe("Testing Line Item Rules", () => {
         });
     });
 
-    describe("Determint if line item should be weighted", () => {
+    describe("Determine if line item should be weighted", () => {
         afterAll(() => {
             lineItem.bid.entities.variables().predictive_pricing.value = false;
             lineItem.bid.entities.variables().wage.value = 35;

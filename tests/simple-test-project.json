@@ -2318,6 +2318,70 @@
                 "type": "assembly"
             }
         ],
+        "dynamic_groups": [
+            {
+                "id": "5cb73e7559e8a45c17031cdd",
+                "title": "Dynamic Group with just line items",
+                "type": "dynamic_group",
+                "line_items": [49661],
+                "components": [],
+                "dynamic_groups": [],
+                "cost": {
+                    "value": 0
+                },
+                "price": {
+                    "value": 0
+                }
+            },
+            {
+                "id": "5cb73e7559e8a45c17031cd6",
+                "title": "Dynamic Group with duplicated line item",
+                "type": "dynamic_group",
+                "line_items": [49662],
+                "components": [62474],
+                "dynamic_groups": []
+            },
+            {
+                "id": "5cb73e7559e8a45c17031cd8",
+                "title": "Dynamic Group with sub dynamic groups",
+                "type": "dynamic_group",
+                "line_items": [],
+                "components": [],
+                "dynamic_groups": ["5cb73e7559e8a45c17031cd6", "5cb73e7559e8a45c17031cdd"]
+            },
+            {
+                "id": "5cb73e7559e8a45c17031cd9",
+                "title": "Group with labor items",
+                "type": "dynamic_group",
+                "line_items": [49664],
+                "components": [62473],
+                "dynamic_groups": []
+            },
+            {
+                "id": "5cb73e7559e8a45c17031ce0",
+                "title": "Empty Group",
+                "type": "dynamic_group",
+                "line_items": [],
+                "components": [],
+                "dynamic_groups": []
+            },
+            {
+                "id": "5cb73e7559e8a45c17031ce1",
+                "title": "Group with multiple direct, non-included, child Line Items",
+                "type": "dynamic_group",
+                "line_items": [49970, 49970],
+                "components": [],
+                "dynamic_groups": []
+            },
+            {
+                "id": "5cb73e7559e8a45c17031ce2",
+                "title": "Group with multiple in-direct, non-included, child Line Items",
+                "type": "dynamic_group",
+                "line_items": [],
+                "components": [],
+                "dynamic_groups": ["5cb73e7559e8a45c17031ce1"]
+            }
+        ],
         "assembly_maps": [],
         "user": {
             "id": 7,

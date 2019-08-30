@@ -21,6 +21,7 @@ import DatatableDefRepository from "./repositories/DatatableDefRepository";
 import ComponentDefRepository from "./repositories/ComponentDefRepository";
 import FieldGroupDefRepository from "./repositories/FieldGroupDefRepository";
 import ComponentGroupDefRepository from "./repositories/ComponentGroupDefRepository";
+import DynamicGroupRepository from "./repositories/DynamicGroupRepository";
 
 /**
  *
@@ -87,7 +88,8 @@ export default class PVBidContext {
       datatableDefs: new DatatableDefRepository(this._httpConfig),
       componentDefs: new ComponentDefRepository(this._httpConfig),
       componentGroupDefs: new ComponentGroupDefRepository(this._httpConfig),
-      fieldGroupDefs: new FieldGroupDefRepository(this._httpConfig)
+      fieldGroupDefs: new FieldGroupDefRepository(this._httpConfig),
+      dynamicGroups: new DynamicGroupRepository(this._httpConfig),
     };
   }
 
@@ -104,7 +106,7 @@ export default class PVBidContext {
     try {
       await this.loadAuthorizedUser();
       return new ProjectLoader(this).load(projectId, {
-        loadBidEntities
+        loadBidEntities,
       });
     } catch (error) {
       return Promise.reject(error);

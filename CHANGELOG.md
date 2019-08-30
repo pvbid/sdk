@@ -1,5 +1,15 @@
 # CHANGELOG
 
+### 1.2.0 (2019-08-30)
+
+Features:
+
+- **DynamicGroup:** Introduces a new assessable bid entity type, `DynamicGroup`. Dynamic Groups provide a flexible way to organize Line Items and Components within a bid. They provide an alternative to the rigid organizational elements of components and component groups. `bid.addDynamicGroup()` creates a new dynamic group within the bid. Now just start adding components, line items, or other dynamic groups with `dynamicGroup.addChild(lineItem)`. The group will provide with a similar interface to the component. `dynamicGroup.cost` for example is the sum of its child costs. Dynamic groups are for organization only and they do not contribute to bid totals. If a dynamic group should appear in the UI alongside component groups, set `dynamicGroup.isRootable` to true.
+
+Improvements:
+
+- **Component:** `isIncluded` has been added to the component interface. A component is considered to be included if it contains any included line items.
+
 ### 1.1.27 (2019-08-01)
 
 Features:
