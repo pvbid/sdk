@@ -33,6 +33,7 @@ export default class ProjectService {
             "field_groups",
             "assemblies",
             "component_groups",
+            "dynamic_groups",
             "datatables"
         ];
         const promises = [];

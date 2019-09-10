@@ -701,6 +701,8 @@ export default class LineItem extends BidEntity {
         return calcDependencyMap[property].map(prop => this.isPredicted(prop)).some(val => val);
     }
 
+    
+
     /**
      * Resets a specific line item member, remove override value.
      *
@@ -781,8 +783,8 @@ export default class LineItem extends BidEntity {
      * @emits {assessing} fires event before assessement.
      * @emits {assessed}
      * @emits {updated}
-     * @param {?BidEntity} dependency The calling dependency
-     * @param {?boolean} forceUpdate
+     * @param {?BidEntity} [dependency] The calling dependency
+     * @param {?boolean} [forceUpdate]
      */
     assess(dependency, forceUpdate) {
         if (this.bid.isAssessable()) {
@@ -1686,6 +1688,27 @@ export default class LineItem extends BidEntity {
         this.dirty();
     }
 
+    _removeFromDynamicGroups() {
+        Object.values(this.bid.entities.dynamicGroups()).forEach(group => {
+            while (group.lineItems.includes(this.id)) { // while loop in-case of duplicates
+                group.removeChildById("line_item", this.id);
+            }
+        });
+    }
+
+    _removeFromComponents() {
+        this.components().forEach(c => {
+            c.removeLineItem(this.id);
+        });
+    }
+
+    _removeFromAssembly() {
+        if (this.hasAssembly) {
+        const assembly = this.getAssembly();
+        assembly.removeBidEntity(this.type, this.id);
+        }
+    }
+
     /**
      * Deletes line item.
      *
@@ -1694,17 +1717,11 @@ export default class LineItem extends BidEntity {
     async delete() {
         if (this.dependants().length === 0) {
             await this.bid._bidService.repositories.lineItems.delete(this.bid.id, this.id);
-            _.each(this.components(), c => {
-                c.removeLineItem(this.id);
-            });
-
-            if (this.hasAssembly) {
-                const assembly = this.getAssembly();
-                assembly.removeBidEntity(this.type, this.id);
-            }
+            this._removeFromComponents();
+            this._removeFromDynamicGroups();
+            this._removeFromAssembly();
 
             delete this.bid._data.line_items[this.id];
-            this.removeAllListeners();
             await this.bid.project.save();
             this.bid.assess();
             return;

@@ -12,7 +12,8 @@ export default class ProjectSavingHelper {
             field_groups: {},
             assemblies: {},
             component_groups: {},
-            datatables: {}
+            datatables: {},
+            dynamic_groups: {},
         };
         _.each(project.bids, bid => {
             if (!bid.isReadOnly()) {
@@ -49,6 +50,10 @@ export default class ProjectSavingHelper {
 
                     _.each(bid.entities.datatables(), item => {
                         if (item.isDirty()) extracted.datatables[item.id] = item.exportData();
+                    });
+
+                    _.each(bid.entities.dynamicGroups(), item => {
+                        if (item.isDirty()) extracted.dynamic_groups[item.id] = item.exportData();
                     });
                 }
             } else if ((bid.isLocked() || !bid.isLoaded) && bid.isDirty()) {

@@ -174,6 +174,22 @@ export default class BidEntityRelationsHelper {
     }
 
     /**
+     * Gets a dynamic group entity by id. If no id is passed, will return an of object of keyed dynamic groups by their id.
+     *
+     * @example <caption>Example of returned keyed object.</caption>
+     * {
+     *    "92" : <DynamicGroup>,
+     *    "103" : <DynamicGroup>
+     * }
+     *
+     * @param {string} id
+     * @returns {?(DynamicGroup|Object.<string, DynamicGroup>)}
+     */
+    dynamicGroups(id) {
+        return id ? this.getBidEntity("dynamic_group", id) : this.bid._data.dynamic_groups;
+    }
+
+    /**
      * Gets a assembly map entity by id.  If no id is passed, will return an object of keyed assembly maps by their id.
      *
      * @example <caption>Example of returned keyed object.</caption>

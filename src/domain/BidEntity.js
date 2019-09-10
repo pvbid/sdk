@@ -26,9 +26,9 @@ export default class BidEntity extends AdvanceEventEmitter {
 
     /**
      * Gets the id of the bid entity.
-     * NOTE: Esculding Projects, all bid entity id's will soon be in UUID format
+     * NOTE: Excluding Projects, all bid entity id's will soon be in UUID format
      *
-     * @type {number}
+     * @type {number|string}
      */
     get id() {
         return this._data.id;
@@ -164,7 +164,7 @@ export default class BidEntity extends AdvanceEventEmitter {
      * @emits {assessing} Fires as assessment begins.
      * @emits {assessed} Fires when bid entity assessement is completed
      * @emits {updated} Fires when the bid entity has changed.
-     * @param {?BidEntity} dependency  - The calling dependency.
+     * @param {?BidEntity} [dependency]  - The calling dependency.
      * @abstract
      */
     assess(dependency) {

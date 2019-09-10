@@ -23,3 +23,15 @@ export type WorkupItemPerQuantityOption = {
   title: string;
   is_key: boolean;
 };
+
+export type LineItemProp =
+  | "wage"
+  | "cost"
+  | "tax"
+  | "taxPercent"
+  | "markup"
+  | "markupPercent"
+  | "laborHours"
+  | "price"
+  | "costWatt"
+  | "priceWatt";

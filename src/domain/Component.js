@@ -365,6 +365,18 @@ export default class Component extends BidEntity {
     }
 
     /**
+     * Gets the included status of the component. 
+     * A component is included if it has included line items.
+     *
+     * @type {boolean}
+     */
+    get isIncluded() {
+        return this._data.properties &&
+            this._data.properties.included_count &&
+            this._data.properties.included_count.value > 0;
+    }
+
+    /**
      * Applies a new value to the component and assesses if there is a change.
      *
      * @param {string} property
@@ -456,7 +468,7 @@ export default class Component extends BidEntity {
      * @emits {assessing}
      * @emits {assessed}
      * @emits {updated}
-     * @param {?BidEntity} dependency  - The calling dependency.
+     * @param {?BidEntity} [dependency]  - The calling dependency.
      */
     assess(dependency) {
         if (this.bid.isAssessable()) {
@@ -495,6 +507,9 @@ export default class Component extends BidEntity {
                     totalLaborLinetItems += 1;
                     laborCosts += lineItem.cost;
                     laborHours += lineItem.laborHours;
+                    if (this.bid.entities.variables().taxable_labor.value) {
+                        taxableCost += lineItem.cost;
+                    }
 
                     dependantValuesMap.push(["cost", "labor_cost"], "labor_hours");
                 } else {
@@ -543,13 +558,13 @@ export default class Component extends BidEntity {
                 laborHours += Helpers.confirmNumber(subComponent.laborHours);
                 laborCosts += Helpers.confirmNumber(subComponent.laborCost);
                 nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
-                base += Helpers.confirmNumber(subComponent._data.base);
-                wage += Helpers.confirmNumber(subComponent._data.wage);
-                burden += Helpers.confirmNumber(subComponent._data.burden);
-                quantity += Helpers.confirmNumber(subComponent._data.quantity);
-                perQuantity += Helpers.confirmNumber(subComponent._data.per_quantity);
-                totalLineItems += Helpers.confirmNumber(subComponent._data.included_count);
-                totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.included_labor_count);
+                base += Helpers.confirmNumber(subComponent._data.properties.base.value);
+                wage += Helpers.confirmNumber(subComponent._data.properties.wage.value);
+                burden += Helpers.confirmNumber(subComponent._data.properties.burden.value);
+                quantity += Helpers.confirmNumber(subComponent._data.properties.quantity.value);
+                perQuantity += Helpers.confirmNumber(subComponent._data.properties.per_quantity.value);
+                totalLineItems += Helpers.confirmNumber(subComponent._data.properties.included_count.value);
+                totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.properties.included_labor_count.value);
 
                 const valuesToCheck = ["cost", "price", "markup", "tax", "taxable_cost", "labor_hours", "labor_cost", "non_labor_cost", "base", "wage", "burden", "quantity", "per_quantity"];
                 predictedValues = new Set([
@@ -602,7 +617,7 @@ export default class Component extends BidEntity {
             this._applyVirtualProperty("quantity", quantity);
             this._applyVirtualProperty("per_quantity", perQuantity);
             this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
-            this._applyVirtualProperty("included_count", totalLineItems);
+            isChanged = this._applyVirtualProperty("included_count", totalLineItems) || isChanged;
             this._applyVirtualProperty("base_avg", baseAvg);
             this._applyVirtualProperty("wage_avg", wageAvg);
             this._applyVirtualProperty("burden_avg", burdenAvg);

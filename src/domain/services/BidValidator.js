@@ -128,6 +128,16 @@ export default class BidValidator {
     });
   }
 
+  _runDynamicGroupTests() {
+    _.each(this._bid.entities.dynamicGroups(), dynamicGroup => {
+      try {
+        this._testDynamicGroupReferences(dynamicGroup);
+      } catch (err) {
+        this._logIssue("unknown_error", dynamicGroup, null, err);
+      }
+    });
+  }
+
   _runAssemblyTest() {
     _.each(this._bid.entities.assemblies(), assembly => {
       try {
@@ -201,6 +211,7 @@ export default class BidValidator {
     this._runFieldGroupTests();
     this._runMetricTests();
     this._runComponentTests();
+    this._runDynamicGroupTests();
     this._runAssemblyTest();
   }
 
@@ -370,7 +381,7 @@ export default class BidValidator {
     }
   }
 
-  _testLineItemWorkup(sourceBidEntity) {
+    _testLineItemWorkup(sourceBidEntity) {
     const hasFieldDependency =
       sourceBidEntity.config.workups &&
       sourceBidEntity.config.workups[0] &&
@@ -466,38 +477,92 @@ export default class BidValidator {
     }
   }
 
+  _testReferencedLineItemExists(lineItemId, sourceBidEntity) {
+    const bidLineItem = this._bid.entities.lineItems(lineItemId);
+
+    if (bidLineItem === undefined || bidLineItem === null) {
+      this._logIssue(`invalid_${sourceBidEntity.type}_line_item_reference`, sourceBidEntity, {
+        type: "line_item",
+        bid_entity_id: lineItemId,
+      });
+    }
+  }
+
+  _testReferencedComponentExists(componentId, sourceBidEntity, errorType) {
+    const bidComponent = this._bid.entities.components(componentId);
+
+    if (bidComponent === undefined || bidComponent === null) {
+      this._logIssue(errorType, sourceBidEntity, {
+        type: "component",
+        bid_entity_id: componentId,
+      });
+    }
+  }
+
+  _testReferencedDynamicGroupExists(groupId, sourceBidEntity) {
+    const bidDynamicGroup = this._bid.entities.dynamicGroups(groupId);
+
+    if (bidDynamicGroup === undefined || bidDynamicGroup === null) {
+      this._logIssue(`invalid_${sourceBidEntity.type}_dynamic_group_reference`, sourceBidEntity, {
+        type: "dynamic_group",
+        bid_entity_id: groupId,
+      });
+    }
+  }
+
   _testComponentReferences(sourceBidEntity) {
-    _.each(sourceBidEntity.config.line_items, lineItemId => {
-      var bidLineItem = this._bid.entities.lineItems(lineItemId);
+    const { line_items, components, parent_component_id, component_group_id } = sourceBidEntity.config;
 
-      if (_.isUndefined(bidLineItem) || _.isNull(bidLineItem)) {
-        this._logIssue("invalid_component_line_item_reference", sourceBidEntity, {
-          type: "line_item",
-          bid_entity_id: lineItemId,
-        });
-      }
+    line_items.forEach(lineItemId => {
+      this._testReferencedLineItemExists(lineItemId, sourceBidEntity);
     });
 
-    _.each(sourceBidEntity.config.components, componentId => {
-      var bidComponent = this._bid.entities.components(componentId);
-
-      if (_.isUndefined(bidComponent) || _.isNull(bidComponent)) {
-        this._logIssue("invalid_component_sub_component_reference", sourceBidEntity);
-      }
+    components.forEach(componentId => {
+      this._testReferencedComponentExists(
+        componentId,
+        sourceBidEntity,
+        "invalid_component_sub_component_reference"
+      );
     });
 
-    if (sourceBidEntity.config.parent_component_id) {
-      var parentComponent = this._bid.entities.components(sourceBidEntity.config.parent_component_id);
-
-      if (_.isUndefined(parentComponent) || _.isNull(parentComponent)) {
-        this._logIssue("invalid_parent_component_reference", sourceBidEntity);
-      }
+    if (parent_component_id) {
+      this._testReferencedComponentExists(
+        parent_component_id,
+        sourceBidEntity,
+        "invalid_parent_component_reference"
+      );
     }
 
-    var componentGroup = this._bid.entities.componentGroups(sourceBidEntity.config.component_group_id);
+    const componentGroup = this._bid.entities.componentGroups(component_group_id);
 
-    if (_.isUndefined(componentGroup) || _.isNull(componentGroup)) {
+    if (componentGroup === undefined || componentGroup === null) {
       this._logIssue("invalid_component_group_reference", sourceBidEntity);
+    }
+  }
+
+  _testDynamicGroupReferences(sourceBidEntity) {
+    sourceBidEntity.lineItems.forEach(lineItemId => {
+      this._testReferencedLineItemExists(lineItemId, sourceBidEntity);
+    });
+
+    sourceBidEntity.components.forEach(componentId => {
+      this._testReferencedComponentExists(
+        componentId,
+        sourceBidEntity,
+        "invalid_dynamic_group_sub_component_reference"
+      );
+    });
+
+    sourceBidEntity.dynamicGroups.forEach(groupId => {
+      this._testReferencedDynamicGroupExists(groupId, sourceBidEntity);
+    });
+
+    if (sourceBidEntity.fromComponent) {
+      this._testReferencedComponentExists(
+        sourceBidEntity.fromComponent,
+        sourceBidEntity,
+        "invalid_dynamic_group_source_component_reference"
+      );
     }
   }
 
@@ -599,12 +664,14 @@ export default class BidValidator {
       source_bid_entity_type: sourceBidEntity.type,
       source_bid_entity_id: sourceBidEntity.id,
       source_bid_entity_title: sourceBidEntity.title,
-      source_bid_entity_assembly_id: sourceBidEntity.config.assembly_id
-        ? sourceBidEntity.config.assembly_id
-        : null,
-      source_bid_entity_assembly_title: sourceBidEntity.config.assembly_id
-        ? this._getAssemblyTitle(sourceBidEntity.config.assembly_id)
-        : null,
+      source_bid_entity_assembly_id:
+        sourceBidEntity.config && sourceBidEntity.config.assembly_id
+          ? sourceBidEntity.config.assembly_id
+          : null,
+      source_bid_entity_assembly_title:
+        sourceBidEntity.config && sourceBidEntity.config.assembly_id
+          ? this._getAssemblyTitle(sourceBidEntity.config.assembly_id)
+          : null,
 
       dependency_type: dependencyContract ? dependencyContract.type : null,
       dependency_id: dependencyContract ? dependencyContract.bid_entity_id : null,
