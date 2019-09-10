@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.1 (2019-09-10)
+
+Bug Fixes:
+
+- **LineItem:** A bug was causing some line item rule expressions to act unexpectedly when there were unused dependencies.
+
 ### 1.2.0 (2019-08-30)
 
 Features:
