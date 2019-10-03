@@ -1,5 +1,12 @@
 # CHANGELOG
 
+### 1.2.x (2019-xx-xx)
+
+Improvements:
+
+- **LineItems:** Prediction Models are now statically embedded in the Line Item so that they are more deterministic.
+- **Project:** Prediction Models are no longer loaded with the Project.
+
 ### 1.2.1 (2019-09-10)
 
 Bug Fixes:

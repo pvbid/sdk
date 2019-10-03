@@ -1,99 +1,27 @@
 {
-    "project": {
-        "id": 461,
-        "account_id": 3,
-        "title": "New Project",
-        "cost": 0,
-        "taxable_cost": 0,
-        "price": 0,
-        "tax_percent": 0,
-        "markup_percent": 0,
-        "margin_percent": 0,
-        "labor_cost": "0.0000",
-        "labor_hours": "0.0000",
-        "tax": 0,
-        "markup": 0,
-        "watts": 0,
-        "bid_options": [
-            {
-                "title": "Option 1",
-                "included_bid_ids": []
-            }
-        ],
-        "users": [
-            {
-                "id": 7,
-                "account_id": 3,
-                "name": "Test User",
-                "email": "test@pvbid.com",
-                "timezone": "America/Los_Angeles",
-                "is_super_admin": 0,
-                "created_at": "2017-09-26 22:46:53",
-                "updated_at": "2017-09-26 22:46:53",
-                "customizations": null,
-                "license": "estimator",
-                "pivot": {
-                    "project_id": 461,
-                    "user_id": 7
-                },
-                "roles": [
-                    {
-                        "id": 2,
-                        "name": "admin",
-                        "display_name": "Admin",
-                        "description": "User is allowed to manage account wide settings, bids, and definitions.",
-                        "created_at": "2017-09-12 18:13:37",
-                        "updated_at": "2017-09-12 18:13:37",
-                        "pivot": {
-                            "user_id": 7,
-                            "role_id": 2
-                        }
-                    },
-                    {
-                        "id": 4,
-                        "name": "estimator",
-                        "display_name": "Estimator",
-                        "description": "User is allowed to create and edit bids with advance estimating tools.",
-                        "created_at": "2017-09-12 18:13:37",
-                        "updated_at": "2017-09-12 18:13:37",
-                        "pivot": {
-                            "user_id": 7,
-                            "role_id": 4
-                        }
-                    }
-                ]
-            }
-        ],
-        "created_at": "2017-09-26T23:04:55+00:00",
-        "updated_at": "2017-09-26T23:04:55+00:00",
-        "project_status_id": 28,
-        "is_locked": 0,
-        "is_shell": 0,
-        "is_indicative_pricing": 1,
-        "closed_at": null,
-        "reconciled_at": null,
-        "actual_hours": null,
-        "actual_cost": null,
-        "project_status": {
-            "id": 28,
-            "account_id": 3,
-            "title": "Open",
-            "core_status": "open",
-            "is_reserved": true,
-            "is_won": false,
-            "order_index": 0,
-            "created_at": "2017-09-26T22:46:28+00:00",
-            "updated_at": "2017-09-26T22:46:28+00:00"
-        },
-        "bids": [
-            {
-                "id": 190,
-                "project_id": 461,
-                "is_active": true
-            }
-        ]
-    },
-    "user": {
+  "project": {
+    "id": 461,
+    "account_id": 3,
+    "title": "New Project",
+    "cost": 0,
+    "taxable_cost": 0,
+    "price": 0,
+    "tax_percent": 0,
+    "markup_percent": 0,
+    "margin_percent": 0,
+    "labor_cost": "0.0000",
+    "labor_hours": "0.0000",
+    "tax": 0,
+    "markup": 0,
+    "watts": 0,
+    "bid_options": [
+      {
+        "title": "Option 1",
+        "included_bid_ids": []
+      }
+    ],
+    "users": [
+      {
         "id": 7,
         "account_id": 3,
         "name": "Test User",
@@ -103,2651 +31,2730 @@
         "created_at": "2017-09-26 22:46:53",
         "updated_at": "2017-09-26 22:46:53",
         "customizations": null,
-        "permissions": [
-            "create-bid",
-            "edit-definition",
-            "edit-bid",
-            "view-bid",
-            "view-analytics",
-            "edit-bid-breakdown"
-        ],
-        "roles": ["admin", "estimator"],
         "license": "estimator",
-        "account": {
-            "id": 3,
-            "title": "New Account 09/26/2017",
-            "address": null,
-            "address2": null,
-            "city": null,
-            "state": null,
-            "postal_code": null,
-            "phone": null,
-            "subdomain": null,
-            "created_at": "2017-09-26T22:46:28+00:00",
-            "updated_at": "2017-09-26T22:46:28+00:00",
-            "is_sandbox": false,
-            "is_resi": false
-        }
+        "pivot": {
+          "project_id": 461,
+          "user_id": 7
+        },
+        "roles": [
+          {
+            "id": 2,
+            "name": "admin",
+            "display_name": "Admin",
+            "description": "User is allowed to manage account wide settings, bids, and definitions.",
+            "created_at": "2017-09-12 18:13:37",
+            "updated_at": "2017-09-12 18:13:37",
+            "pivot": {
+              "user_id": 7,
+              "role_id": 2
+            }
+          },
+          {
+            "id": 4,
+            "name": "estimator",
+            "display_name": "Estimator",
+            "description": "User is allowed to create and edit bids with advance estimating tools.",
+            "created_at": "2017-09-12 18:13:37",
+            "updated_at": "2017-09-12 18:13:37",
+            "pivot": {
+              "user_id": 7,
+              "role_id": 4
+            }
+          }
+        ]
+      }
+    ],
+    "created_at": "2017-09-26T23:04:55+00:00",
+    "updated_at": "2017-09-26T23:04:55+00:00",
+    "project_status_id": 28,
+    "is_locked": 0,
+    "is_shell": 0,
+    "is_indicative_pricing": 1,
+    "closed_at": null,
+    "reconciled_at": null,
+    "actual_hours": null,
+    "actual_cost": null,
+    "project_status": {
+      "id": 28,
+      "account_id": 3,
+      "title": "Open",
+      "core_status": "open",
+      "is_reserved": true,
+      "is_won": false,
+      "order_index": 0,
+      "created_at": "2017-09-26T22:46:28+00:00",
+      "updated_at": "2017-09-26T22:46:28+00:00"
     },
-    "bid": {
+    "bids": [
+      {
         "id": 190,
+        "project_id": 461,
+        "is_active": true
+      }
+    ]
+  },
+  "user": {
+    "id": 7,
+    "account_id": 3,
+    "name": "Test User",
+    "email": "test@pvbid.com",
+    "timezone": "America/Los_Angeles",
+    "is_super_admin": 0,
+    "created_at": "2017-09-26 22:46:53",
+    "updated_at": "2017-09-26 22:46:53",
+    "customizations": null,
+    "permissions": [
+      "create-bid",
+      "edit-definition",
+      "edit-bid",
+      "view-bid",
+      "view-analytics",
+      "edit-bid-breakdown"
+    ],
+    "roles": ["admin", "estimator"],
+    "license": "estimator",
+    "account": {
+      "id": 3,
+      "title": "New Account 09/26/2017",
+      "address": null,
+      "address2": null,
+      "city": null,
+      "state": null,
+      "postal_code": null,
+      "phone": null,
+      "subdomain": null,
+      "created_at": "2017-09-26T22:46:28+00:00",
+      "updated_at": "2017-09-26T22:46:28+00:00",
+      "is_sandbox": false,
+      "is_resi": false
+    }
+  },
+  "bid": {
+    "id": 190,
+    "account_id": 3,
+    "user_id": 7,
+    "title": "New Bid",
+    "cost": 1200,
+    "taxable_cost": 1200,
+    "price": 1587,
+    "tax_percent": 0,
+    "markup_percent": 0,
+    "margin_percent": 13.04,
+    "tax": 180,
+    "markup": 207,
+    "variables": {
+      "tax": {
+        "type": "number",
+        "title": "Tax Percent",
+        "value": 15,
+        "is_reserved": true
+      },
+      "wage": {
+        "type": "number",
+        "title": "Wage",
+        "value": 35,
+        "is_reserved": true
+      },
+      "ohp": {
+        "type": "number",
+        "title": "Subcontractor Scalar",
+        "value": 1.5,
+        "is_reserved": true
+      },
+      "burden": {
+        "type": "number",
+        "title": "Burden",
+        "value": 5,
+        "is_reserved": true
+      },
+      "labels": {
+        "type": "list",
+        "title": "Labels",
+        "value": [
+          {
+            "text": "Labor"
+          },
+          {
+            "text": "Materials"
+          },
+          {
+            "text": "Equipment"
+          }
+        ],
+        "is_reserved": true
+      },
+      "markup": {
+        "type": "number",
+        "title": "Markup Percent",
+        "value": 15,
+        "is_reserved": true
+      },
+      "escalator": {
+        "type": "number",
+        "title": "Escalator",
+        "value": 1,
+        "is_reserved": true
+      },
+      "sub_margins": {
+        "type": "input_list",
+        "title": "Sub Margins",
+        "value": [],
+        "is_reserved": true
+      },
+      "markup_strategy": {
+        "type": "boolean",
+        "title": "Include Tax in Markup",
+        "value": true,
+        "is_reserved": true
+      },
+      "predictive_pricing": {
+        "type": "boolean",
+        "title": "Enable Predictive Pricing",
+        "value": false,
+        "is_reserved": true
+      },
+      "use_computed": {
+        "type": "boolean",
+        "title": "Use calculated value when available (Predictive Pricing)",
+        "value": true,
+        "is_reserved": true
+      },
+      "taxable_labor": {
+        "title": "Tax Labor",
+        "is_reserved": true,
+        "type": "boolean",
+        "value": false
+      }
+    },
+    "system_version": 1,
+    "definition_id": 0,
+    "definition_version": 1,
+    "created_at": "2017-09-26T23:04:55+00:00",
+    "updated_at": "2017-09-27T22:12:52+00:00",
+    "integrations": [],
+    "is_locked": false,
+    "is_shell": false,
+    "reconciled_at": null,
+    "actual_hours": null,
+    "actual_cost": null,
+    "bid_status_id": null,
+    "closed_at": null,
+    "project_id": 461,
+    "watts": 1350,
+    "labor_hours": 0,
+    "labor_cost": 0,
+    "margin_of_error": 0,
+    "is_active": true,
+    "config": {
+      "predicted_values": [],
+      "undefined_prop_flags": []
+    },
+    "line_items": [
+      {
+        "id": 49661,
+        "bid_id": 190,
         "account_id": 3,
-        "user_id": 7,
-        "title": "New Bid",
+        "title": "General Line Item",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "line:general_line_item",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1577,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55",
+        "prediction_model": {
+          "id": 1,
+          "account_id": 3,
+          "line_item_def_id": 1577,
+          "models": [
+            {
+              "model": {
+                "r2": 0.95,
+                "type": "simple_linear",
+                "equation": "0.2a + 100"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1577
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 0.45,
+                "type": "simple_linear",
+                "equation": "0.1a + 400"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": { "type": "metric", "field": "value", "definition_id": 840 },
+                "y": { "type": "line_item", "field": "cost", "definition_id": 1577 }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1577
+                }
+              }
+            }
+          ],
+          "contribution_weight": 0.75,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49662,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Sub Component Line Item",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "line:sub_component_line_item",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1578,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55",
+        "prediction_model": {
+          "id": 2,
+          "account_id": 3,
+          "line_item_def_id": 1578,
+          "models": [
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1578
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1578
+                }
+              }
+            }
+          ],
+          "contribution_weight": 1,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49663,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Inverter",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "line:inverter",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1579,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55",
+        "prediction_model": {
+          "id": 3,
+          "account_id": 3,
+          "line_item_def_id": 1579,
+          "models": [
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1579
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1579
+                }
+              }
+            }
+          ],
+          "contribution_weight": 1,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49664,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Labor Line Item",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "ohp": {
+              "type": "bid_variable",
+              "field": "ohp",
+              "bid_entity_id": "bid_variable"
+            },
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            }
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": [],
+          "short_code": "line:labor_line_item",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1580,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-28 00:19:12",
+        "prediction_model": {
+          "id": 4,
+          "account_id": 3,
+          "line_item_def_id": 1580,
+          "models": [
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1580
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1580
+                }
+              }
+            }
+          ],
+          "contribution_weight": 1,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49665,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Modules",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "reference",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "reference",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": {
+              "type": null,
+              "field": null
+            },
+            "quantity": {
+              "type": "field",
+              "field": "value",
+              "bid_entity_id": 18263
+            },
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": {
+              "type": "field",
+              "field": "tp7q",
+              "bid_entity_id": 18262
+            }
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "is_predicted_labor_hours": false,
+          "is_predicted_cost": false,
+          "is_weighted": false,
+          "tags": [],
+          "undefined_prop_flags": [],
+          "short_code": "line:modules",
+          "description": ""
+        },
+        "cost": 1200,
+        "taxable_cost": 0,
+        "price": 1587,
+        "tax": 180,
+        "tax_percent": 15,
+        "markup": 207,
+        "markup_percent": 15,
+        "quantity": 3,
+        "per_quantity": 400,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1581,
+        "definition_version": 3,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 22:12:52",
+        "prediction_model": {
+          "id": 5,
+          "account_id": 3,
+          "line_item_def_id": 1581,
+          "models": [
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1581
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1581
+                }
+              }
+            }
+          ],
+          "contribution_weight": 1,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49666,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "DT test",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "bid:line:dt_test",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 0,
+        "markup": 0,
+        "markup_percent": 0,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 0,
+        "wage": 0,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": null,
+        "definition_version": null,
+        "type": "line_item",
+        "created_at": "2017-09-27 01:10:54",
+        "updated_at": "2017-09-27 01:10:54",
+        "prediction_model": {}
+      },
+      {
+        "id": 49970,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Always Off",
+        "is_active": true,
+        "is_included": false,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            }
+          },
+          "rules": [],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "bid:line:always_off",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": null,
+        "definition_version": null,
+        "type": "line_item",
+        "created_at": "2017-09-27 22:11:08",
+        "updated_at": "2017-09-28 00:19:12",
+        "prediction_model": {}
+      },
+      {
+        "id": 49971,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "On With Module Selected",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            }
+          },
+          "rules": [
+            {
+              "type": "list_field",
+              "title": "Include With Module",
+              "activate_on": true,
+              "dependencies": {
+                "list_field": {
+                  "type": "field",
+                  "field": "value",
+                  "bid_entity_id": 18262
+                }
+              },
+              "list_options": ["mhzk", "be6f"]
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "bid:line:on_with_module_selected",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": null,
+        "definition_version": null,
+        "type": "line_item",
+        "created_at": "2017-09-27 22:11:33",
+        "updated_at": "2017-09-28 00:19:12",
+        "prediction_model": {}
+      },
+      {
+        "id": 49972,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "On With Rule Value Expression - Watts > Wage",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            },
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": {
+              "type": null,
+              "field": null,
+              "bid_entity_id": null
+            }
+          },
+          "rules": [
+            {
+              "type": "value_expression",
+              "title": "Value Expression rules",
+              "expression": "a > b",
+              "activate_on": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "bid_entity_id": 36093
+                },
+                "b": {
+                  "type": "bid_variable",
+                  "field": "wage",
+                  "bid_entity_id": "bid_variable"
+                }
+              }
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "bid:line:on_with_rule_expression",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1582,
+        "definition_version": null,
+        "type": "line_item",
+        "created_at": "2017-09-28 00:12:36",
+        "updated_at": "2017-09-28 00:19:12",
+        "prediction_model": {
+          "id": 6,
+          "account_id": 3,
+          "line_item_def_id": 1582,
+          "models": [
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "cost",
+                  "definition_id": 1581
+                }
+              }
+            },
+            {
+              "model": {
+                "r2": 1,
+                "type": "simple_linear",
+                "equation": "(-0.00000a + 0.1)*a"
+              },
+              "bounds": [],
+              "is_base": true,
+              "dependencies": {
+                "a": {
+                  "type": "metric",
+                  "field": "value",
+                  "definition_id": 840
+                },
+                "y": {
+                  "type": "line_item",
+                  "field": "labor_hours",
+                  "definition_id": 1581
+                }
+              }
+            }
+          ],
+          "contribution_weight": 1,
+          "use_count": 1,
+          "created_at": "2018-07-10T00:57:38+00:00",
+          "updated_at": "2018-07-17T11:45:52+00:00"
+        }
+      },
+      {
+        "id": 49973,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "General Line Item",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 0
+          },
+          "base": 0,
+          "formula": "1",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "line:no_models_line_item",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1583,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55",
+        "prediction_model": {}
+      },
+      {
+        "id": 49974,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Workup Item",
+        "is_active": true,
+        "is_included": true,
+        "config": {
+          "comments": [],
+          "order_index": 0,
+          "assembly_id": null,
+          "type": "dollar",
+          "quantity": {
+            "type": "value",
+            "value": 1
+          },
+          "per_quantity": {
+            "type": "value",
+            "value": 1
+          },
+          "base": 0,
+          "formula": "WORKUP",
+          "dependencies": {
+            "tax": {
+              "type": "bid_variable",
+              "field": "tax",
+              "bid_entity_id": "bid_variable"
+            },
+            "wage": {
+              "type": "bid_variable",
+              "field": "wage",
+              "bid_entity_id": "bid_variable"
+            },
+            "burden": {
+              "type": "bid_variable",
+              "field": "burden",
+              "bid_entity_id": "bid_variable"
+            },
+            "markup": {
+              "type": "bid_variable",
+              "field": "markup",
+              "bid_entity_id": "bid_variable"
+            },
+            "scalar": [],
+            "quantity": [],
+            "escalator": {
+              "type": "bid_variable",
+              "field": "escalator",
+              "bid_entity_id": "bid_variable"
+            },
+            "per_quantity": []
+          },
+          "workups": [
+            {
+              "value": 150.12345,
+              "reference_quantity": "1",
+              "unit": "units",
+              "items": [
+                {
+                  "quantity": 1,
+                  "per_quantity": 150.12345
+                }
+              ]
+            }
+          ],
+          "rules": [
+            {
+              "type": "always_include",
+              "title": "Always Include"
+            }
+          ],
+          "rule_inclusion": "any",
+          "overrides": {},
+          "short_code": "line:no_models_line_item",
+          "description": ""
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax": 0,
+        "tax_percent": 15,
+        "markup": 0,
+        "markup_percent": 15,
+        "quantity": 0,
+        "per_quantity": 0,
+        "multiplier": 1,
+        "burden": 5,
+        "wage": 35,
+        "base": 0,
+        "escalator": 1,
+        "labor_hours": 0,
+        "actual_cost": null,
+        "acutal_hours": null,
+        "definition_id": 1584,
+        "definition_version": 2,
+        "type": "line_item",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55",
+        "prediction_model": {}
+      }
+    ],
+    "fields": [
+      {
+        "id": 18262,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Module Type",
+        "anchor": null,
+        "value": "mhzk",
+        "is_active": true,
+        "config": {
+          "type": "list",
+          "constraint": "Whole",
+          "short_code": "field:module_type",
+          "description": "",
+          "dependencies": {
+            "auto_a": {
+              "type": null,
+              "field": null
+            },
+            "datatable": {
+              "type": "datatable",
+              "field": null,
+              "bid_entity_id": 7580
+            }
+          },
+          "is_auto_selected": false
+        },
+        "definition_id": 903,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T22:12:52+00:00",
+        "actual_value": null,
+        "type": "field"
+      },
+      {
+        "id": 18263,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Number of Modules",
+        "anchor": null,
+        "value": "3",
+        "is_active": true,
+        "config": {
+          "type": "number",
+          "constraint": "Whole",
+          "short_code": "field:number_of_modules",
+          "description": "",
+          "dependencies": {
+            "auto_a": {
+              "type": null,
+              "field": null
+            },
+            "datatable": []
+          },
+          "is_auto_selected": false
+        },
+        "definition_id": 904,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "type": "field"
+      },
+      {
+        "id": 182623,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Boolean Field",
+        "anchor": null,
+        "value": "true",
+        "is_active": true,
+        "config": {
+          "type": "boolean",
+          "short_code": "field:boolean_field",
+          "description": "",
+          "dependencies": {}
+        },
+        "definition_id": 9033,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T22:12:52+00:00",
+        "actual_value": null,
+        "type": "field"
+      },
+      {
+        "id": 18264,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Undefined Number",
+        "anchor": null,
+        "value": null,
+        "is_active": true,
+        "config": {
+          "type": "number",
+          "constraint": "Whole",
+          "short_code": "field:undefined_number",
+          "description": "",
+          "dependencies": {
+            "auto_a": {
+              "type": null,
+              "field": null
+            },
+            "datatable": []
+          },
+          "is_auto_selected": false
+        },
+        "definition_id": 905,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "type": "field"
+      },
+      {
+        "id": 18265,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "In an assembly",
+        "anchor": "test_anchor",
+        "value": 0,
+        "is_active": true,
+        "config": {
+          "type": "number",
+          "constraint": "Whole",
+          "short_code": "field:in_an_assembly",
+          "description": "",
+          "dependencies": {
+            "auto_a": {
+              "type": null,
+              "field": null
+            },
+            "datatable": []
+          },
+          "is_auto_selected": false
+        },
+        "definition_id": 906,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "type": "field"
+      }
+    ],
+    "metrics": [
+      {
+        "id": 36093,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Watts",
+        "value": 1350,
+        "config": {
+          "manipulations": [],
+          "formula": "a*b",
+          "short_code": "metric:watts",
+          "dependencies": {
+            "a": {
+              "type": "field",
+              "field": "clpa",
+              "bid_entity_id": 18262
+            },
+            "b": {
+              "type": "field",
+              "field": "value",
+              "bid_entity_id": 18263
+            }
+          }
+        },
+        "definition_id": 840,
+        "definition_version": 9,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T22:12:52+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      },
+      {
+        "id": 36094,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Margin of Error",
+        "value": 5,
+        "config": {
+          "formula": "5",
+          "short_code": "metric:margin_of_error",
+          "dependencies": []
+        },
+        "definition_id": 841,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      },
+      {
+        "id": 36095,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Depends on undefined number",
+        "value": 0,
+        "config": {
+          "formula": "A",
+          "short_code": "metric:undefined_metric",
+          "dependencies": {
+            "a": {
+              "type": "field",
+              "field": "value",
+              "bid_entity_id": 18264
+            }
+          }
+        },
+        "definition_id": 842,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      },
+      {
+        "id": 36096,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Depends on defined number",
+        "value": 3,
+        "config": {
+          "formula": "A",
+          "short_code": "metric:defined_metric",
+          "dependencies": {
+            "a": {
+              "type": "field",
+              "field": "value",
+              "bid_entity_id": 18263
+            }
+          }
+        },
+        "definition_id": 843,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      },
+      {
+        "id": 36097,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Formula has Pi",
+        "value": 3,
+        "config": {
+          "formula": "1 * pi",
+          "short_code": "metric:defined_metric",
+          "dependencies": {
+            "a": {
+              "type": "field",
+              "field": "value",
+              "bid_entity_id": 18263
+            }
+          }
+        },
+        "definition_id": 843,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      }
+    ],
+    "datatables": [
+      {
+        "id": 7580,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Modules",
+        "config": {
+          "rows": [
+            {
+              "id": "mhzk",
+              "values": ["Module 1", "400.00", "450", ""]
+            },
+            {
+              "id": "be6f",
+              "values": ["Module 2", "300.00", "250", ""]
+            }
+          ],
+          "columns": [
+            {
+              "id": "at57",
+              "type": "string",
+              "title": "Module",
+              "is_key": true
+            },
+            {
+              "id": "tp7q",
+              "type": "string",
+              "title": "Unit Price",
+              "is_key": false
+            },
+            {
+              "id": "clpa",
+              "type": "string",
+              "title": "Watts",
+              "is_key": false
+            },
+            {
+              "id": "d674",
+              "type": "string",
+              "title": "Empty",
+              "is_key": false
+            }
+          ]
+        },
+        "definition_id": 266,
+        "definition_version": 3,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "is_active": 1,
+        "type": "datatable"
+      },
+      {
+        "id": 7581,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Linked",
+        "inventory_link": "module",
+        "part_type_properties": {
+          "_id": "ID Prop",
+          "pvbid_description": "Description",
+          "model": "Model Name",
+          "pvbid_part_name": "PVBid partname",
+          "pvbid_part_type": "Part Type",
+          "manufacturer_name": "Manufacturer",
+          "example_prop": "An example inventory property",
+          "null_prop": "An example of a property with a null value"
+        },
+        "config": {
+          "rows": [
+            {
+              "id": "6nq6",
+              "values": [
+                "Module 1",
+                "400.00",
+                "450",
+                {
+                  "_id": "5c9be3b759e8a459715c82ae",
+                  "pvbid_description": "Test Module I",
+                  "model": "Test Module I",
+                  "pvbid_part_name": "Test Manufacturer - Test Module I",
+                  "pvbid_part_type": "module",
+                  "manufacturer_name": "Test Manufacturer",
+                  "example_prop": 1000,
+                  "null_prop": null,
+                  "external_sources": {
+                    "test_vendor_a": { "ids": [9876] },
+                    "test_vendor_b": { "ids": [1234] }
+                  }
+                }
+              ]
+            },
+            {
+              "id": "w0wb",
+              "values": ["Module 2", "300.00", "250", ""]
+            },
+            {
+              "id": "3t2n",
+              "values": ["Module 3", "300.00", "250", ""]
+            }
+          ],
+          "columns": [
+            {
+              "id": "9e9g",
+              "type": "string",
+              "title": "Module",
+              "is_key": true
+            },
+            {
+              "id": "a0l8",
+              "type": "string",
+              "title": "Unit Price",
+              "is_key": false
+            },
+            {
+              "id": "cf4e",
+              "type": "string",
+              "title": "Watts",
+              "is_key": false
+            },
+            {
+              "id": "pvbid_inventory_item_id",
+              "type": "string",
+              "title": "PVBid Inventory Part ID",
+              "is_key": false
+            }
+          ]
+        },
+        "definition_id": 267,
+        "definition_version": 3,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "is_active": 1,
+        "type": "datatable"
+      }
+    ],
+    "component_groups": [
+      {
+        "id": 813,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Cost Codes",
+        "config": [],
+        "definition_id": 43,
+        "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-26T23:04:55+00:00",
+        "is_active": 1,
+        "type": "component_group"
+      }
+    ],
+    "field_groups": [
+      {
+        "id": 4108,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "General",
+        "config": {
+          "fields": [18262, 18263, 18264, 182623],
+          "order_index": 0,
+          "default_value": "true"
+        },
+        "definition_id": 109,
+        "definition_version": 4,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-26T23:04:55+00:00",
+        "is_active": 1,
+        "type": "field_group"
+      },
+      {
+        "id": 4109,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Basic Assembly",
+        "config": {
+          "fields": [18265],
+          "order_index": 0,
+          "default_value": "true"
+        },
+        "definition_id": 110,
+        "definition_version": 1,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-26T23:04:55+00:00",
+        "is_active": 1,
+        "type": "field_group"
+      }
+    ],
+    "components": [
+      {
+        "id": 62470,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Modules",
+        "is_active": true,
+        "config": {
+          "is_nested": false,
+          "components": [],
+          "line_items": [49665],
+          "component_group_id": 813,
+          "parent_component_id": null,
+          "comments": [],
+          "description": null,
+          "order_index": 0,
+          "short_code": "component:modules"
+        },
+        "properties": {
+          "base": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage": {
+            "value": 35,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden": {
+            "value": 5,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "base_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity": {
+            "value": 3,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity": {
+            "value": 400,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity_avg": {
+            "value": 3,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_count": {
+            "value": 1,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity_avg": {
+            "value": 400,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_labor_count": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          }
+        },
         "cost": 1200,
         "taxable_cost": 1200,
         "price": 1587,
-        "tax_percent": 0,
-        "markup_percent": 0,
-        "margin_percent": 13.04,
+        "tax_percent": 15,
+        "markup_percent": 15,
         "tax": 180,
         "markup": 207,
-        "variables": {
-            "tax": {
-                "type": "number",
-                "title": "Tax Percent",
-                "value": 15,
-                "is_reserved": true
-            },
-            "wage": {
-                "type": "number",
-                "title": "Wage",
-                "value": 35,
-                "is_reserved": true
-            },
-            "ohp": {
-                "type": "number",
-                "title": "Subcontractor Scalar",
-                "value": 1.5,
-                "is_reserved": true
-            },
-            "burden": {
-                "type": "number",
-                "title": "Burden",
-                "value": 5,
-                "is_reserved": true
-            },
-            "labels": {
-                "type": "list",
-                "title": "Labels",
-                "value": [
-                    {
-                        "text": "Labor"
-                    },
-                    {
-                        "text": "Materials"
-                    },
-                    {
-                        "text": "Equipment"
-                    }
-                ],
-                "is_reserved": true
-            },
-            "markup": {
-                "type": "number",
-                "title": "Markup Percent",
-                "value": 15,
-                "is_reserved": true
-            },
-            "escalator": {
-                "type": "number",
-                "title": "Escalator",
-                "value": 1,
-                "is_reserved": true
-            },
-            "sub_margins": {
-                "type": "input_list",
-                "title": "Sub Margins",
-                "value": [],
-                "is_reserved": true
-            },
-            "markup_strategy": {
-                "type": "boolean",
-                "title": "Include Tax in Markup",
-                "value": true,
-                "is_reserved": true
-            },
-            "predictive_pricing": {
-                "type": "boolean",
-                "title": "Enable Predictive Pricing",
-                "value": false,
-                "is_reserved": true
-            },
-            "use_computed": {
-                "type": "boolean",
-                "title": "Use calculated value when available (Predictive Pricing)",
-                "value": true,
-                "is_reserved": true
-            },
-            "taxable_labor": {
-                "title": "Tax Labor",
-                "is_reserved": true,
-                "type": "boolean",
-                "value": false
-            }
-        },
-        "system_version": 1,
-        "definition_id": 0,
-        "definition_version": 1,
-        "created_at": "2017-09-26T23:04:55+00:00",
-        "updated_at": "2017-09-27T22:12:52+00:00",
-        "integrations": [],
-        "is_locked": false,
-        "is_shell": false,
-        "reconciled_at": null,
-        "actual_hours": null,
-        "actual_cost": null,
-        "bid_status_id": null,
-        "closed_at": null,
-        "project_id": 461,
-        "watts": 1350,
         "labor_hours": 0,
         "labor_cost": 0,
-        "margin_of_error": 0,
+        "non_labor_cost": 1200,
+        "actual_hours": null,
+        "actual_cost": null,
+        "definition_id": 1726,
+        "definition_version": 3,
+        "type": "component",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 22:12:52"
+      },
+      {
+        "id": 62471,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Inverters",
         "is_active": true,
         "config": {
-            "predicted_values": [],
-            "undefined_prop_flags": []
+          "is_nested": false,
+          "components": [],
+          "line_items": [49663],
+          "component_group_id": 813,
+          "parent_component_id": null,
+          "comments": [],
+          "description": null,
+          "order_index": 0,
+          "short_code": "component:inverters"
         },
-        "line_items": [
-            {
-                "id": 49661,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "General Line Item",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "line:general_line_item",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1577,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 49662,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Sub Component Line Item",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "line:sub_component_line_item",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1578,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 49663,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Inverter",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "line:inverter",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1579,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 49664,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Labor Line Item",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "ohp": {
-                            "type": "bid_variable",
-                            "field": "ohp",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        }
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": [],
-                    "short_code": "line:labor_line_item",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1580,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-28 00:19:12"
-            },
-            {
-                "id": 49665,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Modules",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "reference",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "reference",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": {
-                            "type": null,
-                            "field": null
-                        },
-                        "quantity": {
-                            "type": "field",
-                            "field": "value",
-                            "bid_entity_id": 18263
-                        },
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": {
-                            "type": "field",
-                            "field": "tp7q",
-                            "bid_entity_id": 18262
-                        }
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "is_predicted_labor_hours": false,
-                    "is_predicted_cost": false,
-                    "is_weighted": false,
-                    "tags": [],
-                    "undefined_prop_flags": [],
-                    "short_code": "line:modules",
-                    "description": ""
-                },
-                "cost": 1200,
-                "taxable_cost": 0,
-                "price": 1587,
-                "tax": 180,
-                "tax_percent": 15,
-                "markup": 207,
-                "markup_percent": 15,
-                "quantity": 3,
-                "per_quantity": 400,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1581,
-                "definition_version": 3,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 22:12:52"
-            },
-            {
-                "id": 49666,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "DT test",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "bid:line:dt_test",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 0,
-                "markup": 0,
-                "markup_percent": 0,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 0,
-                "wage": 0,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": null,
-                "definition_version": null,
-                "type": "line_item",
-                "created_at": "2017-09-27 01:10:54",
-                "updated_at": "2017-09-27 01:10:54"
-            },
-            {
-                "id": 49970,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Always Off",
-                "is_active": true,
-                "is_included": false,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        }
-                    },
-                    "rules": [],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "bid:line:always_off",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": null,
-                "definition_version": null,
-                "type": "line_item",
-                "created_at": "2017-09-27 22:11:08",
-                "updated_at": "2017-09-28 00:19:12"
-            },
-            {
-                "id": 49971,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "On With Module Selected",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        }
-                    },
-                    "rules": [
-                        {
-                            "type": "list_field",
-                            "title": "Include With Module",
-                            "activate_on": true,
-                            "dependencies": {
-                                "list_field": {
-                                    "type": "field",
-                                    "field": "value",
-                                    "bid_entity_id": 18262
-                                }
-                            },
-                            "list_options": ["mhzk", "be6f"]
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "bid:line:on_with_module_selected",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": null,
-                "definition_version": null,
-                "type": "line_item",
-                "created_at": "2017-09-27 22:11:33",
-                "updated_at": "2017-09-28 00:19:12"
-            },
-            {
-                "id": 49972,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "On With Rule Value Expression - Watts > Wage",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        },
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": {
-                            "type": null,
-                            "field": null,
-                            "bid_entity_id": null
-                        }
-                    },
-                    "rules": [
-                        {
-                            "type": "value_expression",
-                            "title": "Value Expression rules",
-                            "expression": "a > b",
-                            "activate_on": true,
-                            "dependencies": {
-                                "a": {
-                                    "type": "metric",
-                                    "field": "value",
-                                    "bid_entity_id": 36093
-                                },
-                                "b": {
-                                    "type": "bid_variable",
-                                    "field": "wage",
-                                    "bid_entity_id": "bid_variable"
-                                }
-                            }
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "bid:line:on_with_rule_expression",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1582,
-                "definition_version": null,
-                "type": "line_item",
-                "created_at": "2017-09-28 00:12:36",
-                "updated_at": "2017-09-28 00:19:12"
-            },
-            {
-                "id": 49973,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "General Line Item",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 0
-                    },
-                    "base": 0,
-                    "formula": "1",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "line:no_models_line_item",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1583,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 49974,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Workup Item",
-                "is_active": true,
-                "is_included": true,
-                "config": {
-                    "comments": [],
-                    "order_index": 0,
-                    "assembly_id": null,
-                    "type": "dollar",
-                    "quantity": {
-                        "type": "value",
-                        "value": 1
-                    },
-                    "per_quantity": {
-                        "type": "value",
-                        "value": 1
-                    },
-                    "base": 0,
-                    "formula": "WORKUP",
-                    "dependencies": {
-                        "tax": {
-                            "type": "bid_variable",
-                            "field": "tax",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "wage": {
-                            "type": "bid_variable",
-                            "field": "wage",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "burden": {
-                            "type": "bid_variable",
-                            "field": "burden",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "markup": {
-                            "type": "bid_variable",
-                            "field": "markup",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "scalar": [],
-                        "quantity": [],
-                        "escalator": {
-                            "type": "bid_variable",
-                            "field": "escalator",
-                            "bid_entity_id": "bid_variable"
-                        },
-                        "per_quantity": []
-                    },
-                    "workups": [{
-                        "value": 150.12345,
-                        "reference_quantity": "1",
-                        "unit": "units",
-                        "items": [{
-                            "quantity": 1,
-                            "per_quantity": 150.12345
-                        }]
-                    }],
-                    "rules": [
-                        {
-                            "type": "always_include",
-                            "title": "Always Include"
-                        }
-                    ],
-                    "rule_inclusion": "any",
-                    "overrides": {},
-                    "short_code": "line:no_models_line_item",
-                    "description": ""
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax": 0,
-                "tax_percent": 15,
-                "markup": 0,
-                "markup_percent": 15,
-                "quantity": 0,
-                "per_quantity": 0,
-                "multiplier": 1,
-                "burden": 5,
-                "wage": 35,
-                "base": 0,
-                "escalator": 1,
-                "labor_hours": 0,
-                "actual_cost": null,
-                "acutal_hours": null,
-                "definition_id": 1584,
-                "definition_version": 2,
-                "type": "line_item",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
+        "properties": {
+          "base": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "fields": [
-            {
-                "id": 18262,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Module Type",
-                "anchor": null,
-                "value": "mhzk",
-                "is_active": true,
-                "config": {
-                    "type": "list",
-                    "constraint": "Whole",
-                    "short_code": "field:module_type",
-                    "description": "",
-                    "dependencies": {
-                        "auto_a": {
-                            "type": null,
-                            "field": null
-                        },
-                        "datatable": {
-                            "type": "datatable",
-                            "field": null,
-                            "bid_entity_id": 7580
-                        }
-                    },
-                    "is_auto_selected": false
-                },
-                "definition_id": 903,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T22:12:52+00:00",
-                "actual_value": null,
-                "type": "field"
-            },
-            {
-                "id": 18263,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Number of Modules",
-                "anchor": null,
-                "value": "3",
-                "is_active": true,
-                "config": {
-                    "type": "number",
-                    "constraint": "Whole",
-                    "short_code": "field:number_of_modules",
-                    "description": "",
-                    "dependencies": {
-                        "auto_a": {
-                            "type": null,
-                            "field": null
-                        },
-                        "datatable": []
-                    },
-                    "is_auto_selected": false
-                },
-                "definition_id": 904,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "type": "field"
-            },
-            {
-                "id": 182623,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Boolean Field",
-                "anchor": null,
-                "value": "true",
-                "is_active": true,
-                "config": {
-                    "type": "boolean",
-                    "short_code": "field:boolean_field",
-                    "description": "",
-                    "dependencies": {}
-                },
-                "definition_id": 9033,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T22:12:52+00:00",
-                "actual_value": null,
-                "type": "field"
-            },
-            {
-                "id": 18264,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Undefined Number",
-                "anchor": null,
-                "value": null,
-                "is_active": true,
-                "config": {
-                    "type": "number",
-                    "constraint": "Whole",
-                    "short_code": "field:undefined_number",
-                    "description": "",
-                    "dependencies": {
-                        "auto_a": {
-                            "type": null,
-                            "field": null
-                        },
-                        "datatable": []
-                    },
-                    "is_auto_selected": false
-                },
-                "definition_id": 905,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "type": "field"
-            },
-            {
-                "id": 18265,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "In an assembly",
-                "anchor": "test_anchor",
-                "value": 0,
-                "is_active": true,
-                "config": {
-                    "type": "number",
-                    "constraint": "Whole",
-                    "short_code": "field:in_an_assembly",
-                    "description": "",
-                    "dependencies": {
-                        "auto_a": {
-                            "type": null,
-                            "field": null
-                        },
-                        "datatable": []
-                    },
-                    "is_auto_selected": false
-                },
-                "definition_id": 906,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "type": "field"
+          },
+          "wage": {
+            "value": 35,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "metrics": [
-            {
-                "id": 36093,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Watts",
-                "value": 1350,
-                "config": {
-                    "manipulations": [],
-                    "formula": "a*b",
-                    "short_code": "metric:watts",
-                    "dependencies": {
-                        "a": {
-                            "type": "field",
-                            "field": "clpa",
-                            "bid_entity_id": 18262
-                        },
-                        "b": {
-                            "type": "field",
-                            "field": "value",
-                            "bid_entity_id": 18263
-                        }
-                    }
-                },
-                "definition_id": 840,
-                "definition_version": 9,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T22:12:52+00:00",
-                "actual_value": null,
-                "is_active": true,
-                "type": "metric"
-            },
-            {
-                "id": 36094,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Margin of Error",
-                "value": 5,
-                "config": {
-                    "formula": "5",
-                    "short_code": "metric:margin_of_error",
-                    "dependencies": []
-                },
-                "definition_id": 841,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "is_active": true,
-                "type": "metric"
-            },
-            {
-                "id": 36095,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Depends on undefined number",
-                "value": 0,
-                "config": {
-                    "formula": "A",
-                    "short_code": "metric:undefined_metric",
-                    "dependencies": {
-                        "a": {
-                            "type": "field",
-                            "field": "value",
-                            "bid_entity_id": 18264
-                        }
-                    }
-                },
-                "definition_id": 842,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "is_active": true,
-                "type": "metric"
-            },
-            {
-                "id": 36096,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Depends on defined number",
-                "value": 3,
-                "config": {
-                    "formula": "A",
-                    "short_code": "metric:defined_metric",
-                    "dependencies": {
-                        "a": {
-                            "type": "field",
-                            "field": "value",
-                            "bid_entity_id": 18263
-                        }
-                    }
-                },
-                "definition_id": 843,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "is_active": true,
-                "type": "metric"
-            },
-            {
-                "id": 36097,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Formula has Pi",
-                "value": 3,
-                "config": {
-                    "formula": "1 * pi",
-                    "short_code": "metric:defined_metric",
-                    "dependencies": {
-                        "a": {
-                            "type": "field",
-                            "field": "value",
-                            "bid_entity_id": 18263
-                        }
-                    }
-                },
-                "definition_id": 843,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "actual_value": null,
-                "is_active": true,
-                "type": "metric"
+          },
+          "burden": {
+            "value": 5,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "datatables": [
-            {
-                "id": 7580,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Modules",
-                "config": {
-                    "rows": [
-                        {
-                            "id": "mhzk",
-                            "values": ["Module 1", "400.00", "450", ""]
-                        },
-                        {
-                            "id": "be6f",
-                            "values": ["Module 2", "300.00", "250", ""]
-                        }
-                    ],
-                    "columns": [
-                        {
-                            "id": "at57",
-                            "type": "string",
-                            "title": "Module",
-                            "is_key": true
-                        },
-                        {
-                            "id": "tp7q",
-                            "type": "string",
-                            "title": "Unit Price",
-                            "is_key": false
-                        },
-                        {
-                            "id": "clpa",
-                            "type": "string",
-                            "title": "Watts",
-                            "is_key": false
-                        },
-                        {
-                            "id": "d674",
-                            "type": "string",
-                            "title": "Empty",
-                            "is_key": false
-                        }
-                    ]
-                },
-                "definition_id": 266,
-                "definition_version": 3,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "is_active": 1,
-                "type": "datatable"
-            },
-            {
-                "id": 7581,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Linked",
-                "inventory_link": "module",
-                "part_type_properties": {
-                    "_id": "ID Prop",
-                    "pvbid_description": "Description",
-                    "model": "Model Name",
-                    "pvbid_part_name": "PVBid partname",
-                    "pvbid_part_type": "Part Type",
-                    "manufacturer_name": "Manufacturer",
-                    "example_prop": "An example inventory property",
-                    "null_prop": "An example of a property with a null value"
-                },
-                "config": {
-                    "rows": [
-                        {
-                            "id": "6nq6",
-                            "values": [
-                                "Module 1",
-                                "400.00",
-                                "450",
-                                {
-                                    "_id": "5c9be3b759e8a459715c82ae",
-                                    "pvbid_description": "Test Module I",
-                                    "model": "Test Module I",
-                                    "pvbid_part_name": "Test Manufacturer - Test Module I",
-                                    "pvbid_part_type": "module",
-                                    "manufacturer_name": "Test Manufacturer",
-                                    "example_prop": 1000,
-                                    "null_prop": null,
-                                    "external_sources": {
-                                        "test_vendor_a": { "ids": [9876] },
-                                        "test_vendor_b": { "ids": [1234] }
-                                    }
-                                }
-                            ]
-                        },
-                        {
-                            "id": "w0wb",
-                            "values": ["Module 2", "300.00", "250", ""]
-                        },
-                        {
-                            "id": "3t2n",
-                            "values": ["Module 3", "300.00", "250", ""]
-                        }
-                    ],
-                    "columns": [
-                        {
-                            "id": "9e9g",
-                            "type": "string",
-                            "title": "Module",
-                            "is_key": true
-                        },
-                        {
-                            "id": "a0l8",
-                            "type": "string",
-                            "title": "Unit Price",
-                            "is_key": false
-                        },
-                        {
-                            "id": "cf4e",
-                            "type": "string",
-                            "title": "Watts",
-                            "is_key": false
-                        },
-                        {
-                            "id": "pvbid_inventory_item_id",
-                            "type": "string",
-                            "title": "PVBid Inventory Part ID",
-                            "is_key": false
-                        }
-                    ]
-                },
-                "definition_id": 267,
-                "definition_version": 3,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-27T01:10:55+00:00",
-                "is_active": 1,
-                "type": "datatable"
+          },
+          "base_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "component_groups": [
-            {
-                "id": 813,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Cost Codes",
-                "config": [],
-                "definition_id": 43,
-                "definition_version": 2,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-26T23:04:55+00:00",
-                "is_active": 1,
-                "type": "component_group"
+          },
+          "quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "field_groups": [
-            {
-                "id": 4108,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "General",
-                "config": {
-                    "fields": [18262, 18263, 18264, 182623],
-                    "order_index": 0,
-                    "default_value": "true"
-                },
-                "definition_id": 109,
-                "definition_version": 4,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-26T23:04:55+00:00",
-                "is_active": 1,
-                "type": "field_group"
-            },
-            {
-                "id": 4109,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Basic Assembly",
-                "config": {
-                    "fields": [18265],
-                    "order_index": 0,
-                    "default_value": "true"
-                },
-                "definition_id": 110,
-                "definition_version": 1,
-                "created_at": "2017-09-26T23:04:55+00:00",
-                "updated_at": "2017-09-26T23:04:55+00:00",
-                "is_active": 1,
-                "type": "field_group"
+          },
+          "wage_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "components": [
-            {
-                "id": 62470,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Modules",
-                "is_active": true,
-                "config": {
-                    "is_nested": false,
-                    "components": [],
-                    "line_items": [49665],
-                    "component_group_id": 813,
-                    "parent_component_id": null,
-                    "comments": [],
-                    "description": null,
-                    "order_index": 0,
-                    "short_code": "component:modules"
-                },
-                "properties": {
-                    "base": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage": {
-                        "value": 35,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden": {
-                        "value": 5,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "base_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity": {
-                        "value": 3,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity": {
-                        "value": 400,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity_avg": {
-                        "value": 3,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_count": {
-                        "value": 1,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity_avg": {
-                        "value": 400,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_labor_count": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    }
-                },
-                "cost": 1200,
-                "taxable_cost": 1200,
-                "price": 1587,
-                "tax_percent": 15,
-                "markup_percent": 15,
-                "tax": 180,
-                "markup": 207,
-                "labor_hours": 0,
-                "labor_cost": 0,
-                "non_labor_cost": 1200,
-                "actual_hours": null,
-                "actual_cost": null,
-                "definition_id": 1726,
-                "definition_version": 3,
-                "type": "component",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 22:12:52"
-            },
-            {
-                "id": 62471,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Inverters",
-                "is_active": true,
-                "config": {
-                    "is_nested": false,
-                    "components": [],
-                    "line_items": [49663],
-                    "component_group_id": 813,
-                    "parent_component_id": null,
-                    "comments": [],
-                    "description": null,
-                    "order_index": 0,
-                    "short_code": "component:inverters"
-                },
-                "properties": {
-                    "base": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage": {
-                        "value": 35,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden": {
-                        "value": 5,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "base_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_count": {
-                        "value": 1,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_labor_count": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    }
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax_percent": 0,
-                "markup_percent": 0,
-                "tax": 0,
-                "markup": 0,
-                "labor_hours": 0,
-                "labor_cost": 0,
-                "non_labor_cost": 0,
-                "actual_hours": null,
-                "actual_cost": null,
-                "definition_id": 1727,
-                "definition_version": 3,
-                "type": "component",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 62472,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "General",
-                "is_active": true,
-                "config": {
-                    "is_nested": false,
-                    "components": [62474],
-                    "line_items": [49661, 49970, 49971, 49972],
-                    "component_group_id": 813,
-                    "parent_component_id": null,
-                    "comments": [],
-                    "description": null,
-                    "order_index": 0,
-                    "short_code": "component:general"
-                },
-                "properties": {
-                    "base": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage": {
-                        "value": 105,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden": {
-                        "value": 15,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "base_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_count": {
-                        "value": 3,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_labor_count": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    }
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax_percent": 0,
-                "markup_percent": 0,
-                "tax": 0,
-                "markup": 0,
-                "labor_hours": 0,
-                "labor_cost": 0,
-                "non_labor_cost": 0,
-                "actual_hours": null,
-                "actual_cost": null,
-                "definition_id": 1728,
-                "definition_version": 4,
-                "type": "component",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-28 00:19:12"
-            },
-            {
-                "id": 62473,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "Labor",
-                "is_active": true,
-                "config": {
-                    "is_nested": false,
-                    "components": [],
-                    "line_items": [49664],
-                    "component_group_id": 813,
-                    "parent_component_id": null,
-                    "comments": [],
-                    "description": null,
-                    "order_index": 0,
-                    "short_code": "component:labor"
-                },
-                "properties": {
-                    "base": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage": {
-                        "value": 35,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden": {
-                        "value": 5,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "base_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_count": {
-                        "value": 1,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_labor_count": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    }
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax_percent": 0,
-                "markup_percent": 0,
-                "tax": 0,
-                "markup": 0,
-                "labor_hours": 0,
-                "labor_cost": 0,
-                "non_labor_cost": 0,
-                "actual_hours": null,
-                "actual_cost": null,
-                "definition_id": 1729,
-                "definition_version": 3,
-                "type": "component",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
-            },
-            {
-                "id": 62474,
-                "bid_id": 190,
-                "account_id": 3,
-                "title": "General Subcomponent",
-                "is_active": true,
-                "config": {
-                    "is_nested": true,
-                    "components": [],
-                    "line_items": [49662],
-                    "component_group_id": 813,
-                    "parent_component_id": 62472,
-                    "comments": [],
-                    "description": null,
-                    "order_index": 0,
-                    "short_code": "component:general_subcomponent"
-                },
-                "properties": {
-                    "base": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage": {
-                        "value": 35,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden": {
-                        "value": 5,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "base_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "wage_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "burden_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_count": {
-                        "value": 1,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "per_quantity_avg": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    },
-                    "included_labor_count": {
-                        "value": 0,
-                        "config": {
-                            "data_type": "number"
-                        }
-                    }
-                },
-                "cost": 0,
-                "taxable_cost": 0,
-                "price": 0,
-                "tax_percent": 0,
-                "markup_percent": 0,
-                "tax": 0,
-                "markup": 0,
-                "labor_hours": 0,
-                "labor_cost": 0,
-                "non_labor_cost": 0,
-                "actual_hours": null,
-                "actual_cost": null,
-                "definition_id": 1730,
-                "definition_version": 3,
-                "type": "component",
-                "created_at": "2017-09-26 23:04:55",
-                "updated_at": "2017-09-27 01:10:55"
+          },
+          "burden_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "assemblies": [
-            {
-                "id": 84,
-                "account_id": 3,
-                "bid_id": 190,
-                "title": "Basic Assembly",
-                "config": {
-                    "fields": [18265],
-                    "metrics": [],
-                    "components": [],
-                    "line_items": [],
-                    "field_groups": [4109],
-                    "manipulated_metrics": []
-                },
-                "definition_id": 71,
-                "definition_version": 1,
-                "created_at": "2019-03-14T15:54:59+00:00",
-                "updated_at": "2019-03-14T15:55:00+00:00",
-                "is_active": 1,
-                "type": "assembly"
+          },
+          "per_quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "dynamic_groups": [
-            {
-                "id": "5cb73e7559e8a45c17031cdd",
-                "title": "Dynamic Group with just line items",
-                "type": "dynamic_group",
-                "line_items": [49661],
-                "components": [],
-                "dynamic_groups": [],
-                "cost": {
-                    "value": 0
-                },
-                "price": {
-                    "value": 0
-                }
-            },
-            {
-                "id": "5cb73e7559e8a45c17031cd6",
-                "title": "Dynamic Group with duplicated line item",
-                "type": "dynamic_group",
-                "line_items": [49662],
-                "components": [62474],
-                "dynamic_groups": []
-            },
-            {
-                "id": "5cb73e7559e8a45c17031cd8",
-                "title": "Dynamic Group with sub dynamic groups",
-                "type": "dynamic_group",
-                "line_items": [],
-                "components": [],
-                "dynamic_groups": ["5cb73e7559e8a45c17031cd6", "5cb73e7559e8a45c17031cdd"]
-            },
-            {
-                "id": "5cb73e7559e8a45c17031cd9",
-                "title": "Group with labor items",
-                "type": "dynamic_group",
-                "line_items": [49664],
-                "components": [62473],
-                "dynamic_groups": []
-            },
-            {
-                "id": "5cb73e7559e8a45c17031ce0",
-                "title": "Empty Group",
-                "type": "dynamic_group",
-                "line_items": [],
-                "components": [],
-                "dynamic_groups": []
-            },
-            {
-                "id": "5cb73e7559e8a45c17031ce1",
-                "title": "Group with multiple direct, non-included, child Line Items",
-                "type": "dynamic_group",
-                "line_items": [49970, 49970],
-                "components": [],
-                "dynamic_groups": []
-            },
-            {
-                "id": "5cb73e7559e8a45c17031ce2",
-                "title": "Group with multiple in-direct, non-included, child Line Items",
-                "type": "dynamic_group",
-                "line_items": [],
-                "components": [],
-                "dynamic_groups": ["5cb73e7559e8a45c17031ce1"]
+          },
+          "quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
             }
-        ],
-        "assembly_maps": [],
-        "user": {
-            "id": 7,
-            "name": "Test User",
-            "license": "estimator",
-            "roles": [
-                {
-                    "id": 2,
-                    "name": "admin",
-                    "display_name": "Admin",
-                    "description": "User is allowed to manage account wide settings, bids, and definitions.",
-                    "created_at": "2017-09-12 18:13:37",
-                    "updated_at": "2017-09-12 18:13:37",
-                    "pivot": {
-                        "user_id": 7,
-                        "role_id": 2
-                    }
-                },
-                {
-                    "id": 4,
-                    "name": "estimator",
-                    "display_name": "Estimator",
-                    "description": "User is allowed to create and edit bids with advance estimating tools.",
-                    "created_at": "2017-09-12 18:13:37",
-                    "updated_at": "2017-09-12 18:13:37",
-                    "pivot": {
-                        "user_id": 7,
-                        "role_id": 4
-                    }
-                }
-            ]
+          },
+          "included_count": {
+            "value": 1,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_labor_count": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          }
         },
-        "bid_status": null,
-        "tags": []
-    },
-    "prediction_models": [
-        {
-            "id": 1,
-            "account_id": 3,
-            "line_item_def_id": 1577,
-            "models": [
-                {
-                    "model": {
-                        "r2": 0.95,
-                        "type": "simple_linear",
-                        "equation": "0.2a + 100"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1577
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 0.45,
-                        "type": "simple_linear",
-                        "equation": "0.1a + 400"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": { "type": "metric", "field": "value", "definition_id": 840 },
-                        "y": { "type": "line_item", "field": "cost", "definition_id": 1577 }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1577
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 0.75,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax_percent": 0,
+        "markup_percent": 0,
+        "tax": 0,
+        "markup": 0,
+        "labor_hours": 0,
+        "labor_cost": 0,
+        "non_labor_cost": 0,
+        "actual_hours": null,
+        "actual_cost": null,
+        "definition_id": 1727,
+        "definition_version": 3,
+        "type": "component",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55"
+      },
+      {
+        "id": 62472,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "General",
+        "is_active": true,
+        "config": {
+          "is_nested": false,
+          "components": [62474],
+          "line_items": [49661, 49970, 49971, 49972],
+          "component_group_id": 813,
+          "parent_component_id": null,
+          "comments": [],
+          "description": null,
+          "order_index": 0,
+          "short_code": "component:general"
         },
-        {
-            "id": 2,
-            "account_id": 3,
-            "line_item_def_id": 1578,
-            "models": [
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1578
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1578
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 1,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "properties": {
+          "base": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage": {
+            "value": 105,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden": {
+            "value": 15,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "base_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_count": {
+            "value": 3,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_labor_count": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          }
         },
-        {
-            "id": 3,
-            "account_id": 3,
-            "line_item_def_id": 1579,
-            "models": [
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1579
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1579
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 1,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax_percent": 0,
+        "markup_percent": 0,
+        "tax": 0,
+        "markup": 0,
+        "labor_hours": 0,
+        "labor_cost": 0,
+        "non_labor_cost": 0,
+        "actual_hours": null,
+        "actual_cost": null,
+        "definition_id": 1728,
+        "definition_version": 4,
+        "type": "component",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-28 00:19:12"
+      },
+      {
+        "id": 62473,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "Labor",
+        "is_active": true,
+        "config": {
+          "is_nested": false,
+          "components": [],
+          "line_items": [49664],
+          "component_group_id": 813,
+          "parent_component_id": null,
+          "comments": [],
+          "description": null,
+          "order_index": 0,
+          "short_code": "component:labor"
         },
-        {
-            "id": 4,
-            "account_id": 3,
-            "line_item_def_id": 1580,
-            "models": [
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1580
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1580
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 1,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "properties": {
+          "base": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage": {
+            "value": 35,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden": {
+            "value": 5,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "base_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_count": {
+            "value": 1,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_labor_count": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          }
         },
-        {
-            "id": 5,
-            "account_id": 3,
-            "line_item_def_id": 1581,
-            "models": [
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1581
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1581
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 1,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax_percent": 0,
+        "markup_percent": 0,
+        "tax": 0,
+        "markup": 0,
+        "labor_hours": 0,
+        "labor_cost": 0,
+        "non_labor_cost": 0,
+        "actual_hours": null,
+        "actual_cost": null,
+        "definition_id": 1729,
+        "definition_version": 3,
+        "type": "component",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55"
+      },
+      {
+        "id": 62474,
+        "bid_id": 190,
+        "account_id": 3,
+        "title": "General Subcomponent",
+        "is_active": true,
+        "config": {
+          "is_nested": true,
+          "components": [],
+          "line_items": [49662],
+          "component_group_id": 813,
+          "parent_component_id": 62472,
+          "comments": [],
+          "description": null,
+          "order_index": 0,
+          "short_code": "component:general_subcomponent"
         },
-        {
-            "id": 6,
-            "account_id": 3,
-            "line_item_def_id": 1582,
-            "models": [
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "cost",
-                            "definition_id": 1581
-                        }
-                    }
-                },
-                {
-                    "model": {
-                        "r2": 1,
-                        "type": "simple_linear",
-                        "equation": "(-0.00000a + 0.1)*a"
-                    },
-                    "bounds": [],
-                    "is_base": true,
-                    "dependencies": {
-                        "a": {
-                            "type": "metric",
-                            "field": "value",
-                            "definition_id": 840
-                        },
-                        "y": {
-                            "type": "line_item",
-                            "field": "labor_hours",
-                            "definition_id": 1581
-                        }
-                    }
-                }
-            ],
-            "contribution_weight": 1,
-            "use_count": 1,
-            "created_at": "2018-07-10T00:57:38+00:00",
-            "updated_at": "2018-07-17T11:45:52+00:00"
+        "properties": {
+          "base": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage": {
+            "value": 35,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden": {
+            "value": 5,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "base_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "wage_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "burden_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_count": {
+            "value": 1,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "per_quantity_avg": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          },
+          "included_labor_count": {
+            "value": 0,
+            "config": {
+              "data_type": "number"
+            }
+          }
+        },
+        "cost": 0,
+        "taxable_cost": 0,
+        "price": 0,
+        "tax_percent": 0,
+        "markup_percent": 0,
+        "tax": 0,
+        "markup": 0,
+        "labor_hours": 0,
+        "labor_cost": 0,
+        "non_labor_cost": 0,
+        "actual_hours": null,
+        "actual_cost": null,
+        "definition_id": 1730,
+        "definition_version": 3,
+        "type": "component",
+        "created_at": "2017-09-26 23:04:55",
+        "updated_at": "2017-09-27 01:10:55"
+      }
+    ],
+    "assemblies": [
+      {
+        "id": 84,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Basic Assembly",
+        "config": {
+          "fields": [18265],
+          "metrics": [],
+          "components": [],
+          "line_items": [],
+          "field_groups": [4109],
+          "manipulated_metrics": []
+        },
+        "definition_id": 71,
+        "definition_version": 1,
+        "created_at": "2019-03-14T15:54:59+00:00",
+        "updated_at": "2019-03-14T15:55:00+00:00",
+        "is_active": 1,
+        "type": "assembly"
+      }
+    ],
+    "dynamic_groups": [
+      {
+        "id": "5cb73e7559e8a45c17031cdd",
+        "title": "Dynamic Group with just line items",
+        "type": "dynamic_group",
+        "line_items": [49661],
+        "components": [],
+        "dynamic_groups": [],
+        "cost": {
+          "value": 0
+        },
+        "price": {
+          "value": 0
         }
-    ]
+      },
+      {
+        "id": "5cb73e7559e8a45c17031cd6",
+        "title": "Dynamic Group with duplicated line item",
+        "type": "dynamic_group",
+        "line_items": [49662],
+        "components": [62474],
+        "dynamic_groups": []
+      },
+      {
+        "id": "5cb73e7559e8a45c17031cd8",
+        "title": "Dynamic Group with sub dynamic groups",
+        "type": "dynamic_group",
+        "line_items": [],
+        "components": [],
+        "dynamic_groups": ["5cb73e7559e8a45c17031cd6", "5cb73e7559e8a45c17031cdd"]
+      },
+      {
+        "id": "5cb73e7559e8a45c17031cd9",
+        "title": "Group with labor items",
+        "type": "dynamic_group",
+        "line_items": [49664],
+        "components": [62473],
+        "dynamic_groups": []
+      },
+      {
+        "id": "5cb73e7559e8a45c17031ce0",
+        "title": "Empty Group",
+        "type": "dynamic_group",
+        "line_items": [],
+        "components": [],
+        "dynamic_groups": []
+      },
+      {
+        "id": "5cb73e7559e8a45c17031ce1",
+        "title": "Group with multiple direct, non-included, child Line Items",
+        "type": "dynamic_group",
+        "line_items": [49970, 49970],
+        "components": [],
+        "dynamic_groups": []
+      },
+      {
+        "id": "5cb73e7559e8a45c17031ce2",
+        "title": "Group with multiple in-direct, non-included, child Line Items",
+        "type": "dynamic_group",
+        "line_items": [],
+        "components": [],
+        "dynamic_groups": ["5cb73e7559e8a45c17031ce1"]
+      }
+    ],
+    "assembly_maps": [],
+    "user": {
+      "id": 7,
+      "name": "Test User",
+      "license": "estimator",
+      "roles": [
+        {
+          "id": 2,
+          "name": "admin",
+          "display_name": "Admin",
+          "description": "User is allowed to manage account wide settings, bids, and definitions.",
+          "created_at": "2017-09-12 18:13:37",
+          "updated_at": "2017-09-12 18:13:37",
+          "pivot": {
+            "user_id": 7,
+            "role_id": 2
+          }
+        },
+        {
+          "id": 4,
+          "name": "estimator",
+          "display_name": "Estimator",
+          "description": "User is allowed to create and edit bids with advance estimating tools.",
+          "created_at": "2017-09-12 18:13:37",
+          "updated_at": "2017-09-12 18:13:37",
+          "pivot": {
+            "user_id": 7,
+            "role_id": 4
+          }
+        }
+      ]
+    },
+    "bid_status": null,
+    "tags": []
+  }
 }

@@ -1,51 +1,71 @@
-import _ from 'lodash';
+import { isNil, orderBy } from "lodash";
 import Helpers from "../../utils/Helpers";
+import LineItem from "../LineItem";
 
 export default class PredictionService {
-  constructor(bid) {
-    this.bid = bid;
+  /**
+   * Constructor
+   * @param {LineItem} lineItem
+   */
+  constructor(lineItem) {
+    this.lineItem = lineItem;
+    if (!this.lineItem) {
+      throw new Error("Line Item is not set");
+    }
+
+    this.bid = this.lineItem.bid;
+
+    this.models = (this.lineItem._data.prediction_model && this.lineItem._data.prediction_model.models) || [];
   }
 
   /**
    * Retrieves a filtered list of prediction models
    *
-   * @param {number} lineItemDefId The line item definition id to get models for
    * @param {string} filterByType 'cost' or 'labor_hours' the type of models to retrieve
    * @return {object[]} List of models filtered by the filterType
    */
-  _getFilteredModels(lineItemDefId, filterByType) {
-    let models = this.bid.project.predictionModels[lineItemDefId].models;
-    return _.filter(models, (model) => model.dependencies.y.field === filterByType);
+  _getFilteredModels(filterByType) {
+    return this.models.filter(model => model.dependencies.y.field === filterByType);
+  }
+
+  /**
+   * Determine if the line item has any prediction models
+   *
+   * @return {boolean}
+   */
+  hasPredictionModels() {
+    return (
+      this.lineItem._data.prediction_model &&
+      this.lineItem._data.prediction_model.models &&
+      this.lineItem._data.prediction_model.models.length
+    );
   }
 
   /**
    * Retrieves a list of cost prediction models
    *
-   * @param {number} lineItemDefId The line item definition id to get models for
    * @return {Object[]} cost prediction models
    */
-  getCostPredictionModels(lineItemDefId) {
-    return this._getFilteredModels(lineItemDefId, 'cost');
+  getCostPredictionModels() {
+    return this._getFilteredModels("cost");
   }
 
   /**
    * Retrieves a list of labor prediction models
    *
-   * @param {number} lineItemDefId The line item definition id to get models for
    * @return {Object[]} labor prediction models
    */
-  getLaborPredictionModels(lineItemDefId) {
-    return this._getFilteredModels(lineItemDefId, 'labor_hours');
+  getLaborPredictionModels() {
+    return this._getFilteredModels("labor_hours");
   }
 
   /**
    * Retrieves the contribution weight for the line item
    *
-   * @param {number} lineItemDefId The line item definition id to get the contribution weight for
    * @return {number} The contribution weight
    */
-  getContributionWeight(lineItemDefId) {
-    return this.bid.project.predictionModels[lineItemDefId].contribution_weight;
+  getContributionWeight() {
+    return Helpers.confirmNumber(this.lineItem._data.prediction_model.contribution_weight);
   }
 
   /**
@@ -80,7 +100,7 @@ export default class PredictionService {
   _getModelDependencyValue(modelDependency) {
     const { type, definition_id, field } = modelDependency;
     const [bidEntity] = this.bid.entities.getBidEntitiesByDefId(type, definition_id);
-    return (bidEntity)
+    return bidEntity
       ? this.bid.entities.getDependencyValue({ type, field, bid_entity_id: bidEntity.id })
       : null;
   }
@@ -93,17 +113,18 @@ export default class PredictionService {
    * @return {boolean} Whether or not the value is in bounds
    */
   _isInBounds(bounds, value) {
-    if (!bounds) { // the base_model can have no bounds for y=0a
+    if (!bounds) {
+      // the base_model can have no bounds for y=0a
       return true;
     }
     const [lowerBound, upperBound] = bounds;
-    return (value >= (lowerBound * 0.85)) && (value <= (upperBound * 1.15));
+    return value >= lowerBound * 0.85 && value <= upperBound * 1.15;
   }
 
   /**
-   * Evaluates a single prediciton model
+   * Evaluates a single prediction model
    *
-   * @param {object} model A prediciton model to evaluate
+   * @param {object} model A prediction model to evaluate
    * @return {number|null} The result of evaluating the model
    */
   evaluateModel(model) {
@@ -112,18 +133,18 @@ export default class PredictionService {
       dependencyValues.b = this._getModelDependencyValue(model.dependencies.b);
     }
 
-    const hasDefinedDependencyValues = _.every(dependencyValues, val => !_.isNil(val));
+    const hasDefinedDependencyValues = Object.values(dependencyValues).every(val => !isNil(val));
     if (hasDefinedDependencyValues) {
       let modelValue = Helpers.calculateFormula(model.model.equation, dependencyValues);
       modelValue = modelValue < 0 ? 0 : modelValue;
 
-      const isInBounds = _.every(dependencyValues, (dependencyValue, key) => {
+      const isInBounds = Object.keys(dependencyValues).forEach(key => {
         const boundsMap = {
           a: model.bounds[0],
           b: model.bounds[1],
           y: model.bounds[model.bounds.length - 1],
         };
-        return this._isInBounds(boundsMap[key], dependencyValue);
+        return this._isInBounds(boundsMap[key], dependencyValues[key]);
       });
 
       return { value: modelValue, isInBounds, r2: model.model.r2 };
@@ -141,7 +162,7 @@ export default class PredictionService {
     const evaluatedModels = [];
 
     // evaluate up to 5 models in order of highest r2 value
-    const orderedModels = _.orderBy(models, 'model.r2', 'desc');
+    const orderedModels = orderBy(models, "model.r2", "desc");
     for (let model of orderedModels) {
       if (evaluatedModels.length < 5) {
         const evaluatedModel = this.evaluateModel(model);
@@ -149,7 +170,7 @@ export default class PredictionService {
           evaluatedModels.push(evaluatedModel);
         }
       }
-    };
+    }
 
     const inBoundsModels = evaluatedModels.filter(evaluatedModel => evaluatedModel.isInBounds);
     if (inBoundsModels.length > 0) {
@@ -161,36 +182,16 @@ export default class PredictionService {
   }
 
   /**
-   * Determines if the line item has prediction models by its def Id.
-   *  Line item defs might not have prediction models if they have been created since
-   *  the last time the regression was run or if there was not enough data for the regression
-   *  to generate a model.
-   *
-   * @param {number} lineItemDefId
-   * @return {boolean}
-   */
-  hasPredictionModels(lineItemDefId) {
-    if (this.bid.project.predictionModels[lineItemDefId] !== undefined &&
-      this.bid.project.predictionModels[lineItemDefId].models &&
-      this.bid.project.predictionModels[lineItemDefId].models.length) {
-      return true;
-    }
-    return false;
-  }
-
-  /**
    * Gets the dependencies used in the prediction models for the given line item def id
    *
-   * @param {number} lineItemDefId The line item definition id to get dependencies for
    * @return {bidEntity[]} The prediction model dependencies
    */
-  getPredictionDependencies(lineItemDefId) {
+  getPredictionDependencies() {
     const dependencies = [];
-    const models = this.bid.project.predictionModels[lineItemDefId].models;
 
-    for (let model of models) {
+    for (let model of this.models) {
       Object.keys(model.dependencies).forEach(key => {
-        if (key !== 'y') {
+        if (key !== "y") {
           const { type, definition_id } = model.dependencies[key];
           const entities = this.bid.entities.getBidEntitiesByDefId(type, definition_id);
           if (entities) {
