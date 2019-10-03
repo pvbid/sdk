@@ -109,7 +109,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   get cost() {
-    return this._data.cost;
+    return Helpers.confirmNumber(this._data.cost);
   }
 
   /**
@@ -160,7 +160,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   get markup() {
-    return this._data.markup;
+    return Helpers.confirmNumber(this._data.markup);
   }
 
   /**
@@ -308,7 +308,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   get watts() {
-    return this._data.watts;
+    return Helpers.confirmNumber(this._data.watts, 1);
   }
 
   /**
@@ -1277,7 +1277,7 @@ export default class Bid extends BidEntity {
       this.project.once("assessed", () => res());
       this.reassessAll(true);
     });
-    if (Math.round(price) !== Math.round(this.price)) {
+    if (Math.round(price / 10) !== Math.round(this.price / 10)) {
       return this._reassessAllAsync(maxCount, count);
     }
     return true;
