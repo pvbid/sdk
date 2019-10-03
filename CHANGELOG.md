@@ -1,6 +1,6 @@
 # CHANGELOG
 
-### 1.2.x (2019-xx-xx)
+### 1.2.2 (2019-10-03)
 
 Improvements:
 
