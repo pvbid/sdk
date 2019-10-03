@@ -270,6 +270,14 @@ describe("Testing Line Item Predictive Pricing", () => {
     });
 
     describe("Dollar line item", () => {
+      it("should get the cost filtered models only", () => {
+        expect(lineItem._predictionService.getCostPredictionModels().length).toBe(2);
+
+        lineItem._predictionService.getCostPredictionModels().forEach(model => {
+          expect(model.dependencies.y.field).toBe("cost");
+        });
+      });
+
       it("should evaluate the prediction models weighted by r2 to get cost", () => {
         expect(lineItem.laborHours).toBe(0);
         expect(lineItem.cost).toBeCloseTo(423, 0); // 1350 watts weighted average of predict models
@@ -317,7 +325,7 @@ describe("Testing Line Item Predictive Pricing", () => {
 
     it("should not predict", async () => {
       const $lineItem = bid.entities.lineItems(49973);
-      $lineItem.useComputedValueWhenAvailable = true;
+      $lineItem.useComputedValueWhenAvailable = false;
       $lineItem.assess();
       expect($lineItem.isPredicted("cost")).toBe(false);
     });

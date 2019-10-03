@@ -281,7 +281,8 @@
     "definition_version": 2,
     "type": "line_item",
     "created_at": "2017-09-26 23:04:55",
-    "updated_at": "2017-09-27 01:10:55"
+    "updated_at": "2017-09-27 01:10:55",
+    "prediction_model": {}
 }
 ```
 
