@@ -76,7 +76,7 @@ describe("Dynamic Groups", () => {
     });
 
     beforeEach(async () => {
-      await assessChangeAsync(group, () => {
+      await assessChangeAsync(bid, () => {
         lineItem.reset();
       });
     });
