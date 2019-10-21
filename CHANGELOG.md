@@ -1,5 +1,12 @@
 # CHANGELOG
 
+### 1.2.3 (2019-10-21)
+
+Bug Fixes:
+
+- **Helpers:** The `evalExpression` method (used mostly in line item rules) was casting all variables to numbers. It will now maintain the provided type. Casting to number is appropriate for the formula calculator but not for evaluating logical expressions.
+- **Field:** List fields without a datatable dependency were causing new bids to fail on load. The misconfiguration will now be handled gracefully with a validation warning.
+
 ### 1.2.2 (2019-10-03)
 
 Improvements:

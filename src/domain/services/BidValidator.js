@@ -88,6 +88,9 @@ export default class BidValidator {
       try {
         this._baseEntityTest(field);
         this._testIsFieldAssignedToGroup(field);
+        if (field.config.type === "list") {
+          this._testListFieldHasDatatable(field);
+        }
       } catch (err) {
         this._logIssue("unknown_error", field, null, err);
       }
@@ -225,6 +228,18 @@ export default class BidValidator {
 
     if (!isIncluded) {
       this._logIssue("unassigned_field", sourceBidEntity);
+    }
+  }
+
+  _testListFieldHasDatatable(sourceBidEntity) {
+    const {
+      type,
+      dependencies: { datatable },
+    } = sourceBidEntity.config;
+    if (type === "list" && !(datatable && datatable.bid_entity_id)) {
+      this._logIssue("list_field_missing_datatable_dependency", sourceBidEntity, datatable, {
+        source_bid_entity_dependency_key: "datatable",
+      });
     }
   }
 
@@ -381,7 +396,7 @@ export default class BidValidator {
     }
   }
 
-    _testLineItemWorkup(sourceBidEntity) {
+  _testLineItemWorkup(sourceBidEntity) {
     const hasFieldDependency =
       sourceBidEntity.config.workups &&
       sourceBidEntity.config.workups[0] &&
@@ -581,7 +596,10 @@ export default class BidValidator {
       var fieldDependency = this._bid.entities.getDependency(dependencyContract);
 
       if (!_.isUndefined(fieldDependency) && !_.isNull(fieldDependency)) {
-        if (fieldDependency.config.type === "list") {
+        if (
+          fieldDependency.config.type === "list" &&
+          fieldDependency.config.dependencies.datatable.bid_entity_id
+        ) {
           var datatable = this._bid.entities.getDependency(fieldDependency.config.dependencies.datatable);
 
           var datatableColumnKeys = _.map(datatable.columns, c => {

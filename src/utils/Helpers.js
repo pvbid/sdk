@@ -1,6 +1,6 @@
-import _ from "lodash";
 import core from "mathjs/core";
-var math = core.create();
+
+const math = core.create();
 math.import(require("mathjs/lib/type/number"));
 math.import(require("mathjs/lib/type/complex"));
 math.import(require("mathjs/lib/function/utils"));
@@ -24,21 +24,19 @@ export default class Helpers {
    * @param {number} [dflt=0]
    * @returns {number}
    */
-  static confirmNumber(val, dflt) {
-    if (_.isFinite(val)) return val;
+  static confirmNumber(val, dflt = 0) {
+    if (Number.isFinite(val)) return val;
 
-    dflt = _.isUndefined(dflt) || _.isNull(dflt) ? 0 : dflt;
-    if (_.isUndefined(val) || _.isNull(val)) return dflt;
+    if (val === undefined || val === null) return dflt;
 
-    if (_.isBoolean(val) || val === "true" || val === "false") {
-      return val === true || val == "true" ? 1 : 0;
+    if (typeof val === "boolean" || val === "true" || val === "false") {
+      return val === true || val === "true" ? 1 : 0;
     }
 
-    if (_.isNaN(val)) return dflt;
+    if (Number.isNaN(val)) return dflt;
 
-    val = _.replace(val, new RegExp(",", "g"), "");
-    val = _.toNumber(val);
-    return _.isNumber(val) && _.isFinite(val) ? val : dflt;
+    const clean = +val.toString().replace(new RegExp(",", "g"), "");
+    return Number.isFinite(clean) ? clean : dflt;
   }
 
   /**
@@ -49,9 +47,10 @@ export default class Helpers {
    * @returns {boolean}
    */
   static isNumber(val) {
-    if (_.isFinite(val)) return true;
-    val = _.replace(val, new RegExp(",", "g"), "");
-    return _.isFinite(_.toNumber(val));
+    if (Number.isFinite(val)) return true;
+
+    const cleaned = +val.toString().replace(new RegExp(",", "g"), "");
+    return Number.isFinite(cleaned);
   }
 
   /**
@@ -80,7 +79,7 @@ export default class Helpers {
       "undefined",
     ];
     if (formula) {
-      const node = math.parse(this._clean(formula.toString()));
+      const node = math.parse(this._cleanFormula(formula.toString()));
       const args = node.filter(n => n.isSymbolNode && !mathjsConstants.includes(n.name));
       return args.map(arg => arg.name.toLowerCase());
     }
@@ -88,39 +87,29 @@ export default class Helpers {
   }
 
   static calculateFormula(formula, valuesMap) {
-    var result;
     if (!formula || formula === "") {
       formula = "1";
       return;
     }
-    formula = formula.toString().toLowerCase();
-    try {
-      _.each(valuesMap, function(val, key) {
-        if (_.isNull(val)) {
-          valuesMap[key.toLowerCase()] = 1;
-        } else if (_.isBoolean(val) || val === "true" || val === "false") {
-          valuesMap[key.toLowerCase()] = val === true || val === "true" ? 1 : 0;
-        } else if (!_.isNaN(parseFloat(val))) {
-          valuesMap[key.toLowerCase()] = parseFloat(val);
-        } else {
-          valuesMap[key.toLowerCase()] = val.replace(/#/g, "pound_sign");
-        }
-      });
-      if (_.isUndefined(valuesMap) || _.isNull(valuesMap)) {
-        valuesMap = [];
-      }
+    const cleanFormula = this._cleanFormula(formula);
+    const cleanValues = this._cleanValues(valuesMap, true);
 
-      result = math.eval(this._clean(formula).toLowerCase(), valuesMap);
+    let result;
+    try {
+      result = math.eval(cleanFormula, cleanValues);
       result = math.typeof(result) == "boolean" ? Number(result) : result;
       result = math.isNumeric(result) && result != Infinity ? result : null;
     } catch (e) {
-      console.log(e, formula, valuesMap);
-      // FIXME - do something?
+      console.log(e, cleanFormula, cleanValues);
     }
     return result;
   }
-  static _clean(formula) {
+
+  static _cleanFormula(formula) {
+    if (!formula) return "1";
     return formula
+      .toString()
+      .toLowerCase()
       .replace(/[\[\]]/g, "") // what is this?
       .replace(/roundup/gi, "ceil") // change roundup to ceil
       .replace(/rounddown/gi, "floor") // change rowndown to floor
@@ -131,23 +120,58 @@ export default class Helpers {
       .replace(/largerEq/gi, ">=") // revert back to smaller than equal to
       .replace(/#/g, "pound_sign"); // replace pound sign
   }
+
+  static _cleanValues(valuesMap, castAsNumbers = true) {
+    if (valuesMap === undefined || valuesMap === null) return {};
+    const map = { ...valuesMap };
+    Object.keys(map).forEach(key => {
+      const val = map[key];
+      if (val === null && castAsNumbers) {
+        map[key.toLowerCase()] = 1;
+      } else if (castAsNumbers && (typeof val === "boolean" || val === "true" || val === "false")) {
+        map[key.toLowerCase()] = val === true || val === "true" ? 1 : 0;
+      } else if (!Number.isNaN(parseFloat(val))) {
+        map[key.toLowerCase()] = parseFloat(val);
+      } else {
+        map[key.toLowerCase()] = val ? val.replace(/#/g, "pound_sign") : val;
+      }
+    });
+    return map;
+  }
+
   /**
    * FIXME
    * don't think there is a good way to validate without just eval'ing
    * with the variables substituted in.
    */
   static validateFormula(formula, valuesMap) {
-    var val = null;
+    let val = null;
     try {
       val = this.calculateFormula(formula, valuesMap);
     } catch (exception) {
       return false;
     }
-    return !_.isNaN(parseInt(val));
+    return !Number.isNaN(parseInt(val));
   }
+
+  /**
+   * Evaluate the logical expression
+   *
+   * @param {string} formula
+   * @param {object} valueMap
+   * @return {boolean}
+   */
   static evalExpression(formula, valueMap) {
-    var results = this.calculateFormula(formula, valueMap);
-    return results == 1 ? true : false;
+    const cleanFormula = this._cleanFormula(formula);
+    const cleanValues = this._cleanValues(valueMap, false);
+
+    let result;
+    try {
+      result = !!math.eval(cleanFormula, cleanValues);
+    } catch (e) {
+      console.log(e, cleanFormula, cleanValues);
+    }
+    return result;
   }
 
   static union(...iterables) {
