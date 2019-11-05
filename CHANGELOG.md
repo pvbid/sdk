@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.4 (2019-11-05)
+
+Bug Fixes:
+
+- **Component:** Added a helper method for safely accessing virtual properties such as "included_count". This method shouldn't be used externally and will likely be deprecated when the component structure is refactored.
+
 ### 1.2.3 (2019-10-21)
 
 Bug Fixes:

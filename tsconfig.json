@@ -1,6 +1,9 @@
 {
+  "exclude": ["node_modules", "dist"],
   "compilerOptions": {
+    "outDir": "dist",
     "sourceMap": true,
+    "esModuleInterop": true,
     "noImplicitAny": true,
     "allowJs": true,
     "module": "commonjs",

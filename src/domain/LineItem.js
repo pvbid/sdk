@@ -1,19 +1,14 @@
-import {
-  isBoolean,
-  each,
-  round,
-  isUndefined,
-  isArray,
-  reduce,
-  assign,
-  isEmpty,
-  isNil,
-  xor,
-  pickBy,
-  cloneDeep,
-  includes,
-  pull,
-} from "lodash";
+import isBoolean from "lodash/isBoolean";
+import each from "lodash/each";
+import round from "lodash/round";
+import isUndefined from "lodash/isUndefined";
+import isEmpty from "lodash/isEmpty";
+import isNil from "lodash/isNil";
+import xor from "lodash/xor";
+import pickBy from "lodash/pickBy";
+import cloneDeep from "lodash/cloneDeep";
+import includes from "lodash/includes";
+import pull from "lodash/pull";
 import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
@@ -654,12 +649,9 @@ export default class LineItem extends BidEntity {
 
       // If initially empty, the .config can be interpreted as an array.
       // This line converts the array to an object.
-      if (isArray(this._data.config.overrides)) {
-        this._data.config.overrides = reduce(
-          this._data.config.overrides,
-          function(o, k) {
-            return assign(o, k);
-          },
+      if (Array.isArray(this._data.config.overrides)) {
+        this._data.config.overrides = this._data.config.overrides.reduce(
+          (o, k) => Object.assign(o, { [k]: true }),
           {}
         );
       }
