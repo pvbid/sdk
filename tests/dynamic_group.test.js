@@ -90,7 +90,7 @@ describe("Dynamic Groups", () => {
     });
 
     it("should sum the cost correctly", async () => {
-      await assessChangeAsync(group, () => {
+      await assessChangeAsync(bid, () => {
         lineItem.cost = 50;
       });
 

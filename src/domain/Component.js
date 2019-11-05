@@ -1,871 +1,903 @@
-import _ from "lodash";
-import Helpers from "../utils/Helpers";
+import cloneDeep from "lodash/cloneDeep";
+import round from "lodash/round";
+import xor from "lodash/xor";
+import each from "lodash/each";
+import pull from "lodash/pull";
+import isEqual from "lodash/isEqual";
+import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
+import Helpers from "@/utils/Helpers";
 import BidEntity from "./BidEntity";
-import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
 
 /**
  * Component Class
  */
 export default class Component extends BidEntity {
+  /**
+   * Creates an instance of Component.
+   * @param {object} componentData - structured component data
+   * @param {Bid} bid - The bid in which the component belongs to.
+   */
+  constructor(componentData, bid) {
+    super();
     /**
-     * Creates an instance of Component.
-     * @param {object} componentData - structured component data
-     * @param {Bid} bid - The bid in which the component belongs to.
+     * Reference to the bid that the component belongs to.
+     * @type {Bid}
      */
-    constructor(componentData, bid) {
-        super(25);
-        /**
-         * Reference to the bid that the component belongs to.
-         * @type {Bid}
-         */
-        this.bid = bid;
-        this._original = _.cloneDeep(componentData);
-        this._data = componentData;
+    this.bid = bid;
+    this._original = cloneDeep(componentData);
+    this._data = componentData;
+  }
+
+  /**
+   * The summed cost from the nested line items.
+   *
+   * @type {number}
+   */
+  get cost() {
+    return this._data.cost;
+  }
+
+  /**
+   * @type {number}
+   */
+  set cost(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.cost) {
+      this._applyComponentValue("cost", this._data.cost, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * The summed taxable cost from the nested line items.
+   *
+   * @type {number}
+   */
+  get taxableCost() {
+    return this._data.taxable_cost;
+  }
+
+  /**
+   * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
+   *
+   * @type {number}
+   */
+  set taxableCost(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.taxable_cost) {
+      this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * The average tax percentage from the nested line items.
+   *
+   * @type {number}
+   */
+  get taxPercent() {
+    return this._data.tax_percent;
+  }
+
+  /**
+   * @type {number}
+   */
+  set taxPercent(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
+      this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * @type {number}
+   */
+  get tax() {
+    return this._data.tax;
+  }
+
+  /**
+   * @type {number}
+   */
+  set tax(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
+      this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * Cost With Tax
+   * @type {number}
+   */
+  get costWithTax() {
+    return this.tax + this.cost;
+  }
+
+  /**
+   * @type {number}
+   */
+  get markup() {
+    return this._data.markup;
+  }
+
+  /**
+   * @type {number}
+   */
+  set markup(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup) {
+      this._applyComponentValue("markup", this._data.markup, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * @type {number}
+   */
+  get markupPercent() {
+    return this._data.markup_percent;
+  }
+
+  /**
+   * @type {number}
+   */
+  set markupPercent(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup_percent) {
+      this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * @type {number}
+   */
+  get laborHours() {
+    return this._data.labor_hours;
+  }
+
+  /**
+   * @type {number}
+   */
+  set laborHours(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.labor_hours) {
+      this._applyComponentValue("laborHours", this._data.labor_hours, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * @type {number}
+   */
+  get laborCost() {
+    return this._data.labor_cost;
+  }
+
+  /**
+   * @type {number}
+   */
+  get nonLaborCost() {
+    return this._data.non_labor_cost;
+  }
+
+  /**
+   * Price Property
+   * @type {number}
+   */
+  get price() {
+    return this._data.price;
+  }
+
+  /**
+   * @type {number}
+   */
+  set price(val) {
+    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.price) {
+      this._applyComponentValue("price", this._data.price, val, false);
+      this.dirty();
+      this.emit("updated");
+    }
+  }
+
+  /**
+   * Price per watt
+   * @type {number}
+   */
+  get priceWatt() {
+    if (this.bid.watts > 0) {
+      return Helpers.confirmNumber(this.price / this.bid.watts);
+    }
+    return this.price;
+  }
+
+  /**
+   * @type {number}
+   */
+  set priceWatt(val) {
+    if (Helpers.isNumber(val) && this.priceWatt !== Helpers.confirmNumber(val)) {
+      this.price = Helpers.confirmNumber(val * this.bid.watts);
+    }
+  }
+
+  /**
+   * Cost per watt
+   * @type {number}
+   */
+  get costWatt() {
+    if (this.bid.watts > 0) {
+      return Helpers.confirmNumber(this.cost / this.bid.watts);
     }
 
-    /**
-     * The summed cost from the nested line items.
-     *
-     * @type {number}
-     */
-    get cost() {
-        return this._data.cost;
+    return this.cost;
+  }
+
+  /**
+   * @type {number}
+   */
+  set costWatt(val) {
+    if (Helpers.isNumber(val) && this.costWatt !== Helpers.confirmNumber(val)) {
+      this.cost = Helpers.confirmNumber(val * this.bid.watts);
+    }
+  }
+
+  /**
+   * @type {object}
+   */
+  get config() {
+    return this._data.config;
+  }
+
+  /**
+   * @type {number}
+   */
+  get actualCost() {
+    return this._data.actual_cost;
+  }
+
+  /**
+   * @type {number}
+   */
+  set actualCost(val) {
+    this._data.actual_cost = val;
+
+    // Note: API should handle responsibility of setting confidence. Remove once when api is updated
+    if (val === null || val === "" || val === undefined) {
+      this._data.actual_cost_confidence_factor = null;
+    } else {
+      this._data.actual_cost_confidence_factor = 1;
     }
 
-    /**
-     * @type {number}
-     */
-    set cost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.cost) {
-            this._applyComponentValue("cost", this._data.cost, val, false);
-            this.dirty();
-            this.emit("updated");
+    this.dirty();
+  }
+
+  get actualCostConfidenceFactor() {
+    return this._data.actual_cost_confidence_factor;
+  }
+
+  /**
+   * @type {number}
+   */
+  get actualHours() {
+    return this._data.actual_hours;
+  }
+
+  /**
+   * @type {number}
+   */
+  set actualHours(val) {
+    this._data.actual_hours = val;
+
+    // Note: API should handle responsibility of setting confidence. Remove once when api is updated
+    if (val === null || val === "" || val === undefined) {
+      this._data.actual_hours_confidence_factor = null;
+    } else {
+      this._data.actual_hours_confidence_factor = 1;
+    }
+
+    this.dirty();
+  }
+
+  get actualHoursConfidenceFactor() {
+    return this._data.actual_hours_confidence_factor;
+  }
+
+  /**
+   * @type {number}
+   */
+  get baseAvg() {
+    return this.getVirtualPropertyValue("base_avg");
+  }
+
+  /**
+   * @type {number}
+   */
+  get wageAvg() {
+    return this.getVirtualPropertyValue("wage_avg");
+  }
+
+  /**
+   * @type {number}
+   */
+  get burdenAvg() {
+    return this.getVirtualPropertyValue("burden_avg");
+  }
+
+  /**
+   * @type {number}
+   */
+  get quantityAvg() {
+    return this.getVirtualPropertyValue("quantity_avg");
+  }
+
+  /**
+   * @type {number}
+   */
+  get perQuantityAvg() {
+    return this.getVirtualPropertyValue("per_quantity_avg");
+  }
+
+  /**
+   * Gets the component's group id.
+   *
+   * @type {number}
+   */
+  get componentGroupId() {
+    return this.config.component_group_id;
+  }
+
+  /**
+   * Gets the component's definition id.
+   *
+   * @type {number}
+   * @deprecated Definition ids will become obsolete in planned data structure upgrade.
+   */
+  get definitionId() {
+    return this._data.definition_id;
+  }
+
+  /**
+   * Gets the included status of the component.
+   * A component is included if it has included line items.
+   *
+   * @type {boolean}
+   */
+  get isIncluded() {
+    return this.getVirtualPropertyValue("included_count") > 0;
+  }
+
+  /**
+   * Applies a new value to the component and assesses if there is a change.
+   *
+   * @param {string} property
+   * @param {number} value
+   * @returns {boolean} Returns true if there is a change.
+   */
+  _apply(property, value) {
+    const oldValue = round(this._data[property], 4);
+    const newValue = round(Helpers.confirmNumber(value), 4);
+    if (oldValue !== newValue) {
+      this._data[property] = Helpers.confirmNumber(value);
+      this.dirty();
+
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Applies a new virtual property value to the component and returns true if there is a change.
+   *
+   * @param {string} property
+   * @param {number} value
+   * @returns {boolean}
+   */
+  _applyVirtualProperty(property, value) {
+    // Must check if config.properties exists due to not existing in legacy bids.
+    if (this._data.properties === undefined || this._data.properties === null) {
+      this._data.properties = {};
+    }
+
+    if (this._data.properties[property] === undefined) {
+      this._data.properties[property] = {
+        value: 0,
+        config: {
+          data_type: "number",
+        },
+      };
+    }
+
+    const oldValue = round(this.getVirtualPropertyValue(property), 4);
+    const newValue = round(Helpers.confirmNumber(value), 4);
+    if (oldValue !== newValue) {
+      this._data.properties[property].value = newValue;
+      this.dirty();
+
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Get the value for the key in the component's properties object
+   *
+   * @param {string} key
+   * @return {number}
+   */
+  getVirtualPropertyValue(key) {
+    const properties = this._data.properties;
+    const hasProperty = properties && properties[key];
+    return hasProperty ? Helpers.confirmNumber(properties[key].value) : 0;
+  }
+
+  /**
+   * Applies any changes to a config flag set
+   *
+   * @param {string} configProp config property name
+   * @param {string[]} newFlags flags to be set true
+   * @return {boolean} If there was a change or not
+   */
+  _applyConfigFlags(configProp, newFlags) {
+    if (!this.config[configProp] || xor(newFlags, this.config[configProp]).length > 0) {
+      this.config[configProp] = [...newFlags];
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Sets the override status for any props in the given array
+   *
+   * @param {string[]} newOverrideProps Overridden props from the assessment
+   * @return {boolean} Whether or not the overrides have changed
+   */
+  _applyOverrides(newOverrideProps) {
+    const currentOverrides = this.config.overrides
+      ? Object.keys(this.config.overrides).filter(o => this.config.overrides[o] === true)
+      : [];
+
+    if (!this.config.overrides || xor(newOverrideProps, currentOverrides).length > 0) {
+      this.config.overrides = {};
+      newOverrideProps.forEach(prop => {
+        this.config.overrides[prop] = true;
+      });
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Assess the component instance.
+   *
+   * @emits {assessing}
+   * @emits {assessed}
+   * @emits {updated}
+   */
+  assess() {
+    if (this.bid.isAssessable()) {
+      let isChanged = false;
+      let cost = 0;
+      let taxableCost = 0;
+      let price = 0;
+      let markup = 0;
+      let tax = 0;
+      let base = 0;
+      let laborHours = 0;
+      let totalLineItems = 0;
+      let totalLaborLineItems = 0;
+      let wage = 0;
+      let burden = 0;
+      let quantity = 0;
+      let perQuantity = 0;
+      let laborCosts = 0;
+      let nonLaborCosts = 0;
+      let predictedValues = new Set();
+      let hasNullDependencyValues = new Set();
+      let overrides = new Set();
+
+      each(this.getLineItems(), lineItem => {
+        if (!lineItem) return true;
+
+        if (!lineItem.isIncluded) {
+          overrides = new Set([
+            ...overrides,
+            ...this._checkProperties(["is_included"], lineItem.isOverridden.bind(lineItem)),
+          ]);
+          return true;
         }
-    }
 
-    /**
-     * The summed taxable cost from the nested line items.
-     *
-     * @type {number}
-     */
-    get taxableCost() {
-        return this._data.taxable_cost;
-    }
+        totalLineItems += 1;
+        const dependantValuesMap = []; // track line item values used in component
 
-    /**
-     * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
-     *
-     * @type {number}
-     */
-    set taxableCost(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.taxable_cost) {
-            this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
+        if (lineItem.isLabor()) {
+          totalLaborLineItems += 1;
+          laborCosts += lineItem.cost;
+          laborHours += lineItem.laborHours;
+          if (this.bid.entities.variables().taxable_labor.value) {
+            taxableCost += lineItem.cost;
+          }
 
-    /**
-     * The average tax percentage from the nested line items.
-     *
-     * @type {number}
-     */
-    get taxPercent() {
-        return this._data.tax_percent;
-    }
-
-    /**
-     * @type {number}
-     */
-    set taxPercent(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
-            this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * @type {number}
-     */
-    get tax() {
-        return this._data.tax;
-    }
-
-    /**
-     * @type {number}
-     */
-    set tax(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.tax_percent) {
-            this._applyComponentValue("taxPercent", this._data.tax_percent, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * Cost With Tax
-     * @type {number}
-     */
-    get costWithTax() {
-        return this.tax + this.cost;
-    }
-
-    /**
-     * @type {number}
-     */
-    get markup() {
-        return this._data.markup;
-    }
-
-    /**
-     * @type {number}
-     */
-    set markup(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup) {
-            this._applyComponentValue("markup", this._data.markup, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * @type {number}
-     */
-    get markupPercent() {
-        return this._data.markup_percent;
-    }
-
-    /**
-     * @type {number}
-     */
-    set markupPercent(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup_percent) {
-            this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * @type {number}
-     */
-    get laborHours() {
-        return this._data.labor_hours;
-    }
-
-    /**
-     * @type {number}
-     */
-    set laborHours(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.labor_hours) {
-            this._applyComponentValue("laborHours", this._data.labor_hours, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * @type {number}
-     */
-    get laborCost() {
-        return this._data.labor_cost;
-    }
-
-    /**
-     * @type {number}
-     */
-    get nonLaborCost() {
-        return this._data.non_labor_cost;
-    }
-
-    /**
-     * Price Property
-     * @type {number}
-     */
-    get price() {
-        return this._data.price;
-    }
-
-    /**
-     * @type {number}
-     */
-    set price(val) {
-        if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.price) {
-            this._applyComponentValue("price", this._data.price, val, false);
-            this.dirty();
-            this.emit("updated");
-        }
-    }
-
-    /**
-     * Price per watt
-     * @type {number}
-     */
-    get priceWatt() {
-        if (this.bid.watts > 0) {
-            return Helpers.confirmNumber(this.price / this.bid.watts);
-        }
-        return this.price;
-    }
-
-    /**
-     * @type {number}
-     */
-    set priceWatt(val) {
-        if (Helpers.isNumber(val) && this.priceWatt !== Helpers.confirmNumber(val)) {
-            this.price = Helpers.confirmNumber(val * this.bid.watts);
-        }
-    }
-
-    /**
-     * Cost per watt
-     * @type {number}
-     */
-    get costWatt() {
-        if (this.bid.watts > 0) {
-            return Helpers.confirmNumber(this.cost / this.bid.watts);
-        }
-
-        return this.cost;
-    }
-
-    /**
-     * @type {number}
-     */
-    set costWatt(val) {
-        if (Helpers.isNumber(val) && this.costWatt !== Helpers.confirmNumber(val)) {
-            this.cost = Helpers.confirmNumber(val * this.bid.watts);
-        }
-    }
-
-    /**
-     * @type {object}
-     */
-    get config() {
-        return this._data.config;
-    }
-
-    /**
-     * @type {number}
-     */
-    get actualCost() {
-        return this._data.actual_cost;
-    }
-
-    /**
-     * @type {number}
-     */
-    set actualCost(val) {
-        this._data.actual_cost = val;
-
-        // Note: API should handle responsibility of setting confidence. Remove once when api is updated
-        if (val === null || val === "" || val === undefined) {
-            this._data.actual_cost_confidence_factor = null;
+          dependantValuesMap.push(["cost", "labor_cost"], "labor_hours");
         } else {
-            this._data.actual_cost_confidence_factor = 1;
+          nonLaborCosts += lineItem.cost;
+          taxableCost += lineItem.cost;
+
+          dependantValuesMap.push(["cost", "non_labor_cost"], ["cost", "taxable_cost"]);
         }
 
-        this.dirty();
+        cost += lineItem.cost;
+        price += lineItem.price;
+        markup += lineItem.markup;
+        tax += lineItem.tax;
+        base += lineItem.base;
+        wage += lineItem.wage;
+        burden += lineItem.burden;
+        quantity += lineItem.quantity;
+        perQuantity += lineItem.perQuantity;
+
+        dependantValuesMap.push(
+          "cost",
+          "price",
+          "markup",
+          "tax",
+          "base",
+          "wage",
+          "burden",
+          "quantity",
+          "per_quantity"
+        );
+
+        predictedValues = new Set([
+          ...predictedValues,
+          ...this._checkProperties(dependantValuesMap, lineItem.isPredicted.bind(lineItem)),
+        ]);
+        hasNullDependencyValues = new Set([
+          ...hasNullDependencyValues,
+          ...this._checkProperties(dependantValuesMap, lineItem.hasNullDependency.bind(lineItem)),
+        ]);
+        overrides = new Set([
+          ...overrides,
+          ...this._checkProperties(
+            [...dependantValuesMap, "is_included"],
+            lineItem.isOverridden.bind(lineItem)
+          ),
+        ]);
+      });
+
+      each(this.getSubComponents(), subComponent => {
+        subComponent.assess();
+        cost += Helpers.confirmNumber(subComponent.cost);
+        price += Helpers.confirmNumber(subComponent.price);
+        markup += Helpers.confirmNumber(subComponent.markup);
+        tax += Helpers.confirmNumber(subComponent.tax);
+        taxableCost += Helpers.confirmNumber(subComponent.taxableCost);
+        laborHours += Helpers.confirmNumber(subComponent.laborHours);
+        laborCosts += Helpers.confirmNumber(subComponent.laborCost);
+        nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
+        base += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("base"));
+        wage += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("wage"));
+        burden += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("burden"));
+        quantity += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("quantity"));
+        perQuantity += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("per_quantity"));
+        totalLineItems += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("included_count"));
+        totalLaborLineItems += Helpers.confirmNumber(
+          subComponent.getVirtualPropertyValue("included_labor_count")
+        );
+
+        const valuesToCheck = [
+          "cost",
+          "price",
+          "markup",
+          "tax",
+          "taxable_cost",
+          "labor_hours",
+          "labor_cost",
+          "non_labor_cost",
+          "base",
+          "wage",
+          "burden",
+          "quantity",
+          "per_quantity",
+        ];
+        predictedValues = new Set([
+          ...predictedValues,
+          ...this._checkProperties(valuesToCheck, subComponent.isPredicted.bind(subComponent)),
+        ]);
+        hasNullDependencyValues = new Set([
+          ...hasNullDependencyValues,
+          ...this._checkProperties(valuesToCheck, subComponent.hasNullDependency.bind(subComponent)),
+        ]);
+        overrides = new Set([
+          ...overrides,
+          ...this._checkProperties(
+            [...valuesToCheck, "is_included"],
+            subComponent.isOverridden.bind(subComponent)
+          ),
+        ]);
+      });
+
+      let markupPercent = 0;
+      if (this.bid.includeTaxInMarkup()) {
+        const adjCost = cost + tax;
+        markupPercent = adjCost > 0 ? (markup / adjCost) * 100 : 0;
+      } else {
+        markupPercent = cost > 0 ? (markup / cost) * 100 : 0;
+      }
+
+      const taxPercent = taxableCost > 0 ? (tax / taxableCost) * 100 : 0;
+      const baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
+      const wageAvg = totalLaborLineItems > 0 ? wage / totalLaborLineItems : 0;
+      const burdenAvg = totalLaborLineItems > 0 ? burden / totalLaborLineItems : 0;
+      const quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
+      const perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
+
+      isChanged = this._apply("cost", cost) || isChanged;
+      isChanged = this._apply("price", price) || isChanged;
+      isChanged = this._apply("taxable_cost", taxableCost) || isChanged;
+      isChanged = this._apply("tax", tax) || isChanged;
+      isChanged = this._apply("markup", markup) || isChanged;
+      isChanged = this._apply("tax_percent", taxPercent) || isChanged;
+      isChanged = this._apply("markup_percent", markupPercent) || isChanged;
+      isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
+      isChanged = this._apply("labor_hours", laborHours) || isChanged;
+      isChanged = this._apply("labor_cost", laborCosts) || isChanged;
+
+      isChanged = this._applyConfigFlags("predicted_values", [...predictedValues.values()]) || isChanged;
+      isChanged =
+        this._applyConfigFlags("undefined_prop_flags", [...hasNullDependencyValues.values()]) || isChanged;
+      isChanged = this._applyOverrides([...overrides.values()]) || isChanged;
+
+      this._applyVirtualProperty("base", base);
+      this._applyVirtualProperty("burden", burden);
+      this._applyVirtualProperty("wage", wage);
+      this._applyVirtualProperty("quantity", quantity);
+      this._applyVirtualProperty("per_quantity", perQuantity);
+      this._applyVirtualProperty("included_labor_count", totalLaborLineItems);
+      isChanged = this._applyVirtualProperty("included_count", totalLineItems) || isChanged;
+      this._applyVirtualProperty("base_avg", baseAvg);
+      this._applyVirtualProperty("wage_avg", wageAvg);
+      this._applyVirtualProperty("burden_avg", burdenAvg);
+      this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
+      this._applyVirtualProperty("quantity_avg", quantityAvg);
+
+      if (isChanged) this.emit("updated");
+
+      this.emit("assessed");
     }
+  }
 
-    get actualCostConfidenceFactor() {
-        return this._data.actual_cost_confidence_factor;
-    }
+  /**
+   * Gets a list of bid entities that relies on the component instance.
+   *
+   * @returns {BidEntity[]}
+   */
+  dependants() {
+    return this.bid.entities.getDependants("component", this.id);
+  }
 
-    /**
-     * @type {number}
-     */
-    get actualHours() {
-        return this._data.actual_hours;
-    }
+  /**
+   * Removes a line item from the component.
+   *
+   * @param {number} lineItemId
+   */
+  removeLineItem(lineItemId) {
+    pull(this.config.line_items, lineItemId);
+    this.dirty();
+    this.assess();
+  }
 
-    /**
-     * @type {number}
-     */
-    set actualHours(val) {
-        this._data.actual_hours = val;
-
-        // Note: API should handle responsibility of setting confidence. Remove once when api is updated
-        if (val === null || val === "" || val === undefined) {
-            this._data.actual_hours_confidence_factor = null;
-        } else {
-            this._data.actual_hours_confidence_factor = 1;
-        }
-
-        this.dirty();
-    }
-
-    get actualHoursConfidenceFactor() {
-        return this._data.actual_hours_confidence_factor;
-    }
-
-    /**
-     * @type {number}
-     */
-    get baseAvg() {
-        if (this._data.properties && this._data.properties.base_avg) {
-            return this._data.properties.base_avg.value;
-        } return 0;
-    }
-
-    /**
-     * @type {number}
-     */
-    get wageAvg() {
-        if (this._data.properties && this._data.properties.wage_avg) {
-            return this._data.properties.wage_avg.value;
-        } return 0;
-    }
-
-    /**
-     * @type {number}
-     */
-    get burdenAvg() {
-        if (this._data.properties && this._data.properties.burden_avg) {
-            return this._data.properties.burden_avg.value;
-        } return 0;
-    }
-
-    /**
-     * @type {number}
-     */
-    get quantityAvg() {
-        if (this._data.properties && this._data.properties.per_quantity) {
-            return this._data.properties.per_quantity.value;
-        } return 0;
-    }
-
-    /**
-     * @type {number}
-     */
-    get perQuantityAvg() {
-        if (this._data.properties && this._data.properties.per_quantity_avg) {
-            return this._data.properties.per_quantity_avg.value;
-        } return 0;
-    }
-
-    /**
-     * Gets the component's group id.
-     *
-     * @type {number}
-     */
-    get componentGroupId() {
-        return this.config.component_group_id;
-    }
-
-    /**
-     * Gets the component's definition id.
-     *
-     * @type {number}
-     * @deprecated Definition ids will become obsolete in planned data structure upgrade.
-     */
-    get definitionId() {
-        return this._data.definition_id;
-    }
-
-    /**
-     * Gets the included status of the component. 
-     * A component is included if it has included line items.
-     *
-     * @type {boolean}
-     */
-    get isIncluded() {
-        return this._data.properties &&
-            this._data.properties.included_count &&
-            this._data.properties.included_count.value > 0;
-    }
-
-    /**
-     * Applies a new value to the component and assesses if there is a change.
-     *
-     * @param {string} property
-     * @param {number} value
-     * @returns {boolean} Returns true if there is a change.
-     */
-    _apply(property, value) {
-        const oldValue = _.round(this._data[property], 4);
-        const newValue = _.round(Helpers.confirmNumber(value), 4);
-        if (oldValue !== newValue) {
-            this._data[property] = Helpers.confirmNumber(value);
-            this.dirty();
-
-            return true;
-        } return false;
-    }
-
-    /**
-     * Applies a new virtual property value to the component and returns true if there is a change.
-     *
-     * @param {string} property
-     * @param {number} value
-     * @returns {boolean}
-     */
-    _applyVirtualProperty(property, value) {
-        // Must check if config.properties exists due to not existing in legacy bids.
-        if (_.isUndefined(this._data.properties) || _.isNull(this._data.properties)) {
-            this._data.properties = {};
-        }
-
-        if (_.isUndefined(this._data.properties[property])) {
-            this._data.properties[property] = {
-                value: 0,
-                config: {
-                    data_type: "number",
-                },
-            };
-        }
-
-        const oldValue = _.round(this._data.properties[property].value, 4);
-        const newValue = _.round(Helpers.confirmNumber(value), 4);
-        if (oldValue !== newValue) {
-            this._data.properties[property].value = newValue;
-            this.dirty();
-
-            return true;
-        } return false;
-    }
-
-    /**
-     * Applies any changes to a config flag set
-     *
-     * @param {string} configProp config property name
-     * @param {string[]} newFlags flags to be set true
-     * @return {boolean} If there was a change or not
-     */
-    _applyConfigFlags(configProp, newFlags) {
-        if (!this.config[configProp] || _.xor(newFlags, this.config[configProp]).length > 0) {
-            this.config[configProp] = [...newFlags];
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Sets the override status for any props in the given array
-     *
-     * @param {string[]} newOverrideProps Overriden props from the assessment
-     * @return {boolean} Whether or not the overrides have changed
-     */
-    _applyOverrides(newOverrideProps) {
-        const currentOverrides = this.config.overrides
-            ? Object.keys(this.config.overrides).filter(o => this.config.overrides[o] === true)
-            : [];
-
-        if (!this.config.overrides || _.xor(newOverrideProps, currentOverrides).length > 0) {
-            this.config.overrides = {};
-            newOverrideProps.forEach((prop) => {
-                this.config.overrides[prop] = true;
-            });
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Assess the component instance.
-     *
-     * @emits {assessing}
-     * @emits {assessed}
-     * @emits {updated}
-     * @param {?BidEntity} [dependency]  - The calling dependency.
-     */
-    assess(dependency) {
-        if (this.bid.isAssessable()) {
-            let isChanged = false;
-            let cost = 0;
-            let taxableCost = 0;
-            let price = 0;
-            let markup = 0;
-            let tax = 0;
-            let base = 0;
-            let laborHours = 0;
-            let totalLineItems = 0;
-            let totalLaborLinetItems = 0;
-            let wage = 0;
-            let burden = 0;
-            let quantity = 0;
-            let perQuantity = 0;
-            let laborCosts = 0;
-            let nonLaborCosts = 0;
-            let predictedValues = new Set();
-            let hasNullDependencyValues = new Set();
-            let overrides = new Set();
-
-            _.each(this.getLineItems(), (lineItem) => {
-                if (!lineItem) return true;
-
-                if (!lineItem.isIncluded) {
-                    overrides = new Set([...overrides, ...this._checkProperties(["is_included"], lineItem.isOverridden.bind(lineItem))]);
-                    return true;
-                }
-
-                totalLineItems += 1;
-                const dependantValuesMap = []; // track line item values used in component
-
-                if (lineItem.isLabor()) {
-                    totalLaborLinetItems += 1;
-                    laborCosts += lineItem.cost;
-                    laborHours += lineItem.laborHours;
-                    if (this.bid.entities.variables().taxable_labor.value) {
-                        taxableCost += lineItem.cost;
-                    }
-
-                    dependantValuesMap.push(["cost", "labor_cost"], "labor_hours");
-                } else {
-                    nonLaborCosts += lineItem.cost;
-                    taxableCost += lineItem.cost;
-
-                    dependantValuesMap.push(["cost", "non_labor_cost"], ["cost", "taxable_cost"]);
-                }
-
-                cost += lineItem.cost;
-                price += lineItem.price;
-                markup += lineItem.markup;
-                tax += lineItem.tax;
-                base += lineItem.base;
-                wage += lineItem.wage;
-                burden += lineItem.burden;
-                quantity += lineItem.quantity;
-                perQuantity += lineItem.perQuantity;
-
-                dependantValuesMap.push("cost", "price", "markup", "tax", "base", "wage", "burden", "quantity", "per_quantity");
-
-                predictedValues = new Set([
-                    ...predictedValues,
-                    ...this._checkProperties(dependantValuesMap, lineItem.isPredicted.bind(lineItem)),
-                ]);
-                hasNullDependencyValues = new Set([
-                    ...hasNullDependencyValues,
-                    ...this._checkProperties(dependantValuesMap, lineItem.hasNullDependency.bind(lineItem)),
-                ]);
-                overrides = new Set([
-                    ...overrides,
-                    ...this._checkProperties(
-                        [...dependantValuesMap, "is_included"],
-                        lineItem.isOverridden.bind(lineItem)
-                    ),
-                ]);
-            });
-
-            _.each(this.getSubComponents(), (subComponent) => {
-                subComponent.assess();
-                cost += Helpers.confirmNumber(subComponent.cost);
-                price += Helpers.confirmNumber(subComponent.price);
-                markup += Helpers.confirmNumber(subComponent.markup);
-                tax += Helpers.confirmNumber(subComponent.tax);
-                taxableCost += Helpers.confirmNumber(subComponent.taxableCost);
-                laborHours += Helpers.confirmNumber(subComponent.laborHours);
-                laborCosts += Helpers.confirmNumber(subComponent.laborCost);
-                nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
-                base += Helpers.confirmNumber(subComponent._data.properties.base.value);
-                wage += Helpers.confirmNumber(subComponent._data.properties.wage.value);
-                burden += Helpers.confirmNumber(subComponent._data.properties.burden.value);
-                quantity += Helpers.confirmNumber(subComponent._data.properties.quantity.value);
-                perQuantity += Helpers.confirmNumber(subComponent._data.properties.per_quantity.value);
-                totalLineItems += Helpers.confirmNumber(subComponent._data.properties.included_count.value);
-                totalLaborLinetItems += Helpers.confirmNumber(subComponent._data.properties.included_labor_count.value);
-
-                const valuesToCheck = ["cost", "price", "markup", "tax", "taxable_cost", "labor_hours", "labor_cost", "non_labor_cost", "base", "wage", "burden", "quantity", "per_quantity"];
-                predictedValues = new Set([
-                    ...predictedValues,
-                    ...this._checkProperties(valuesToCheck, subComponent.isPredicted.bind(subComponent)),
-                ]);
-                hasNullDependencyValues = new Set([
-                    ...hasNullDependencyValues,
-                    ...this._checkProperties(valuesToCheck, subComponent.hasNullDependency.bind(subComponent)),
-                ]);
-                overrides = new Set([
-                    ...overrides,
-                    ...this._checkProperties([...valuesToCheck, "is_included"], subComponent.isOverridden.bind(subComponent)),
-                ]);
-            });
-
-            let markupPercent = 0;
-            if (this.bid.includeTaxInMarkup()) {
-                const adjCost = cost + tax;
-                markupPercent = adjCost > 0 ? markup / adjCost * 100 : 0;
-            } else {
-                markupPercent = cost > 0 ? markup / cost * 100 : 0;
-            }
-
-            const taxPercent = taxableCost > 0 ? tax / taxableCost * 100 : 0;
-            const baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
-            const wageAvg = totalLaborLinetItems > 0 ? wage / totalLaborLinetItems : 0;
-            const burdenAvg = totalLaborLinetItems > 0 ? burden / totalLaborLinetItems : 0;
-            const quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
-            const perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
-
-            isChanged = this._apply("cost", cost) || isChanged;
-            isChanged = this._apply("price", price) || isChanged;
-            isChanged = this._apply("taxable_cost", taxableCost) || isChanged;
-            isChanged = this._apply("tax", tax) || isChanged;
-            isChanged = this._apply("markup", markup) || isChanged;
-            isChanged = this._apply("tax_percent", taxPercent) || isChanged;
-            isChanged = this._apply("markup_percent", markupPercent) || isChanged;
-            isChanged = this._apply("non_labor_cost", nonLaborCosts) || isChanged;
-            isChanged = this._apply("labor_hours", laborHours) || isChanged;
-            isChanged = this._apply("labor_cost", laborCosts) || isChanged;
-
-            isChanged = this._applyConfigFlags("predicted_values", [...predictedValues.values()]) || isChanged;
-            isChanged = this._applyConfigFlags("undefined_prop_flags", [...hasNullDependencyValues.values()]) || isChanged;
-            isChanged = this._applyOverrides([...overrides.values()]) || isChanged;
-
-            this._applyVirtualProperty("base", base);
-            this._applyVirtualProperty("burden", burden);
-            this._applyVirtualProperty("wage", wage);
-            this._applyVirtualProperty("quantity", quantity);
-            this._applyVirtualProperty("per_quantity", perQuantity);
-            this._applyVirtualProperty("included_labor_count", totalLaborLinetItems);
-            isChanged = this._applyVirtualProperty("included_count", totalLineItems) || isChanged;
-            this._applyVirtualProperty("base_avg", baseAvg);
-            this._applyVirtualProperty("wage_avg", wageAvg);
-            this._applyVirtualProperty("burden_avg", burdenAvg);
-            this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
-            this._applyVirtualProperty("quantity_avg", quantityAvg);
-
-            if (isChanged) this.emit("updated");
-
-            this.emit("assessed");
-        }
-    }
-
-    /**
-     * Gets a list of bid entities that relies on the component instance.
-     *
-     * @returns {BidEntity[]}
-     */
-    dependants() {
-        return this.bid.entities.getDependants("component", this.id);
-    }
-
-    /**
-     * Removes a line item from the component.
-     *
-     * @param {number} lineItemId
-     */
-    removeLineItem(lineItemId) {
-        _.pull(this.config.line_items, lineItemId);
-        this.dirty();
-        this.assess();
-    }
-
-    /**
-     * Binds the "updated" event for all dependant bid entities.
-     */
-    bind() {
-        for (const lineItemId of this.config.line_items) {
-            const lineItem = this.bid.entities.lineItems(lineItemId);
-            if (lineItem) {
-                lineItem.on("updated", `component.${this.id}`, (requesterId, self) => {
-                    waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.lineItem.${requesterId}`);
-                });
-            }
-        }
-
-        _.each(this.getSubComponents(), (c) => {
-            c.onDelay("updated", 5, `component.${this.id}`, (requesterId, self) => {
-                waitForFinalEvent(() => this.assess(self), 5, `bid.${this.id}.${requesterId}`);
-            });
+  /**
+   * Binds the "updated" event for all dependant bid entities.
+   */
+  bind() {
+    for (const lineItemId of this.config.line_items) {
+      const lineItem = this.bid.entities.lineItems(lineItemId);
+      if (lineItem) {
+        lineItem.on("updated", `component.${this.id}`, requesterId => {
+          waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.lineItem.${requesterId}`);
         });
+      }
     }
 
-    /**
-     * Gets an array of nested of subcomponents.
-     *
-     * @return {Component[]}
-     */
-    getSubComponents() {
-        const components = [];
+    each(this.getSubComponents(), c => {
+      c.onDelay("updated", 5, `component.${this.id}`, requesterId => {
+        waitForFinalEvent(() => this.assess(), 5, `bid.${this.id}.${requesterId}`);
+      });
+    });
+  }
 
-        _.each(this.config.components, (subComponentId) => {
-            components.push(this.bid.entities.components(subComponentId));
-        });
+  /**
+   * Gets an array of nested of subcomponents.
+   *
+   * @return {Component[]}
+   */
+  getSubComponents() {
+    const components = [];
 
-        return components;
+    each(this.config.components, subComponentId => {
+      components.push(this.bid.entities.components(subComponentId));
+    });
+
+    return components;
+  }
+
+  /**
+   * Gets the component's parent component, if exists.
+   *
+   * @returns {?Component}
+   */
+  getParent() {
+    if (this.config.is_nested) {
+      return this.bid.entities.components(this.config.parent_component_id);
+    }
+    return null;
+  }
+
+  /**
+   * Gets the level at which the component is nested: 0, 1, 2.
+   *
+   * @returns {number}
+   */
+  getNestedLevel() {
+    const parent = this.getParent();
+    if (parent) {
+      return parent.config.is_nested ? 2 : 1;
+    }
+    return 0;
+  }
+
+  /**
+   * Determines of component is a top parent component, in which is not nested.
+   *
+   * @returns {boolean}
+   */
+  isParent() {
+    return !this.config.is_nested;
+  }
+
+  /**
+   * Determine if any of the components children have been overridden
+   *
+   * @param {string} [property=null]
+   * @return {boolean}
+   */
+  isOverridden(property = null) {
+    if (!this.config.overrides) {
+      this.config.overrides = {};
     }
 
-    /**
-     * Gets the component's parent component, if exists.
-     *
-     * @returns {?Component}
-     */
-    getParent() {
-        if (this.config.is_nested) {
-            return this.bid.entities.components(this.config.parent_component_id);
-        } return null;
+    return property === null
+      ? Object.values(this.config.overrides).some(o => o)
+      : !!this.config.overrides[property];
+  }
+
+  /**
+   * Gets an array of nested line items.
+   *
+   * @param  {boolean} [includeSubComponents=false]
+   * @return {array} Returns an array of line items in component.
+   */
+  getLineItems(includeSubComponents = false) {
+    let lines = [];
+
+    for (const lineItemId of this.config.line_items) {
+      const lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
+
+      if (lineItem) lines.push(lineItem);
     }
 
-    /**
-     * Gets the level at which the component is nested: 0, 1, 2.
-     *
-     * @returns {number}
-     */
-    getNestedLevel() {
-        const parent = this.getParent();
-        if (parent) {
-            return parent.config.is_nested ? 2 : 1;
-        } return 0;
+    if (includeSubComponents) {
+      for (const subComponentId of this.config.components) {
+        const subComponent = this.bid.entities.components(subComponentId);
+        lines = lines.concat(subComponent.getLineItems(includeSubComponents));
+      }
     }
 
-    /**
-     * Determines of component is a top parent component, in which is not nested.
-     *
-     * @returns {boolean}
-     */
-    isParent() {
-        return !this.config.is_nested;
+    return lines;
+  }
+
+  /**
+   * Sets the include status for all nested line items.
+   *
+   * @param {boolean} isIncluded
+   */
+  setIncludeStatus(isIncluded) {
+    if (this.bid.isAssessable()) {
+      const lineItems = this.getLineItems(true);
+
+      each(lineItems, lineItem => {
+        lineItem.isIncluded = isIncluded;
+      });
     }
+  }
 
-    /**
-     * Determine if any of the components children have been overriden
-     *
-     * @param {string} [property=null]
-     * @return {boolean}
-     */
-    isOverridden(property = null) {
-        if (!this.config.overrides) {
-            this.config.overrides = {};
-        }
+  /**
+   * Check whether a given value is predicted or not
+   *
+   * @param {string} value The value to check the prediction status of
+   * @return {boolean}
+   */
+  isPredicted(value) {
+    const hasPredictions = !!(this.config.predicted_values && this.config.predicted_values.length);
+    if (!value) return hasPredictions;
+    return hasPredictions && this.config.predicted_values.indexOf(value) >= 0;
+  }
 
-        return property === null
-            ? Object.values(this.config.overrides).some(o => o)
-            : !!this.config.overrides[property];
+  /**
+   * Checks if a component property relied on a null dependency at any point in calculation
+   *
+   * @param {string} value The property to check
+   * @return {boolean}
+   */
+  hasNullDependency(value) {
+    const hasUndefinedProps = !!(this.config.undefined_prop_flags && this.config.undefined_prop_flags.length);
+    if (!value) return hasUndefinedProps;
+    return hasUndefinedProps && this.config.undefined_prop_flags.indexOf(value) >= 0;
+  }
+
+  /**
+   * Resets all nested line items.
+   */
+  reset() {
+    if (this.bid.isAssessable()) {
+      const lineItems = this.getLineItems(true);
+
+      each(lineItems, lineItem => {
+        lineItem.reset();
+      });
     }
+  }
 
-    /**
-     * Gets an array of nested line items.
-     *
-     * @param  {boolean} includeSubComponents
-     * @return {array} Returns an array of line items in component.
-     */
-    getLineItems(includeSubComponents) {
-        includeSubComponents = typeof includeSubComponents === "undefined" ? false : includeSubComponents;
+  /**
+   * Applies the component value change to the nested line items.
+   *
+   * @param {string} property
+   * @param {number} oldValue
+   * @param {number} newValue
+   * @param {boolean} overrideAllLineItems
+   */
+  _applyComponentValue(property, oldValue, newValue, overrideAllLineItems) {
+    newValue = Helpers.confirmNumber(newValue);
 
-        let lines = [];
+    let lineItems = this.getLineItems(true);
+    const includedLineItemsOnly = lineItems.filter(li => li.isIncluded);
 
-        for (const lineItemId of this.config.line_items) {
-            const lineItem = this.bid.entities.getBidEntity("line_item", lineItemId);
+    lineItems =
+      includedLineItemsOnly.length === 0 || overrideAllLineItems ? lineItems : includedLineItemsOnly;
 
-            if (lineItem) lines.push(lineItem);
-        }
-
-        if (includeSubComponents) {
-            for (const subComponentId of this.config.components) {
-                const subComponent = this.bid.entities.components(subComponentId);
-                lines = lines.concat(subComponent.getLineItems(includeSubComponents));
-            }
-        }
-
-        return lines;
+    for (let i = 0; i < lineItems.length; i += 1) {
+      if (["markupPercent", "taxPercent"].indexOf(property) >= 0 && parseFloat(oldValue) === 0) {
+        lineItems[i][property] = newValue;
+      } else if (Helpers.confirmNumber(oldValue) !== 0) {
+        const ratio = newValue / Helpers.confirmNumber(oldValue);
+        lineItems[i][property] = Helpers.confirmNumber(parseFloat(lineItems[i][property]) * ratio);
+      } else {
+        lineItems[i][property] = newValue / lineItems.length;
+      }
     }
+  }
 
-    /**
-     * Sets the include status for all nested line items.
-     *
-     * @param {boolean} isIncluded
-     */
-    setIncludeStatus(isIncluded) {
-        if (this.bid.isAssessable()) {
-            const lineItems = this.getLineItems(true);
+  /**
+   * Exports component internal data structure.
+   *
+   * @param {boolean} [alwaysIncludeConfig=false] Will include config object in export regardless of changed status.
+   * @return {object}
+   */
+  exportData(alwaysIncludeConfig = false) {
+    const data = cloneDeep(this._data);
+    if (!alwaysIncludeConfig && isEqual(data.config, this._original.config)) delete data.config;
 
-            _.each(lineItems, (lineItem) => {
-                lineItem.isIncluded = isIncluded;
-            });
-        }
-    }
+    return data;
+  }
 
-    /**
-     * Check whether a given value is predicted or not
-     *
-     * @param {string} value The value to check the prediction status of
-     * @return {boolean}
-     */
-    isPredicted(value) {
-        if (value) {
-            if (this.config.predicted_values && this.config.predicted_values.indexOf(value) >= 0) {
-                return true;
-            }
-            return false;
-        }
-        return this.config.predicted_values.length > 0;
-    }
-
-    /**
-     * Checks if a component property relied on a null dependency at any point in calculation
-     *
-     * @param {string} value The property to check
-     * @return {boolean}
-     */
-    hasNullDependency(value) {
-        if (value) {
-            if (this.config.undefined_prop_flags && this.config.undefined_prop_flags.indexOf(value) >= 0) {
-                return true;
-            }
-            return false;
-        }
-        return this.config.undefined_prop_flags.length > 0;
-    }
-
-    /**
-     * Resets all nested line items.
-     */
-    reset() {
-        if (this.bid.isAssessable()) {
-            const lineItems = this.getLineItems(true);
-
-            _.each(lineItems, (lineItem) => {
-                lineItem.reset();
-            });
-        }
-    }
-
-    /**
-     * Applies the component value change to the nested line items.
-     *
-     * @param {string} property
-     * @param {number} oldValue
-     * @param {number} newValue
-     * @param {boolean} overrideAllLineItems
-     */
-    _applyComponentValue(property, oldValue, newValue, overrideAllLineItems) {
-        newValue = Helpers.confirmNumber(newValue);
-
-        let lineItems = this.getLineItems(true);
-        const includedLineItemsOnly = _.filter(lineItems, li => li.isIncluded);
-
-        lineItems = includedLineItemsOnly.length === 0 || overrideAllLineItems ? lineItems : includedLineItemsOnly;
-
-        for (let i = 0; i < lineItems.length; i += 1) {
-            if (["markupPercent", "taxPercent"].indexOf(property) >= 0 && parseFloat(oldValue) === 0) {
-                lineItems[i][property] = newValue;
-            } else if (Helpers.confirmNumber(oldValue) !== 0) {
-                const ratio = newValue / Helpers.confirmNumber(oldValue);
-                lineItems[i][property] = Helpers.confirmNumber(parseFloat(lineItems[i][property]) * ratio);
-            } else {
-                lineItems[i][property] = newValue / lineItems.length;
-            }
-        }
-    }
-
-    /**
-     * Exports component internal data structure.
-     *
-     * @param {boolean} [alwaysIncludeConfig=false] Will include config object in export regardless of changed status.
-     * @returns {object}
-     */
-    exportData(alwaysIncludeConfig=false) {
-        const data = _.cloneDeep(this._data);
-        if (!alwaysIncludeConfig && _.isEqual(data.config, this._original.config)) delete data.config;
-
-        return data;
-    }
-
-    /**
-     * Flags the component and corresponding bid as dirty and to be saved.
-     */
-    dirty() {
-        this.bid.dirty();
-        super.dirty();
-    }
+  /**
+   * Flags the component and corresponding bid as dirty and to be saved.
+   */
+  dirty() {
+    this.bid.dirty();
+    super.dirty();
+  }
 }

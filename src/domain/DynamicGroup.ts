@@ -1,11 +1,12 @@
-import { cloneDeep, round } from "lodash";
-import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
-import Helpers from "../utils/Helpers";
-import BidEntity from "./BidEntity";
-import Bid from "./Bid";
-import LineItem from "./LineItem";
+import cloneDeep from "lodash/cloneDeep";
+import round from "lodash/round";
+import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import { LineItemProp } from "@/types";
+import Helpers from "@/utils/Helpers";
+import BidEntity from "./BidEntity";
 import Component from "./Component";
+import LineItem from "./LineItem";
+import Bid from "./Bid";
 
 const summableProps = [
   "cost",
@@ -647,9 +648,9 @@ export default class DynamicGroup extends BidEntity {
       if (component.isOverridden("is_included")) {
         isIncluded.is_overridden = true;
       }
-      totalIncludedLineItems += Helpers.confirmNumber(component._data.properties.included_count.value);
+      totalIncludedLineItems += Helpers.confirmNumber(component.getVirtualPropertyValue("included_count"));
       totalIncludedLaborLineItems += Helpers.confirmNumber(
-        component._data.properties.included_labor_count.value
+        component.getVirtualPropertyValue("included_labor_count")
       );
     });
 
@@ -857,9 +858,9 @@ export default class DynamicGroup extends BidEntity {
       laborHours: this._getEntityProp(c.laborHours, c, "labor_hours"),
       laborCosts: this._getEntityProp(c.laborCost, c, "labor_cost"),
       nonLaborCosts: this._getEntityProp(c.nonLaborCost, c, "non_labor_cost"),
-      base: this._getEntityProp(c._data.properties.base.value, c, "base"),
-      wage: this._getEntityProp(c._data.properties.wage.value, c, "wage"),
-      burden: this._getEntityProp(c._data.properties.burden.value, c, "burden"),
+      base: this._getEntityProp(c.getVirtualPropertyValue("base"), c, "base"),
+      wage: this._getEntityProp(c.getVirtualPropertyValue("wage"), c, "wage"),
+      burden: this._getEntityProp(c.getVirtualPropertyValue("burden"), c, "burden"),
     };
   }
 
