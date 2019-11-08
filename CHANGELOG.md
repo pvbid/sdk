@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.5 (2019-11-08)
+
+Improvements:
+
+- **Helpers:** `calculateFormula` method now accepts an `options` object. This may contain the options flag `[castValuesToNumbers=true]` which will force all given values and the formula result to a number. Set the flag to false if you wish to use/evaluate anything with booleans, strings, or nulls.
+
 ### 1.2.4 (2019-11-05)
 
 Bug Fixes:
