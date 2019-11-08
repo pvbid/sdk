@@ -47,6 +47,7 @@ export default class Helpers {
    * @returns {boolean}
    */
   static isNumber(val) {
+    if (typeof val !== "number" && typeof val !== "string") return false;
     if (Number.isFinite(val)) return true;
 
     const cleaned = +val.toString().replace(new RegExp(",", "g"), "");
@@ -86,19 +87,30 @@ export default class Helpers {
     return [];
   }
 
-  static calculateFormula(formula, valuesMap) {
+  /**
+   * Calculate the value of the given formula
+   *
+   * @param {string} formula formula to evaluate
+   * @param {Object.<string, number|boolean|string>} valuesMap
+   * @param {object} options
+   * @param {boolean} [options.castValuesToNumbers=true] flag forces all non-number values to be treated as numbers
+   * @return {number|boolean|string} the calculated value of the formula
+   */
+  static calculateFormula(formula, valuesMap, options = { castValuesToNumbers: true }) {
     if (!formula || formula === "") {
       formula = "1";
       return;
     }
     const cleanFormula = this._cleanFormula(formula);
-    const cleanValues = this._cleanValues(valuesMap, true);
+    const cleanValues = this._cleanValues(valuesMap, options.castValuesToNumbers);
 
     let result;
     try {
       result = math.eval(cleanFormula, cleanValues);
-      result = math.typeof(result) == "boolean" ? Number(result) : result;
-      result = math.isNumeric(result) && result != Infinity ? result : null;
+      if (options.castValuesToNumbers) {
+        result = math.typeof(result) == "boolean" ? Number(result) : result;
+        result = math.isNumeric(result) && result != Infinity ? result : null;
+      }
     } catch (e) {
       console.log(e, cleanFormula, cleanValues);
     }
@@ -128,10 +140,14 @@ export default class Helpers {
       const val = map[key];
       if (val === null && castAsNumbers) {
         map[key.toLowerCase()] = 1;
-      } else if (castAsNumbers && (typeof val === "boolean" || val === "true" || val === "false")) {
-        map[key.toLowerCase()] = val === true || val === "true" ? 1 : 0;
-      } else if (!Number.isNaN(parseFloat(val))) {
-        map[key.toLowerCase()] = parseFloat(val);
+      } else if (typeof val === "boolean" || val === "true" || val === "false") {
+        if (castAsNumbers) {
+          map[key.toLowerCase()] = val === true || val === "true" ? 1 : 0;
+        } else {
+          map[key.toLowerCase()] = val === true || val === "true";
+        }
+      } else if (this.isNumber(val)) {
+        map[key.toLowerCase()] = this.confirmNumber(val);
       } else {
         map[key.toLowerCase()] = val ? val.replace(/#/g, "pound_sign") : val;
       }
