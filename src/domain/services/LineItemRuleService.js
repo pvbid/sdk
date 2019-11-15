@@ -1,39 +1,38 @@
-import _ from "lodash";
-import Helpers from "../../utils/Helpers";
+import isNil from "lodash/isNil";
+import Helpers from "@/utils/Helpers";
 
 export default class LineItemRuleService {
   isIncluded(lineItem) {
-    var includeStatues = [];
+    var includeStatuses = [];
 
     if (lineItem.config.rules.length > 0) {
       for (let rule of Object.values(lineItem.config.rules)) {
         if (
           lineItem.config.rule_inclusion === "all" ||
-          (lineItem.config.rule_inclusion === "any" && !_.includes(includeStatues, true))
+          (lineItem.config.rule_inclusion === "any" && !includeStatuses.includes(true))
         ) {
-          if (this._isUsingUndefinedDependencies(rule, lineItem)) {
+          if (
+            this._isUsingUndefinedDependencies(rule, lineItem) &&
+            lineItem.bid.entities.variables().predictive_pricing.value
+          ) {
             // For predictive pricing, undefined rule references default to true because
             //  it is better for the predicted cost to come out high than low.
-            if (lineItem.bid.entities.variables().predictive_pricing.value) {
-              includeStatues.push(true);
-            } else {
-              includeStatues.push(false);
-            }
+            includeStatuses.push(true);
           } else if (rule.type === "always_include") {
-            includeStatues.push(true);
+            includeStatuses.push(true);
           } else if (rule.type === "value_expression") {
-            includeStatues.push(this._evalExpressionRule(rule, lineItem));
+            includeStatuses.push(this._evalExpressionRule(rule, lineItem));
           } else if (rule.type === "toggle_field") {
-            includeStatues.push(this._evalToggleFieldRule(rule, lineItem));
+            includeStatuses.push(this._evalToggleFieldRule(rule, lineItem));
           } else if (rule.type === "list_field") {
-            includeStatues.push(this._evalListSelectRule(rule, lineItem));
+            includeStatuses.push(this._evalListSelectRule(rule, lineItem));
           }
         }
       }
 
       return lineItem.config.rule_inclusion === "all"
-        ? !_.includes(includeStatues, false)
-        : _.includes(includeStatues, true);
+        ? !includeStatuses.includes(false)
+        : includeStatuses.includes(true);
     } else return false;
   }
 
@@ -86,7 +85,7 @@ export default class LineItemRuleService {
     // check dependencies
     for (let i = 0; i < dependencies.length; i += 1) {
       const isFullyDefined = lineItem.bid.entities.isDependencyFullyDefined(dependencies[i]);
-      const isValidValue = !_.isNil(lineItem.bid.entities.getDependencyValue(dependencies[i]));
+      const isValidValue = !isNil(lineItem.bid.entities.getDependencyValue(dependencies[i]));
       if (!isFullyDefined || !isValidValue) {
         return true;
       }
@@ -105,7 +104,7 @@ export default class LineItemRuleService {
 
     const results = Helpers.evalExpression(lineItemRule.expression, valueMap);
 
-    if (!_.isNaN(results) && _.isBoolean(results)) {
+    if (!Number.isNaN(results) && typeof results === "boolean") {
       return lineItemRule.activate_on ? results : !results;
     } else return false;
   }
@@ -115,14 +114,14 @@ export default class LineItemRuleService {
 
     toggleValue = toggleValue === "0" || toggleValue === "1" ? Boolean(parseInt(toggleValue)) : toggleValue;
 
-    if (!_.isNaN(toggleValue) && _.isBoolean(toggleValue)) {
+    if (!Number.isNaN(toggleValue) && typeof toggleValue === "boolean") {
       return lineItemRule.activate_on ? toggleValue : !toggleValue;
     } else return false;
   }
 
   _evalListSelectRule(lineItemRule, lineItem) {
     const listField = lineItem.bid.entities.getDependency(lineItemRule.dependencies.list_field);
-    const hasSelected = _.includes(lineItemRule.list_options, listField.value);
+    const hasSelected = lineItemRule.list_options.includes(listField.value);
 
     return lineItemRule.activate_on ? hasSelected : !hasSelected;
   }

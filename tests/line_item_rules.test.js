@@ -1,6 +1,13 @@
 import { loadTestProject } from "./TestProjectLoader";
 let project, bid, field, lineItem;
 
+const assessChangeAsync = async (entity, changes) => {
+  await new Promise(res => {
+    entity.once("assessed", res);
+    changes();
+  });
+};
+
 describe("Testing Line Item Rules", () => {
   beforeAll(async () => {
     project = await loadTestProject();
@@ -147,6 +154,72 @@ describe("Testing Line Item Rules", () => {
         });
         let options = field.getListOptions();
         field.value = options[0].row_id;
+      });
+    });
+  });
+
+  describe("Handle undefined dependency in expression", () => {
+    let $lineItem;
+    let $undefinedField;
+    let $wattsMetric;
+    let $originalDef;
+
+    beforeAll(() => {
+      $undefinedField = bid.entities.searchByTitle("field", "Undefined Number")[0];
+      $wattsMetric = bid.entities.searchByTitle("metric", "watts")[0];
+      $wattsMetric.value = 100;
+      $lineItem = bid.entities.searchByTitle("line_item", "On With Rule Value Expression - Watts > Wage")[0];
+      $lineItem.config.rules[0].activate_on = true;
+      $originalDef = { ...$lineItem.config.rules[0].dependencies.b };
+      $lineItem.config.rules[0].dependencies.b.type = "field";
+      $lineItem.config.rules[0].dependencies.b.bid_entity_id = $undefinedField.id;
+      $lineItem.config.rules[0].dependencies.b.field = "value";
+      $lineItem.bind();
+    });
+
+    afterAll(() => {
+      bid.entities.variables().predictive_pricing.value = false;
+      $wattsMetric.reset();
+      $lineItem.config.rules[0].dependencies.b = { ...$originalDef };
+      $lineItem.config.rules[0].expression = "a > b";
+      $lineItem.bind();
+    });
+
+    describe("Predictive pricing is 'off'", () => {
+      beforeAll(async () => {
+        bid.entities.variables().predictive_pricing.value = false;
+        await assessChangeAsync($lineItem, () => {
+          $lineItem.reset();
+        });
+      });
+
+      test("Rules should evaluate undefined dependencies as zero", async () => {
+        expect($lineItem.isIncluded).toBe(true); // 100 > 0
+
+        $lineItem.config.rules[0].expression = "a*b";
+        await assessChangeAsync($lineItem, () => {
+          $lineItem.assess();
+        });
+        expect($lineItem.isIncluded).toBe(false);
+      });
+    });
+
+    describe("Predictive pricing is 'on'", () => {
+      beforeAll(async () => {
+        bid.entities.variables().predictive_pricing.value = true;
+        await assessChangeAsync($lineItem, () => {
+          $lineItem.reset();
+        });
+      });
+
+      test("Rules should always be true", async () => {
+        expect($lineItem.isIncluded).toBe(true);
+
+        $lineItem.config.rules[0].expression = "a*b*0";
+        await assessChangeAsync($lineItem, () => {
+          $lineItem.assess();
+        });
+        expect($lineItem.isIncluded).toBe(true);
       });
     });
   });
