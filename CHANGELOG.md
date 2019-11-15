@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.6 (2019-11-15)
+
+Improvements:
+
+- **LineItem:** Rules will no longer consider whether or not their dependencies are fully defined when predictive pricing is not being used.
+
 ### 1.2.5 (2019-11-08)
 
 Improvements:
