@@ -135,6 +135,15 @@ export default class Bid extends BidEntity {
   }
 
   /**
+   * Cost including Tax
+   *
+   * @type {number}
+   */
+  get costWithTax() {
+    return this.cost + this.tax;
+  }
+
+  /**
    * Tax Percent Property
    *
    * @type {number}
