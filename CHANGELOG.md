@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.7 (2019-12-05)
+
+Features:
+
+- **Bid:** `bid.costWithTax` property is now available representing the sum of the bid's cost and tax value.
+
 ### 1.2.6 (2019-11-15)
 
 Improvements:
