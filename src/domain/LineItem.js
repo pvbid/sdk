@@ -871,7 +871,7 @@ export default class LineItem extends BidEntity {
   }
 
   _getWorkup() {
-    return !this.config.workups || !this.config.workups[0] ? null : this.config.workups[0];
+    return !this.config.workups || isEmpty(this.config.workups[0]) ? null : this.config.workups[0];
   }
 
   /**
