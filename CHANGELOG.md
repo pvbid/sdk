@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.8 (2019-12-16)
+
+Bug Fixes:
+
+- **Line Item:** Empty workups were sometimes unable to be edited.
+
 ### 1.2.7 (2019-12-05)
 
 Features:
