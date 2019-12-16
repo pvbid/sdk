@@ -871,7 +871,7 @@ export default class LineItem extends BidEntity {
   }
 
   _getWorkup() {
-    return !this.config.workups || !this.config.workups[0] ? null : this.config.workups[0];
+    return !this.config.workups || isEmpty(this.config.workups[0]) ? null : this.config.workups[0];
   }
 
   /**
@@ -1625,6 +1625,18 @@ export default class LineItem extends BidEntity {
       }
     }
     return (this._cacheValues.predictedLabor = 0);
+  }
+
+  getPredictedCostExperimental() {
+    return this._getExperimentalPrediction(this._predictionService.getCostPredictionModels());
+  }
+
+  getPredictedLaborHoursExperimental() {
+    return this._getExperimentalPrediction(this._predictionService.getLaborPredictionModels());
+  }
+
+  _getExperimentalPrediction(models) {
+    return round(Helpers.confirmNumber(this._predictionService.evaluateModelsExperimental(models)), 4);
   }
 
   /**

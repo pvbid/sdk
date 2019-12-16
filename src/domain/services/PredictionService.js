@@ -15,7 +15,16 @@ export default class PredictionService {
 
     this.bid = this.lineItem.bid;
 
-    this.models = (this.lineItem._data.prediction_model && this.lineItem._data.prediction_model.models) || [];
+    const model = this.lineItem._data.prediction_model;
+    this.models = (model && model.models) || [];
+
+    // determine if a patch can be used by the model's created_at timestamp
+    // this is necessary to prevent estimates from changing in bids that use models created before the fix was released
+    const timestamp = model ? model.created_at : undefined;
+    this._canUsePatch = {
+      ignoreNullDependency: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ignores prediction models that rely on entities that are not fully defined
+      dependencyAssemblyContext: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ensures assembly context is correctly considered
+    };
   }
 
   /**
@@ -71,13 +80,12 @@ export default class PredictionService {
   /**
    * Gets average model value weighted by r2 for the given evaluated models
    *
-   * @param {object[]} evaluatedModels The evaluated model object. Must include the model's evaluated 'value' and 'r2'
+   * @param {EvaluatedModel[]} evaluatedModels The evaluated model object. Must include the model's evaluated 'value' and 'r2'
    * @return {number} Weighted average
    */
   _getWeightedAvg(evaluatedModels) {
-    if (evaluatedModels.length === 0) {
-      return 0;
-    }
+    if (!evaluatedModels.length) return 0;
+
     const r2Sum = evaluatedModels.reduce((sum, model) => sum + model.r2, 0);
     const weightedAverage = evaluatedModels.reduce((avg, model) => {
       const weight = model.r2 / r2Sum;
@@ -89,20 +97,67 @@ export default class PredictionService {
   }
 
   /**
+   * Get the weighted average result of the prediction models based on scaled r2
+   *
+   * @param {EvaluatedModel[]} evaluatedModels
+   * @return {number}
+   */
+  _getExperimentalWeightedAvg(evaluatedModels) {
+    if (!evaluatedModels.length) return 0;
+    const weights = evaluatedModels.map(({ r2 }) => r2 * (2 ^ (r2 * 10))); // scale r2 to weight .9 twice as high as .8
+    const totalWeight = weights.reduce((total, weight) => total + weight, 0);
+    return evaluatedModels.reduce((total, { value }, i) => total + value * (weights[i] / totalWeight), 0);
+  }
+
+  /**
    * Evaluates a prediction model dependency. Returns null if it cannot be evaluated.
    *
    * @param {object} modelDependency A prediction model dependency
    * @param {string} modelDependency.type The type of dependency. Either 'field' or 'metric'
    * @param {number} modelDependency.definition_id The definition id of the dependency
    * @param {string} modelDependency.field The dependencies value field. Typically 'value'
+   * @param {boolean} isBaseModel Whether or not this is the base model for the line item.
+   *            If it is, the value should be given even if the dependency is not fully defined.
    * @return {number|null} The evaluated value of the dependency
    */
-  _getModelDependencyValue(modelDependency) {
+  _getModelDependencyValue(modelDependency, isBaseModel) {
     const { type, definition_id, field } = modelDependency;
-    const [bidEntity] = this.bid.entities.getBidEntitiesByDefId(type, definition_id);
-    return bidEntity
+    const bidEntity = this._getModelDependency(type, definition_id);
+    return bidEntity && (isBaseModel || this._canUseDependency(bidEntity, field))
       ? this.bid.entities.getDependencyValue({ type, field, bid_entity_id: bidEntity.id })
       : null;
+  }
+
+  /**
+   * Get the dependency used by the prediction model
+   *
+   * @param {string} type
+   * @param {number} definitionId
+   * @return {object|undefined} bid entity
+   */
+  _getModelDependency(type, definitionId) {
+    const entities = this.bid.entities.getBidEntitiesByDefId(type, definitionId);
+    return this._canUsePatch.dependencyAssemblyContext
+      ? entities.find(
+          entity =>
+            !entity.config.assembly_id || entity.config.assembly_id === this.lineItem.config.assembly_id
+        )
+      : entities[0];
+  }
+
+  /**
+   * Determine if the entity should be used to evaluate a prediction model.
+   * Because of the need to maintain the integrity of old estimates,
+   *  a date check is used here to ensure only prediction models generated
+   *  after the fix date get the fix
+   *
+   * @param {object} entity
+   * @param {?object} field
+   * @return {boolean}
+   */
+  _canUseDependency(entity, field = null) {
+    if (!this._canUsePatch.ignoreNullDependency) return true;
+    return !entity.hasNullDependency(field);
   }
 
   /**
@@ -122,15 +177,22 @@ export default class PredictionService {
   }
 
   /**
+   * @typedef {Object} EvaluatedModel
+   * @property {number|null} value
+   * @property {boolean} isInBounds
+   * @property {number} r2
+   */
+
+  /**
    * Evaluates a single prediction model
    *
    * @param {object} model A prediction model to evaluate
-   * @return {number|null} The result of evaluating the model
+   * @return {EvaluatedModel} The result of evaluating the model
    */
   evaluateModel(model) {
-    const dependencyValues = { a: this._getModelDependencyValue(model.dependencies.a) };
+    const dependencyValues = { a: this._getModelDependencyValue(model.dependencies.a, model.is_base) };
     if (model.dependencies.b) {
-      dependencyValues.b = this._getModelDependencyValue(model.dependencies.b);
+      dependencyValues.b = this._getModelDependencyValue(model.dependencies.b, model.is_base);
     }
 
     const hasDefinedDependencyValues = Object.values(dependencyValues).every(val => !isNil(val));
@@ -159,12 +221,34 @@ export default class PredictionService {
    * @return {number} The weighted avg of evaluating the given models
    */
   evaluateModels(models) {
+    const evaluatedModels = this._getEvaluatedModels(models);
+    return this._getWeightedAvg(this._filterByBounds(evaluatedModels));
+  }
+
+  /**
+   * Evaluate the models using an experimental weighting
+   *
+   * @param {object[]} models
+   * @return {number}
+   */
+  evaluateModelsExperimental(models) {
+    if (!models || !models.length) return 0;
+    return this._getExperimentalWeightedAvg(this._filterByBounds(this._getEvaluatedModels(models)));
+  }
+
+  /**
+   * Evaluate the given models in order of descending r2 value.
+   *
+   * @param {object[]} models
+   * @param {number} [limit=5] The maximum number of models to evaluate
+   * @return {EvaluatedModel[]}
+   */
+  _getEvaluatedModels(models, limit = 5) {
     const evaluatedModels = [];
 
-    // evaluate up to 5 models in order of highest r2 value
     const orderedModels = orderBy(models, "model.r2", "desc");
     for (let model of orderedModels) {
-      if (evaluatedModels.length < 5) {
+      if (evaluatedModels.length < limit) {
         const evaluatedModel = this.evaluateModel(model);
         if (evaluatedModel.value !== null && evaluatedModel.value !== undefined) {
           evaluatedModels.push(evaluatedModel);
@@ -172,13 +256,19 @@ export default class PredictionService {
       }
     }
 
-    const inBoundsModels = evaluatedModels.filter(evaluatedModel => evaluatedModel.isInBounds);
-    if (inBoundsModels.length > 0) {
-      return this._getWeightedAvg(inBoundsModels);
-    } else {
-      // evaluating out of bounds... TODO: indicate this to user as this could reduce the quality of prediction results
-      return this._getWeightedAvg(evaluatedModels.filter(model => model.value !== null));
-    }
+    return evaluatedModels;
+  }
+
+  /**
+   * If any models are in bounds, filter out-of-bounds models from the given models.
+   * TODO: indicate if out-of-bounds models are used as this could reduce the quality of prediction
+   *
+   * @param {EvaluatedModel[]} models
+   * @return {EvaluatedModel[]}
+   */
+  _filterByBounds(models) {
+    const inBounds = models.filter(({ isInBounds }) => isInBounds);
+    return inBounds.length > 0 ? inBounds : models.filter(({ value }) => value !== null);
   }
 
   /**
