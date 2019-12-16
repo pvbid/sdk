@@ -80,13 +80,12 @@ export default class PredictionService {
   /**
    * Gets average model value weighted by r2 for the given evaluated models
    *
-   * @param {object[]} evaluatedModels The evaluated model object. Must include the model's evaluated 'value' and 'r2'
+   * @param {EvaluatedModel[]} evaluatedModels The evaluated model object. Must include the model's evaluated 'value' and 'r2'
    * @return {number} Weighted average
    */
   _getWeightedAvg(evaluatedModels) {
-    if (evaluatedModels.length === 0) {
-      return 0;
-    }
+    if (!evaluatedModels.length) return 0;
+
     const r2Sum = evaluatedModels.reduce((sum, model) => sum + model.r2, 0);
     const weightedAverage = evaluatedModels.reduce((avg, model) => {
       const weight = model.r2 / r2Sum;
@@ -95,6 +94,19 @@ export default class PredictionService {
     }, 0);
 
     return weightedAverage;
+  }
+
+  /**
+   * Get the weighted average result of the prediction models based on scaled r2
+   *
+   * @param {EvaluatedModel[]} evaluatedModels
+   * @return {number}
+   */
+  _getExperimentalWeightedAvg(evaluatedModels) {
+    if (!evaluatedModels.length) return 0;
+    const weights = evaluatedModels.map(({ r2 }) => r2 * (2 ^ (r2 * 10))); // scale r2 to weight .9 twice as high as .8
+    const totalWeight = weights.reduce((total, weight) => total + weight, 0);
+    return evaluatedModels.reduce((total, { value }, i) => total + value * (weights[i] / totalWeight), 0);
   }
 
   /**
@@ -165,10 +177,17 @@ export default class PredictionService {
   }
 
   /**
+   * @typedef {Object} EvaluatedModel
+   * @property {number|null} value
+   * @property {boolean} isInBounds
+   * @property {number} r2
+   */
+
+  /**
    * Evaluates a single prediction model
    *
    * @param {object} model A prediction model to evaluate
-   * @return {number|null} The result of evaluating the model
+   * @return {EvaluatedModel} The result of evaluating the model
    */
   evaluateModel(model) {
     const dependencyValues = { a: this._getModelDependencyValue(model.dependencies.a, model.is_base) };
@@ -202,12 +221,34 @@ export default class PredictionService {
    * @return {number} The weighted avg of evaluating the given models
    */
   evaluateModels(models) {
+    const evaluatedModels = this._getEvaluatedModels(models);
+    return this._getWeightedAvg(this._filterByBounds(evaluatedModels));
+  }
+
+  /**
+   * Evaluate the models using an experimental weighting
+   *
+   * @param {object[]} models
+   * @return {number}
+   */
+  evaluateModelsExperimental(models) {
+    if (!models || !models.length) return 0;
+    return this._getExperimentalWeightedAvg(this._filterByBounds(this._getEvaluatedModels(models)));
+  }
+
+  /**
+   * Evaluate the given models in order of descending r2 value.
+   *
+   * @param {object[]} models
+   * @param {number} [limit=5] The maximum number of models to evaluate
+   * @return {EvaluatedModel[]}
+   */
+  _getEvaluatedModels(models, limit = 5) {
     const evaluatedModels = [];
 
-    // evaluate up to 5 models in order of highest r2 value
     const orderedModels = orderBy(models, "model.r2", "desc");
     for (let model of orderedModels) {
-      if (evaluatedModels.length < 5) {
+      if (evaluatedModels.length < limit) {
         const evaluatedModel = this.evaluateModel(model);
         if (evaluatedModel.value !== null && evaluatedModel.value !== undefined) {
           evaluatedModels.push(evaluatedModel);
@@ -215,13 +256,19 @@ export default class PredictionService {
       }
     }
 
-    const inBoundsModels = evaluatedModels.filter(evaluatedModel => evaluatedModel.isInBounds);
-    if (inBoundsModels.length > 0) {
-      return this._getWeightedAvg(inBoundsModels);
-    } else {
-      // evaluating out of bounds... TODO: indicate this to user as this could reduce the quality of prediction results
-      return this._getWeightedAvg(evaluatedModels.filter(model => model.value !== null));
-    }
+    return evaluatedModels;
+  }
+
+  /**
+   * If any models are in bounds, filter out-of-bounds models from the given models.
+   * TODO: indicate if out-of-bounds models are used as this could reduce the quality of prediction
+   *
+   * @param {EvaluatedModel[]} models
+   * @return {EvaluatedModel[]}
+   */
+  _filterByBounds(models) {
+    const inBounds = models.filter(({ isInBounds }) => isInBounds);
+    return inBounds.length > 0 ? inBounds : models.filter(({ value }) => value !== null);
   }
 
   /**

@@ -1627,6 +1627,18 @@ export default class LineItem extends BidEntity {
     return (this._cacheValues.predictedLabor = 0);
   }
 
+  getPredictedCostExperimental() {
+    return this._getExperimentalPrediction(this._predictionService.getCostPredictionModels());
+  }
+
+  getPredictedLaborHoursExperimental() {
+    return this._getExperimentalPrediction(this._predictionService.getLaborPredictionModels());
+  }
+
+  _getExperimentalPrediction(models) {
+    return round(Helpers.confirmNumber(this._predictionService.evaluateModelsExperimental(models)), 4);
+  }
+
   /**
    * Exports the line item's internal data structure.
    *
