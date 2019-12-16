@@ -15,7 +15,16 @@ export default class PredictionService {
 
     this.bid = this.lineItem.bid;
 
-    this.models = (this.lineItem._data.prediction_model && this.lineItem._data.prediction_model.models) || [];
+    const model = this.lineItem._data.prediction_model;
+    this.models = (model && model.models) || [];
+
+    // determine if a patch can be used by the model's created_at timestamp
+    // this is necessary to prevent estimates from changing in bids that use models created before the fix was released
+    const timestamp = model ? model.created_at : undefined;
+    this._canUsePatch = {
+      ignoreNullDependency: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ignores prediction models that rely on entities that are not fully defined
+      dependencyAssemblyContext: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ensures assembly context is correctly considered
+    };
   }
 
   /**
@@ -95,14 +104,48 @@ export default class PredictionService {
    * @param {string} modelDependency.type The type of dependency. Either 'field' or 'metric'
    * @param {number} modelDependency.definition_id The definition id of the dependency
    * @param {string} modelDependency.field The dependencies value field. Typically 'value'
+   * @param {boolean} isBaseModel Whether or not this is the base model for the line item.
+   *            If it is, the value should be given even if the dependency is not fully defined.
    * @return {number|null} The evaluated value of the dependency
    */
-  _getModelDependencyValue(modelDependency) {
+  _getModelDependencyValue(modelDependency, isBaseModel) {
     const { type, definition_id, field } = modelDependency;
-    const [bidEntity] = this.bid.entities.getBidEntitiesByDefId(type, definition_id);
-    return bidEntity
+    const bidEntity = this._getModelDependency(type, definition_id);
+    return bidEntity && (isBaseModel || this._canUseDependency(bidEntity, field))
       ? this.bid.entities.getDependencyValue({ type, field, bid_entity_id: bidEntity.id })
       : null;
+  }
+
+  /**
+   * Get the dependency used by the prediction model
+   *
+   * @param {string} type
+   * @param {number} definitionId
+   * @return {object|undefined} bid entity
+   */
+  _getModelDependency(type, definitionId) {
+    const entities = this.bid.entities.getBidEntitiesByDefId(type, definitionId);
+    return this._canUsePatch.dependencyAssemblyContext
+      ? entities.find(
+          entity =>
+            !entity.config.assembly_id || entity.config.assembly_id === this.lineItem.config.assembly_id
+        )
+      : entities[0];
+  }
+
+  /**
+   * Determine if the entity should be used to evaluate a prediction model.
+   * Because of the need to maintain the integrity of old estimates,
+   *  a date check is used here to ensure only prediction models generated
+   *  after the fix date get the fix
+   *
+   * @param {object} entity
+   * @param {?object} field
+   * @return {boolean}
+   */
+  _canUseDependency(entity, field = null) {
+    if (!this._canUsePatch.ignoreNullDependency) return true;
+    return !entity.hasNullDependency(field);
   }
 
   /**
@@ -128,9 +171,9 @@ export default class PredictionService {
    * @return {number|null} The result of evaluating the model
    */
   evaluateModel(model) {
-    const dependencyValues = { a: this._getModelDependencyValue(model.dependencies.a) };
+    const dependencyValues = { a: this._getModelDependencyValue(model.dependencies.a, model.is_base) };
     if (model.dependencies.b) {
-      dependencyValues.b = this._getModelDependencyValue(model.dependencies.b);
+      dependencyValues.b = this._getModelDependencyValue(model.dependencies.b, model.is_base);
     }
 
     const hasDefinedDependencyValues = Object.values(dependencyValues).every(val => !isNil(val));
