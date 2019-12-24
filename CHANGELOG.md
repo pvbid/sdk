@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.X (2019-XX-XX)
+
+Bug Fixes:
+
+- **Bid Entities:** Return null from `bid.entities.getDependency(contract)` when `contract.bid_entity_id` is not defined.
+
 ### 1.2.8 (2019-12-16)
 
 Bug Fixes:
