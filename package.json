@@ -1,6 +1,6 @@
 {
   "name": "pvbid-sdk",
-  "version": "1.2.8",
+  "version": "1.2.9",
   "description": "",
   "main": "dist/pvbid.node.js",
   "scripts": {
@@ -12,7 +12,10 @@
     "docs": "./node_modules/.bin/esdoc && xdg-open docs/index.html",
     "publish-docs": "npm run test && npm run docs && PLATFORM=web DOCS=true webpack",
     "size": "size-limit",
-    "test": "jest"
+    "test": "jest",
+    "preversion": "npm run test",
+    "version": "npm run build-node && npm run build-web",
+    "postversion": "git push"
   },
   "size-limit": [
     {
