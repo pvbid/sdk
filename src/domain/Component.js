@@ -2,7 +2,6 @@ import cloneDeep from "lodash/cloneDeep";
 import round from "lodash/round";
 import xor from "lodash/xor";
 import each from "lodash/each";
-import pull from "lodash/pull";
 import isEqual from "lodash/isEqual";
 import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import Helpers from "@/utils/Helpers";
@@ -681,12 +680,21 @@ export default class Component extends BidEntity {
   /**
    * Removes a line item from the component.
    *
-   * @param {number} lineItemId
+   * @param {string|number} lineItemId
    */
   removeLineItem(lineItemId) {
-    pull(this.config.line_items, lineItemId);
-    this.dirty();
-    this.assess();
+    // is this a numeric string?
+    if (!Number.isNaN(+lineItemId)) {
+      lineItemId = +lineItemId;
+    }
+
+    // remove the first instance of the Line Item
+    const index = this.config.line_items.indexOf(lineItemId);
+    if (index >= 0) {
+      this.config.line_items.splice(index, 1);
+      this.dirty();
+      this.assess();
+    }
   }
 
   /**
