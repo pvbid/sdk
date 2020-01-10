@@ -38,7 +38,12 @@ export default class FieldGroup extends BidEntity {
   getFields() {
     const fields = {};
     this.config.fields.forEach(fieldRef => {
-      fields[fieldRef] = this.bid.entities.fields(fieldRef);
+      if (fieldRef) {
+        const field = this.bid.entities.fields(fieldRef);
+        if (field) {
+          fields[fieldRef] = field;
+        }
+      }
     });
     return fields;
   }

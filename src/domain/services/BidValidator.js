@@ -216,6 +216,7 @@ export default class BidValidator {
     this._runComponentTests();
     this._runDynamicGroupTests();
     this._runAssemblyTest();
+    this._testForLiDupesInComponentGroups();
   }
 
   _testIsFieldAssignedToGroup(sourceBidEntity) {
@@ -438,6 +439,50 @@ export default class BidValidator {
     if (_.isUndefined(rule.dependencies)) {
       this._logIssue("rule_undefined_dependency", sourceBidEntity);
     }
+  }
+
+  /**
+   * Test Line Items are not used more than once within a Component Group
+   */
+  _testForLiDupesInComponentGroups() {
+    const dupeMap = Object.values(this._bid.entities.components()).reduce((o, c) => {
+      if (_.isUndefined(c.config.line_items)) {
+        return o;
+      }
+
+      // initialize cg prop
+      o[c.config.component_group_id] = o[c.config.component_group_id] || {};
+
+      // a one-to-many map of LI IDs to Component IDs in which they are found
+      c.config.line_items.forEach(liId => {
+        o[c.config.component_group_id][liId] = [...(o[c.config.component_group_id][liId] || []), c.id];
+      });
+
+      return o;
+    }, {});
+
+    Object.keys(dupeMap).forEach(cgId => {
+      const liData = dupeMap[cgId];
+
+      Object.keys(liData).forEach(liId => {
+        const cIds = liData[liId];
+
+        if (cIds.length > 1) {
+          this._logIssue(
+            "component_group_contains_dupes",
+            this._bid.entities.componentGroups(cgId),
+            {},
+            {
+              details: {
+                liId,
+                liTitle: this._bid.entities.lineItems(liId).title,
+                components: cIds.map(cId => this._bid.entities.components(cId)),
+              },
+            }
+          );
+        }
+      });
+    });
   }
 
   _testDependencyExistence(sourceBidEntity, dependencyContract, dependencyKey) {

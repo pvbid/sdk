@@ -7,8 +7,8 @@ import isNil from "lodash/isNil";
 import xor from "lodash/xor";
 import pickBy from "lodash/pickBy";
 import cloneDeep from "lodash/cloneDeep";
-import includes from "lodash/includes";
 import pull from "lodash/pull";
+import omit from "lodash/omit";
 import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
@@ -1366,7 +1366,7 @@ export default class LineItem extends BidEntity {
         if (this._undefinedPropsIncludes(...dependencies) && this._shouldPredict(dependencies)) {
           this._applyConfig("is_predicted_cost", true);
           let cost = this.getPredictedCost();
-          return this.isWeighted ? cost * this._predictionService.getContributionWeight(this) : cost;
+          return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
         }
 
         cost = this.laborHours * (this.wage + this.burden);
@@ -1375,7 +1375,7 @@ export default class LineItem extends BidEntity {
         if (this._shouldPredict(dependencies)) {
           this._applyConfig("is_predicted_cost", true);
           let cost = this.getPredictedCost();
-          return this.isWeighted ? cost * this._predictionService.getContributionWeight(this) : cost;
+          return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
         }
 
         cost = (this.quantity * this.perQuantity + this.base) * this.multiplier;
@@ -1649,15 +1649,11 @@ export default class LineItem extends BidEntity {
    * @returns {object}
    */
   exportData(alwaysIncludeConfig = false) {
-    let data;
-    if (alwaysIncludeConfig || this._hasConfigEverChanged) {
-      data = this._data;
-    } else {
-      // improve save performance by removing config if its never been changed
-      const { config, ...noConfig } = this._data;
-      data = noConfig;
+    const blacklist = ["prediction_model"];
+    if (!alwaysIncludeConfig && !this._hasConfigEverChanged) {
+      blacklist.push("config");
     }
-    return cloneDeep(data);
+    return cloneDeep(omit(this._data, blacklist));
   }
 
   /**
@@ -1668,7 +1664,7 @@ export default class LineItem extends BidEntity {
   moveToComponent(component) {
     each(this.bid.entities.components(), componentToLeave => {
       if (componentToLeave.config.component_group_id === component.config.component_group_id) {
-        if (includes(componentToLeave.config.line_items, this.id)) {
+        if (componentToLeave.config.line_items.includes(this.id)) {
           pull(componentToLeave.config.line_items, this.id);
 
           componentToLeave.assess();
@@ -1690,7 +1686,7 @@ export default class LineItem extends BidEntity {
   components() {
     let components = [];
     each(this.bid.entities.components(), component => {
-      if (includes(component.config.line_items, this.id)) components.push(component);
+      if (component.config.line_items.includes(this.id)) components.push(component);
     });
     return components;
   }

@@ -88,6 +88,20 @@ describe("Bid validator", () => {
     let validations = bid.validate();
     expect(bid.isValid()).toBe(false);
     expect(validations[0].type).toBe("invalid_metric_manipulation_assembly_reference");
+
+    watts._data.config.manipulations = []; //reset
+    bid.validate();
+  });
+
+  test("should catch duplicate line items within the same component group.", () => {
+    expect(bid.isValid()).toBe(true);
+
+    let component = bid.entities.components(62472);
+    component.config.line_items.push(49661, 49661);
+
+    let validations = bid.validate();
+    expect(bid.isValid()).toBe(false);
+    expect(validations[0].type).toBe("component_group_contains_dupes");
   });
 });
 //TODO: test all known validation error types to ensure they catch the problem.
