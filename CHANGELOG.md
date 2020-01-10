@@ -1,5 +1,16 @@
 # CHANGELOG
 
+### 1.2.10 (2020-01-10)
+
+Improvements:
+
+- **Line Item:** Minor performance improvements when saving.
+- **Validator:** Now checks for line item duplicates within component groups.
+
+Bug Fixes:
+
+- **Field Group:** Fixed the potential to return an undefined field entity if an invalid field reference exists in the group
+
 ### 1.2.9 (2019-12-24)
 
 Bug Fixes:
