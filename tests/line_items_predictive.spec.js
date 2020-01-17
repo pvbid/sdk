@@ -314,46 +314,93 @@ describe("Testing Line Item Predictive Pricing", () => {
       });
     });
 
-    describe("When the prediction model depends on an undefined dependency", () => {
-      beforeAll(() => {
-        lineItem._data.prediction_model.models.push({
-          model: {
-            r2: 0.45,
-            type: "simple_linear",
-            equation: "0.1a + 1400",
-          },
-          bounds: [],
-          is_base: false,
-          dependencies: {
-            a: { type: "metric", field: "value", definition_id: 842 },
-            y: { type: "line_item", field: "cost", definition_id: 1577 },
-          },
-        });
-        lineItem.assess();
-      });
-
-      afterAll(() => {
-        lineItem._data.prediction_model.models.pop();
-      });
-
-      it("should predict using only the prediction models with defined dependencies", () => {
-        expect(lineItem.laborHours).toBe(0);
-        expect(lineItem.cost).toBeCloseTo(423, 0); // 1350 watts weighted average of predict models
-      });
-
-      describe("When the prediction model was created before December 2019", () => {
+    describe("Patches", () => {
+      describe("When the prediction model depends on an undefined dependency", () => {
         beforeAll(() => {
-          lineItem._predictionService._canUsePatch.ignoreNullDependency = false;
+          lineItem._data.prediction_model.models.push({
+            model: {
+              r2: 0.45,
+              type: "simple_linear",
+              equation: "0.1a + 1400",
+            },
+            bounds: [],
+            is_base: false,
+            dependencies: {
+              a: { type: "metric", field: "value", definition_id: 842 },
+              y: { type: "line_item", field: "cost", definition_id: 1577 },
+            },
+          });
           lineItem.assess();
         });
 
         afterAll(() => {
-          lineItem._predictionService._canUsePatch.ignoreNullDependency = true;
+          lineItem._data.prediction_model.models.pop();
+        });
+
+        it("should predict using only the prediction models with defined dependencies", () => {
+          expect(lineItem.laborHours).toBe(0);
+          expect(lineItem.cost).toBeCloseTo(423, 0); // 1350 watts weighted average of predict models
+        });
+
+        describe("When the prediction model was created before December 2019", () => {
+          beforeAll(() => {
+            lineItem._predictionService._canUsePatch.ignoreNullDependency = false;
+            lineItem.assess();
+          });
+
+          afterAll(() => {
+            lineItem._predictionService._canUsePatch.ignoreNullDependency = true;
+            lineItem.assess();
+          });
+
+          it("should make an exception and use the undefined dependency", () => {
+            expect(lineItem.cost).toBeCloseTo(661, 0);
+          });
+        });
+      });
+
+      describe("When the prediction model results in a non numeric value", () => {
+        beforeAll(() => {
+          lineItem._data.prediction_model.models.push({
+            model: {
+              r2: 0.95,
+              type: "simple_linear",
+              equation: "log(a) + 1400", // => -Infinity
+            },
+            bounds: [],
+            is_base: false,
+            dependencies: {
+              a: { type: "metric", field: "value", definition_id: 844 }, // zero
+              y: { type: "line_item", field: "cost", definition_id: 1577 },
+            },
+          });
+          lineItem._predictionService._canUsePatch.nonNumericResult = true;
           lineItem.assess();
         });
 
-        it("should make an exception and use the undefined dependency", () => {
-          expect(lineItem.cost).toBeCloseTo(661, 0);
+        afterAll(() => {
+          lineItem._data.prediction_model.models.pop();
+        });
+
+        it("should predict using only the prediction models with numeric results", () => {
+          expect(lineItem.laborHours).toBe(0);
+          expect(lineItem.cost).toBeCloseTo(423, 0);
+        });
+
+        describe("When the prediction model was created before January 2020", () => {
+          beforeAll(() => {
+            lineItem._predictionService._canUsePatch.nonNumericResult = false;
+            lineItem.assess();
+          });
+
+          afterAll(() => {
+            lineItem._predictionService._canUsePatch.nonNumericResult = true;
+            lineItem.assess();
+          });
+
+          it("should make an exception and use the non numeric result", () => {
+            expect(lineItem.cost).toBeCloseTo(252, 0);
+          });
         });
       });
     });

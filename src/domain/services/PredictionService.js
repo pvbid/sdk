@@ -1,6 +1,6 @@
 import { isNil, orderBy } from "lodash";
-import Helpers from "../../utils/Helpers";
-import LineItem from "../LineItem";
+import Helpers from "@/utils/Helpers";
+import LineItem from "@/domain/LineItem";
 
 export default class PredictionService {
   /**
@@ -23,6 +23,7 @@ export default class PredictionService {
     const timestamp = model ? model.created_at : undefined;
     this._canUsePatch = {
       ignoreNullDependency: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ignores prediction models that rely on entities that are not fully defined
+      nonNumericResult: timestamp ? new Date(timestamp) > new Date("2020-01-17") : false, // ignores prediction models that have non-numeric results
       dependencyAssemblyContext: timestamp ? new Date(timestamp) > new Date("2019-12-16") : false, // ensures assembly context is correctly considered
     };
   }
@@ -198,18 +199,20 @@ export default class PredictionService {
     const hasDefinedDependencyValues = Object.values(dependencyValues).every(val => !isNil(val));
     if (hasDefinedDependencyValues) {
       let modelValue = Helpers.calculateFormula(model.model.equation, dependencyValues);
-      modelValue = modelValue < 0 ? 0 : modelValue;
+      if (!this._canUsePatch.nonNumericResult || Helpers.isNumber(modelValue)) {
+        modelValue = modelValue < 0 ? 0 : modelValue;
 
-      const isInBounds = Object.keys(dependencyValues).forEach(key => {
-        const boundsMap = {
-          a: model.bounds[0],
-          b: model.bounds[1],
-          y: model.bounds[model.bounds.length - 1],
-        };
-        return this._isInBounds(boundsMap[key], dependencyValues[key]);
-      });
+        const isInBounds = Object.keys(dependencyValues).every(key => {
+          const boundsMap = {
+            a: model.bounds[0],
+            b: model.bounds[1],
+            y: model.bounds[model.bounds.length - 1],
+          };
+          return this._isInBounds(boundsMap[key], dependencyValues[key]);
+        });
 
-      return { value: modelValue, isInBounds, r2: model.model.r2 };
+        return { value: modelValue, isInBounds, r2: model.model.r2 };
+      }
     }
     return { value: null, isInBounds: false, r2: 0 };
   }
@@ -250,7 +253,7 @@ export default class PredictionService {
     for (let model of orderedModels) {
       if (evaluatedModels.length < limit) {
         const evaluatedModel = this.evaluateModel(model);
-        if (evaluatedModel.value !== null && evaluatedModel.value !== undefined) {
+        if (Helpers.isNumber(evaluatedModel.value)) {
           evaluatedModels.push(evaluatedModel);
         }
       }

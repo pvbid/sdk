@@ -1885,7 +1885,7 @@
         "value": 3,
         "config": {
           "formula": "1 * pi",
-          "short_code": "metric:defined_metric",
+          "short_code": "metric:formula_pi",
           "dependencies": {
             "a": {
               "type": "field",
@@ -1896,6 +1896,25 @@
         },
         "definition_id": 843,
         "definition_version": 2,
+        "created_at": "2017-09-26T23:04:55+00:00",
+        "updated_at": "2017-09-27T01:10:55+00:00",
+        "actual_value": null,
+        "is_active": true,
+        "type": "metric"
+      },
+      {
+        "id": 36098,
+        "account_id": 3,
+        "bid_id": 190,
+        "title": "Zero",
+        "value": 0,
+        "config": {
+          "formula": "0",
+          "short_code": "metric:zero",
+          "dependencies": {}
+        },
+        "definition_id": 844,
+        "definition_version": 1,
         "created_at": "2017-09-26T23:04:55+00:00",
         "updated_at": "2017-09-27T01:10:55+00:00",
         "actual_value": null,

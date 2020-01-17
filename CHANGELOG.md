@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.11 (2020-01-17)
+
+Improvements:
+
+- **Line Item**: Better handling for prediction model results
+
 ### 1.2.10 (2020-01-10)
 
 Improvements:
