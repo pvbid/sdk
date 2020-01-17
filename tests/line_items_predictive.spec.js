@@ -374,6 +374,7 @@ describe("Testing Line Item Predictive Pricing", () => {
               y: { type: "line_item", field: "cost", definition_id: 1577 },
             },
           });
+          lineItem._predictionService._canUsePatch.nonNumericResult = true;
           lineItem.assess();
         });
 
@@ -386,7 +387,7 @@ describe("Testing Line Item Predictive Pricing", () => {
           expect(lineItem.cost).toBeCloseTo(423, 0);
         });
 
-        describe("When the prediction model was created before December 2019", () => {
+        describe("When the prediction model was created before January 2020", () => {
           beforeAll(() => {
             lineItem._predictionService._canUsePatch.nonNumericResult = false;
             lineItem.assess();
