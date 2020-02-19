@@ -86,10 +86,10 @@ export default class BidEntityRelationsHelper {
    *    "103" : <LineItem>
    * }
    *
-   * @param {number} id
+   * @param {?number} id
    * @returns {?(LineItem|Object.<string, LineItem>)}
    */
-  lineItems(id) {
+  lineItems(id = undefined) {
     return id ? this.getBidEntity("line_item", id) : this.bid._data.line_items;
   }
 

@@ -11,6 +11,7 @@ import BidVariable from "./BidVariable";
 import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import BidEntityRelationsHelper from "./services/BidEntityRelationsHelper";
 import IndicativePricingHelper from "./services/IndicativePricingHelper";
+import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
 
 /**
  * Bids are self assessing classes representing the totality of a bid estimate.
@@ -181,30 +182,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set markup(val) {
-    if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val) && !this.isReadOnly()) {
-      const newValue = Helpers.confirmNumber(val);
-      const oldValue = Helpers.confirmNumber(this._data.markup);
-      const includedLineItems = Object.values(this.entities.lineItems()).filter(li => li.isIncluded);
-
-      if (oldValue > 0) {
-        const changePercent = 1 + (newValue - oldValue) / oldValue;
-        includedLineItems.forEach(lineItem => {
-          lineItem.markupPercent = lineItem.markupPercent * changePercent;
-        });
-      } else {
-        const contributingLineItems = includedLineItems.filter(li => li.cost > 0);
-        if (contributingLineItems.length) {
-          const liMarkupValue = newValue / contributingLineItems.length;
-          contributingLineItems.forEach(lineItem => {
-            lineItem.markup = liMarkupValue;
-          });
-        }
-      }
-
-      this._data.markup = newValue;
-      this.dirty();
-      this.emit("property.updated");
-    }
+    LineItemGroupEntityHelper.applyMarkup(this, val);
   }
 
   /**
@@ -237,15 +215,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set markupPercent(val) {
-    if (
-      Helpers.isNumber(val) &&
-      this._data.markup_percent != Helpers.confirmNumber(val) &&
-      !this.isReadOnly()
-    ) {
-      const subtotal = this.includeTaxInMarkup() ? this.costWithTax : this.cost;
-      const targetMarkup = (val * subtotal) / 100;
-      this.markup = targetMarkup;
-    }
+    LineItemGroupEntityHelper.applyMarkupPercent(this, val);
   }
 
   /**
@@ -259,12 +229,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set price(val) {
-    if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val) && !this.isReadOnly()) {
-      const oldPrice = Helpers.confirmNumber(this._data.price);
-      const newPrice = Helpers.confirmNumber(val);
-      const targetMarkup = this.markup + (newPrice - oldPrice);
-      this.markup = targetMarkup;
-    }
+    LineItemGroupEntityHelper.applyPrice(this, val);
   }
 
   /**

@@ -6,6 +6,7 @@ import isEqual from "lodash/isEqual";
 import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import Helpers from "@/utils/Helpers";
 import BidEntity from "./BidEntity";
+import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
 
 /**
  * Component Class
@@ -126,11 +127,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set markup(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup) {
-      this._applyComponentValue("markup", this._data.markup, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyMarkup(this, val);
   }
 
   /**
@@ -144,11 +141,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set markupPercent(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup_percent) {
-      this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyMarkupPercent(this, val);
   }
 
   /**
@@ -195,11 +188,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set price(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.price) {
-      this._applyComponentValue("price", this._data.price, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyPrice(this, val);
   }
 
   /**
