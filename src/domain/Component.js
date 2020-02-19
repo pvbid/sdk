@@ -58,19 +58,6 @@ export default class Component extends BidEntity {
   }
 
   /**
-   * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
-   *
-   * @type {number}
-   */
-  set taxableCost(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.taxable_cost) {
-      this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
-  }
-
-  /**
    * The average tax percentage from the nested line items.
    *
    * @type {number}
@@ -519,6 +506,9 @@ export default class Component extends BidEntity {
         cost += lineItem.cost;
         price += lineItem.price;
         markup += lineItem.markup;
+        if (this.bid.includeMarkupInTax()) {
+          taxableCost += lineItem.markup;
+        }
         tax += lineItem.tax;
         base += lineItem.base;
         wage += lineItem.wage;

@@ -353,7 +353,15 @@ export default class Bid extends BidEntity {
    */
   includeTaxInMarkup() {
     return (
-      this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true
+      !this.includeMarkupInTax() &&
+      this.entities.variables().markup_strategy &&
+      this.entities.variables().markup_strategy.value === true
+    );
+  }
+
+  includeMarkupInTax() {
+    return (
+      this.entities.variables().taxable_profit && this.entities.variables().taxable_profit.value === true
     );
   }
 
@@ -447,6 +455,7 @@ export default class Bid extends BidEntity {
         price: 0,
         markup: 0,
         tax: 0,
+        tax_percent: 0,
         taxable_cost: 0,
         margin_percent: 0,
         markup_percent: 0,
@@ -473,9 +482,13 @@ export default class Bid extends BidEntity {
             bidValues.labor_hours += li.laborHours;
             bidValues.labor_cost += li.cost;
 
+            if (this.entities.variables().taxable_labor.value) {
+              bidValues.taxable_cost += this.includeMarkupInTax() ? li.cost + li.markup : li.cost;
+            }
+
             dependantValuesMap.push("labor_hours", ["cost", "labor_cost"]);
           } else {
-            bidValues.taxable_cost += li.cost;
+            bidValues.taxable_cost += this.includeMarkupInTax() ? li.cost + li.markup : li.cost;
 
             dependantValuesMap.push(["cost", "taxable_cost"]);
           }
@@ -499,6 +512,9 @@ export default class Bid extends BidEntity {
       if (bidValues.cost > 0) {
         const subtotal = this.includeTaxInMarkup() ? bidValues.cost + bidValues.tax : bidValues.cost;
         bidValues.markup_percent = (bidValues.markup / subtotal) * 100;
+
+        bidValues.tax_percent =
+          bidValues.taxable_cost > 0 ? (bidValues.tax / bidValues.taxable_cost) * 100 : 0;
       }
 
       var isChanged = false;

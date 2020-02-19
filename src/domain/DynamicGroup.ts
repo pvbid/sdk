@@ -831,7 +831,13 @@ export default class DynamicGroup extends BidEntity {
       laborHours: li.isLabor() ? this._getEntityProp(li.laborHours, li, "labor_hours") : { value: 0 },
       nonLaborCosts: li.isLabor() ? { value: 0 } : { ...cost },
       taxableCost:
-        li.isLabor() && !this.bid.entities.variables().taxable_labor.value ? { value: 0 } : { ...cost },
+        li.isLabor() && !this.bid.entities.variables().taxable_labor.value
+          ? { value: 0 }
+          : {
+              ...(this.bid.includeMarkupInTax()
+                ? this._mergeEntityProps(cost, this._getEntityProp(li.markup, li, "markup"))
+                : cost),
+            },
     };
   }
 

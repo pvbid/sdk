@@ -224,6 +224,12 @@
         "is_reserved": true,
         "type": "boolean",
         "value": false
+      },
+      "taxable_profit": {
+        "title": "Apply Sales Tax to the Markup",
+        "is_reserved": true,
+        "type": "boolean",
+        "value": false
       }
     },
     "system_version": 1,
