@@ -148,11 +148,11 @@ describe("Line item markup percent", () => {
     test("when bid markup changes and line item is included.", async () => {
       expect.assertions(7);
 
-      let lineItem = bid.entities.searchByTitle("line_item", "general line item")[0];
+      let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
       expect(lineItem.isIncluded).toBe(true);
       expect(lineItem.markupPercent).toBe(15);
+      expect(lineItem.cost).toBe(5);
       expect(lineItem.isOverridden("markup_percent")).toBe(false);
-      expect(lineItem.isOverridden()).toBe(false);
 
       return new Promise(resolve => {
         lineItem.once("updated", () => {
@@ -166,22 +166,22 @@ describe("Line item markup percent", () => {
     });
 
     test("when bid margin changes and line item is included.", async () => {
-      expect.assertions(7);
-      let lineItem = bid.entities.searchByTitle("line_item", "general line item")[0];
+      expect.assertions(6);
+      let lineItem = bid.entities.searchByTitle("line_item", "Labor Line Item")[0];
 
       await new Promise(resolve => {
         lineItem.once("assessed", resolve);
         lineItem.reset();
+        lineItem.cost = 5;
       });
 
       expect(lineItem.isIncluded).toBe(true);
       expect(lineItem.markupPercent).toBe(15);
       expect(lineItem.isOverridden("markup_percent")).toBe(false);
-      expect(lineItem.isOverridden()).toBe(false);
 
       return new Promise(resolve => {
         lineItem.once("updated", () => {
-          expect(_.round(lineItem.markupPercent, 2)).toBe(19.41);
+          expect(_.round(lineItem.markupPercent, 2)).toBe(25);
           expect(lineItem.isOverridden("markup_percent")).toBe(true);
           expect(lineItem.isOverridden()).toBe(true);
           resolve();

@@ -100,7 +100,7 @@ describe("When enabled, projects should auto save", () => {
 
     return new Promise(resolve => {
       bid.project.once("saved", () => {
-        expect(bid.price).toBe(3000);
+        expect(bid.price).toBeCloseTo(3000);
         resolve();
       });
       bid.price = 3000;
@@ -113,7 +113,7 @@ describe("When enabled, projects should auto save", () => {
 
     return new Promise(resolve => {
       bid.project.once("saved", () => {
-        expect(lineItem.price).toBe(3000);
+        expect(lineItem.price).toBeCloseTo(3000);
         resolve();
       });
       lineItem.price = 3000;

@@ -4,7 +4,7 @@ const PVBid = require("../src/pvbid.js");
 var MockAdapter = require("axios-mock-adapter");
 import LineItemScaffolding from "../src/domain/scaffolding/LineItemScaffolding";
 
-export const loadTestProject = async () => {
+export const loadTestProject = async (withEntities = true) => {
   let context = PVBid.createContext({
     token: "Bearer Token",
     base_uri: "http://api.pvbid.local/v2",
@@ -26,7 +26,7 @@ export const loadTestProject = async () => {
         data: { user: data.user },
       });
 
-      context.getProject(461).then(p => {
+      context.getProject(461, { loadBidEntities: withEntities }).then(p => {
         resolve(p);
       });
     });

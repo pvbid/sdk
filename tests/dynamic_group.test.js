@@ -515,12 +515,12 @@ describe("Dynamic Groups", () => {
       await assessChangeAsync(group, () => {
         bid.entities.lineItems(49970).cost = 50;
         bid.entities.lineItems(49970).isIncluded = false;
-        group.markupPercent = 100;
+        group.taxPercent = 100;
       });
 
       expect(group.includedLineItemCount).toBe(2);
-      expect(bid.entities.lineItems(49970).markupPercent).toBe(100);
-      expect(group.markupPercent).toBe(100);
+      expect(bid.entities.lineItems(49970).taxPercent).toBe(100);
+      expect(group.taxPercent).toBe(100);
 
       await assessChangeAsync(group, () => group.reset());
     });

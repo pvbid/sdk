@@ -1,5 +1,15 @@
 # CHANGELOG
 
+### 1.2.12 (2020-02-19)
+
+Improvements:
+
+- **Bid**: Price overrides are applied as a markup adjustment.
+
+Features:
+
+- **Bid Variables:** - Include a variable option for applying tax after markup.
+
 ### 1.2.11 (2020-01-17)
 
 Improvements:

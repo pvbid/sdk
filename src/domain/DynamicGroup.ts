@@ -7,6 +7,7 @@ import BidEntity from "./BidEntity";
 import Component from "./Component";
 import LineItem from "./LineItem";
 import Bid from "./Bid";
+import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
 
 const summableProps = [
   "cost",
@@ -391,10 +392,7 @@ export default class DynamicGroup extends BidEntity {
    * Setter for markup
    */
   public set markup(val: number) {
-    if (!Helpers.isNumber(val)) {
-      throw new Error("Markup value must be a finite number");
-    }
-    this._applyChangesToLineItemDescendants("markup", val);
+    LineItemGroupEntityHelper.applyMarkup(this, val);
   }
 
   /**
@@ -408,10 +406,7 @@ export default class DynamicGroup extends BidEntity {
    * Setter for markup_percent
    */
   public set markupPercent(val: number) {
-    if (!Helpers.isNumber(val)) {
-      throw new Error("Markup Percent value must be a finite number");
-    }
-    this._applyChangesToLineItemDescendants("markupPercent", val);
+    LineItemGroupEntityHelper.applyMarkupPercent(this, val);
   }
 
   /**
@@ -456,10 +451,7 @@ export default class DynamicGroup extends BidEntity {
    * Setter for price
    */
   public set price(val: number) {
-    if (!Helpers.isNumber(val)) {
-      throw new Error("Price value must be a finite number");
-    }
-    this._applyChangesToLineItemDescendants("price", val);
+    LineItemGroupEntityHelper.applyPrice(this, val);
   }
 
   /**
@@ -787,11 +779,6 @@ export default class DynamicGroup extends BidEntity {
     }
   }
 
-  private _postApply(emission: string = "updated") {
-    this.dirty();
-    this.emit(emission);
-  }
-
   private _arePropFlagsDifferent(currentValue: EntityPropFlags, newValue: EntityPropFlags): boolean {
     return (
       !!currentValue.is_overridden !== !!newValue.is_overridden ||
@@ -844,7 +831,13 @@ export default class DynamicGroup extends BidEntity {
       laborHours: li.isLabor() ? this._getEntityProp(li.laborHours, li, "labor_hours") : { value: 0 },
       nonLaborCosts: li.isLabor() ? { value: 0 } : { ...cost },
       taxableCost:
-        li.isLabor() && !this.bid.entities.variables().taxable_labor.value ? { value: 0 } : { ...cost },
+        li.isLabor() && !this.bid.entities.variables().taxable_labor.value
+          ? { value: 0 }
+          : {
+              ...(this.bid.includeMarkupInTax()
+                ? this._mergeEntityProps(cost, this._getEntityProp(li.markup, li, "markup"))
+                : cost),
+            },
     };
   }
 

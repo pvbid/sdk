@@ -6,6 +6,7 @@ import isEqual from "lodash/isEqual";
 import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import Helpers from "@/utils/Helpers";
 import BidEntity from "./BidEntity";
+import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
 
 /**
  * Component Class
@@ -54,19 +55,6 @@ export default class Component extends BidEntity {
    */
   get taxableCost() {
     return this._data.taxable_cost;
-  }
-
-  /**
-   * Overrides taxable cost by proportionally distributing the component value to the included nested line items.
-   *
-   * @type {number}
-   */
-  set taxableCost(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.taxable_cost) {
-      this._applyComponentValue("taxableCost", this._data.taxable_cost, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
   }
 
   /**
@@ -126,11 +114,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set markup(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup) {
-      this._applyComponentValue("markup", this._data.markup, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyMarkup(this, val);
   }
 
   /**
@@ -144,11 +128,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set markupPercent(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.markup_percent) {
-      this._applyComponentValue("markupPercent", this._data.markup_percent, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyMarkupPercent(this, val);
   }
 
   /**
@@ -195,11 +175,7 @@ export default class Component extends BidEntity {
    * @type {number}
    */
   set price(val) {
-    if (Helpers.isNumber(val) && Helpers.confirmNumber(val) !== this._data.price) {
-      this._applyComponentValue("price", this._data.price, val, false);
-      this.dirty();
-      this.emit("updated");
-    }
+    LineItemGroupEntityHelper.applyPrice(this, val);
   }
 
   /**
@@ -530,6 +506,9 @@ export default class Component extends BidEntity {
         cost += lineItem.cost;
         price += lineItem.price;
         markup += lineItem.markup;
+        if (this.bid.includeMarkupInTax()) {
+          taxableCost += lineItem.markup;
+        }
         tax += lineItem.tax;
         base += lineItem.base;
         wage += lineItem.wage;
@@ -541,6 +520,7 @@ export default class Component extends BidEntity {
           "cost",
           "price",
           "markup",
+          "markup_percent",
           "tax",
           "base",
           "wage",
@@ -590,6 +570,7 @@ export default class Component extends BidEntity {
           "cost",
           "price",
           "markup",
+          "markup_percent",
           "tax",
           "taxable_cost",
           "labor_hours",

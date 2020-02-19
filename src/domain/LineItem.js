@@ -385,21 +385,22 @@ export default class LineItem extends BidEntity {
    * @type {number}
    */
   set tax(val) {
-    if (Helpers.isNumber(val) && this._data.tax != Helpers.confirmNumber(val)) {
-      this._data.tax = Helpers.confirmNumber(val);
-      this.override("tax", true);
-      this.override("tax_percent", true);
-      this.override("price", false);
-      this.override("price_watt", false);
-      this.isIncluded = true;
-      this.dirty();
+    if (!Helpers.isNumber(val) || this._data.tax === Helpers.confirmNumber(val)) return;
+    this._data.tax = Helpers.confirmNumber(val);
+    this.override("tax", true);
+    this.override("tax_percent", true);
+    this.override("price", false);
+    this.override("price_watt", false);
+    this.isIncluded = true;
+    this.dirty();
 
-      this._data.tax_percent = this.cost > 0 ? Helpers.confirmNumber(this.tax / this.cost) * 100 : 0;
+    const taxableSubtotal = this._getTaxableSubtotal();
+    this._data.tax_percent =
+      taxableSubtotal > 0 ? Helpers.confirmNumber(this.tax / taxableSubtotal) * 100 : 0;
 
-      if (this.bid.includeTaxInMarkup()) {
-        this.markup = Helpers.confirmNumber(this.cost + this.tax) * (this.markupPercent / 100);
-      } else this.assess();
-    }
+    if (this.bid.includeTaxInMarkup()) {
+      this.markup = Helpers.confirmNumber(this.cost + this.tax) * (this.markupPercent / 100);
+    } else this.assess();
   }
 
   /**
@@ -810,10 +811,20 @@ export default class LineItem extends BidEntity {
       isChanged = this._applyProperty("labor_hours", this._getLaborHoursValue()) || isChanged;
       isChanged = this._applyConfig("is_weighted", this._getIsWeightedValue()) || isChanged;
       isChanged = this._applyProperty("cost", this._getCostValue()) || isChanged;
-      isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
-      isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
+
+      if (!this.bid.includeMarkupInTax()) {
+        isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
+        isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
+      }
+
       isChanged = this._applyProperty("markup_percent", this._getMarkupPercentValue()) || isChanged;
       isChanged = this._applyProperty("markup", this._getMarkupValue()) || isChanged;
+
+      if (this.bid.includeMarkupInTax()) {
+        isChanged = this._applyProperty("tax_percent", this._getTaxPercentValue()) || isChanged;
+        isChanged = this._applyProperty("tax", this._getTaxValue()) || isChanged;
+      }
+
       isChanged = this._applyProperty("price", this._getPriceValue()) || isChanged;
       isChanged = this._applyProperty("is_included", this._getIsIncludedValue()) || isChanged;
       isChanged = this._applyConfigArray("tags", this._getTagValue()) || isChanged;
@@ -864,6 +875,7 @@ export default class LineItem extends BidEntity {
     this._bindPredictionBidVariables();
     this._bindMarkupStrategy();
     this._bindTaxableLabor();
+    this._bindTaxProfit();
   }
 
   getWorkup() {
@@ -986,10 +998,9 @@ export default class LineItem extends BidEntity {
    * Bind to markup strategy variable
    */
   _bindMarkupStrategy() {
-    if (!isNil(this.bid.entities.variables().markup_strategy)) {
-      this.bid.entities
-        .variables()
-        .markup_strategy.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
+    const variable = this.bid.entities.variables().markup_strategy;
+    if (!isNil(variable)) {
+      variable.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
     }
   }
 
@@ -997,12 +1008,18 @@ export default class LineItem extends BidEntity {
    * Bind to taxable labor variable
    */
   _bindTaxableLabor() {
-    if (!isNil(this.bid.entities.variables().taxable_labor)) {
-      this.bid.entities
-        .variables()
-        .taxable_labor.on("updated", `line_item.${this.id}`, (requesterId, self) => {
-          if (this.isLabor()) this.assess(self);
-        });
+    const variable = this.bid.entities.variables().taxable_labor;
+    if (!isNil(variable)) {
+      variable.on("updated", `line_item.${this.id}`, (requesterId, self) => {
+        if (this.isLabor()) this.assess(self);
+      });
+    }
+  }
+
+  _bindTaxProfit() {
+    const variable = this.bid.entities.variables().taxable_profit;
+    if (!isNil(variable)) {
+      variable.on("updated", `line_item.${this.id}`, (requesterId, self) => this.assess(self));
     }
   }
 
@@ -1117,15 +1134,8 @@ export default class LineItem extends BidEntity {
     }
   }
 
-  /**
-   *
-   */
   _applyTaxPercentChange() {
-    this._data.tax = this.cost * (this.taxPercent / 100);
-
-    if (this.bid.includeTaxInMarkup()) {
-      //this.markup = Helpers.confirmNumber(this.cost + this.tax) * (this.markupPercent / 100);
-    }
+    this._data.tax = this._getTaxableSubtotal() * (this.taxPercent / 100);
   }
 
   _applyMarkupPercent() {
@@ -1179,6 +1189,10 @@ export default class LineItem extends BidEntity {
       const dependencyValue = this._evaluateDependency(this.config.dependencies.wage, "wage");
       return round(Helpers.confirmNumber(dependencyValue), 4);
     } else return round(Helpers.confirmNumber(this._data.wage), 4);
+  }
+
+  _getTaxableSubtotal() {
+    return this.bid.includeMarkupInTax() ? this.cost + this.markup : this.cost;
   }
 
   /**
@@ -1397,16 +1411,19 @@ export default class LineItem extends BidEntity {
    * @return {number}
    */
   _getTaxValue() {
-    if (!this.isOverridden("tax")) {
-      const shouldTax = !this.isLabor() || this.bid.entities.variables().taxable_labor.value;
-      if (shouldTax && this.cost > 0) {
-        if (this._undefinedPropsIncludes("cost", "tax_percent")) {
-          this._undefinedPropFlags.push("tax");
-        }
+    if (this.isOverridden("tax")) return round(Helpers.confirmNumber(this._data.tax));
 
-        return round(Helpers.confirmNumber(this.cost * (this.taxPercent / 100)), 4);
-      } else return 0;
-    } else return round(Helpers.confirmNumber(this._data.tax));
+    const shouldTax = !this.isLabor() || this.bid.entities.variables().taxable_labor.value;
+    if (!shouldTax || this.cost <= 0) return 0;
+
+    const dependencies = this.bid.includeMarkupInTax()
+      ? ["cost", "tax_percent", "markup"]
+      : ["cost", "tax_percent"];
+    if (this._undefinedPropsIncludes(...dependencies)) {
+      this._undefinedPropFlags.push("tax");
+    }
+
+    return round(Helpers.confirmNumber(this._getTaxableSubtotal() * (this.taxPercent / 100)), 4);
   }
 
   /**

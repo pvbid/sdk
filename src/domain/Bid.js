@@ -1,11 +1,17 @@
-import _ from "lodash";
-import Helpers from "../utils/Helpers";
-import BidEntity from "./BidEntity";
-import BidVariable from "./BidVariable";
+import xor from "lodash/xor";
+import each from "lodash/each";
+import round from "lodash/round";
+import floor from "lodash/floor";
+import cloneDeep from "lodash/cloneDeep";
 import now from "performance-now";
-import { waitForFinalEvent } from "../utils/WaitForFinalEvent";
+
+import BidEntity from "./BidEntity";
+import Helpers from "@/utils/Helpers";
+import BidVariable from "./BidVariable";
+import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
 import BidEntityRelationsHelper from "./services/BidEntityRelationsHelper";
 import IndicativePricingHelper from "./services/IndicativePricingHelper";
+import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
 
 /**
  * Bids are self assessing classes representing the totality of a bid estimate.
@@ -86,7 +92,7 @@ export default class Bid extends BidEntity {
    * @type {boolean}
    */
   set isActive(val) {
-    if (_.isBoolean(val) && val != this._data.is_active) {
+    if (typeof val === "boolean" && val != this._data.is_active) {
       this._data.is_active = val;
       this.dirty();
       this.assess(this, true);
@@ -176,21 +182,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set markup(val) {
-    if (Helpers.isNumber(val) && this._data.markup != Helpers.confirmNumber(val) && !this.isReadOnly()) {
-      const newValue = Helpers.confirmNumber(val);
-      const oldValue = Helpers.confirmNumber(this._data.markup);
-      const changePercent = 1 + (newValue - oldValue) / oldValue;
-
-      _.each(this.entities.lineItems(), lineItem => {
-        if (lineItem.isIncluded) {
-          lineItem.markupPercent = lineItem.markupPercent * changePercent;
-        }
-      });
-
-      this._data.markup = newValue;
-      this.dirty();
-      this.emit("property.updated");
-    }
+    LineItemGroupEntityHelper.applyMarkup(this, val);
   }
 
   /**
@@ -223,20 +215,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set markupPercent(val) {
-    if (
-      Helpers.isNumber(val) &&
-      this._data.markup_percent != Helpers.confirmNumber(val) &&
-      !this.isReadOnly()
-    ) {
-      this._data.markup_percent = Helpers.confirmNumber(val);
-      Object.values(this.entities.lineItems()).forEach(lineItem => {
-        if (lineItem.isIncluded) {
-          lineItem.markupPercent = this._data.markup_percent;
-        }
-      });
-      this.dirty();
-      this.emit("property.updated");
-    }
+    LineItemGroupEntityHelper.applyMarkupPercent(this, val);
   }
 
   /**
@@ -250,21 +229,7 @@ export default class Bid extends BidEntity {
    * @type {number}
    */
   set price(val) {
-    if (Helpers.isNumber(val) && this._data.price != Helpers.confirmNumber(val) && !this.isReadOnly()) {
-      const oldPrice = Helpers.confirmNumber(this._data.price);
-      const newPrice = Helpers.confirmNumber(val);
-      const changePercent = (newPrice - oldPrice) / oldPrice;
-
-      _.each(this.entities.lineItems(), lineItem => {
-        if (lineItem.isIncluded && lineItem.price > 0) {
-          lineItem.price = lineItem.price * (1 + changePercent);
-        }
-      });
-
-      this._data.price = newPrice;
-      this.dirty();
-      this.emit("property.updated");
-    }
+    LineItemGroupEntityHelper.applyPrice(this, val);
   }
 
   /**
@@ -330,13 +295,13 @@ export default class Bid extends BidEntity {
     var categorizedLineItemIds = [];
     var uncategorizedLineItems = [];
 
-    _.each(this.entities.components(), component => {
+    each(this.entities.components(), component => {
       if (component.config.component_group_id === componentGroupId) {
-        categorizedLineItemIds = _.concat(categorizedLineItemIds, component.config.line_items);
+        categorizedLineItemIds = categorizedLineItemIds.concat(component.config.line_items);
       }
     });
 
-    _.each(this.entities.lineItems(), lineItem => {
+    each(this.entities.lineItems(), lineItem => {
       if (categorizedLineItemIds.indexOf(lineItem.id) < 0) {
         uncategorizedLineItems.push(lineItem);
       }
@@ -360,10 +325,10 @@ export default class Bid extends BidEntity {
    * @return {number}
    */
   _getTotalWatts() {
-    if (_.isNull(this._wattMetricDef)) {
-      this._wattMetricDef = _.find(this.entities.metrics(), function(el) {
-        return el.title.toLowerCase() === "watt" || el.title.toLowerCase() === "watts" ? true : false;
-      });
+    if (this._wattMetricDef === null) {
+      this._wattMetricDef = Object.values(this.entities.metrics()).find(el =>
+        el.title.toLowerCase() === "watt" || el.title.toLowerCase() === "watts" ? true : false
+      );
 
       return !this._wattMetricDef ? 0 : Math.max(parseFloat(this._wattMetricDef.value), 1);
     } else return Math.max(parseFloat(this._wattMetricDef.value), 1);
@@ -388,7 +353,15 @@ export default class Bid extends BidEntity {
    */
   includeTaxInMarkup() {
     return (
-      this.entities.variables().markup_strategy && this.entities.variables().markup_strategy.value === true
+      !this.includeMarkupInTax() &&
+      this.entities.variables().markup_strategy &&
+      this.entities.variables().markup_strategy.value === true
+    );
+  }
+
+  includeMarkupInTax() {
+    return (
+      this.entities.variables().taxable_profit && this.entities.variables().taxable_profit.value === true
     );
   }
 
@@ -408,7 +381,7 @@ export default class Bid extends BidEntity {
 
       var markupChangePercent = oldMarkup !== 0 ? newMarkup / oldMarkup : 1;
 
-      _.each(this.entities.lineItems(), lineItem => {
+      each(this.entities.lineItems(), lineItem => {
         if (lineItem.isIncluded) {
           lineItem.markupPercent = lineItem.markupPercent * markupChangePercent;
         }
@@ -422,14 +395,14 @@ export default class Bid extends BidEntity {
   _resetSubMargins() {
     var totalSubMargins = 0;
 
-    if (!_.isUndefined(this.entities.variables().sub_margins)) {
-      _.each(this.entities.variables().sub_margins.value, subMargin => {
+    if (this.entities.variables().sub_margins !== undefined) {
+      each(this.entities.variables().sub_margins.value, subMargin => {
         totalSubMargins += Helpers.confirmNumber(subMargin.value);
       });
 
       var bidMarginPercent = this.getMarginPercent();
 
-      _.each(this.entities.variables().sub_margins.value, subMargin => {
+      each(this.entities.variables().sub_margins.value, subMargin => {
         if (totalSubMargins > 0) {
           subMargin.value = (bidMarginPercent * Helpers.confirmNumber(subMargin.value)) / totalSubMargins;
         } else {
@@ -444,7 +417,7 @@ export default class Bid extends BidEntity {
    */
   resetMarkup() {
     if (this.isAssessable()) {
-      _.each(this.entities.lineItems(), lineItem => {
+      each(this.entities.lineItems(), lineItem => {
         lineItem.resetMarkup();
       });
     }
@@ -456,7 +429,7 @@ export default class Bid extends BidEntity {
   applySubMarginChange() {
     if (this.isAssessable()) {
       let totalSubMargins = 0;
-      _.each(this.entities.variables().sub_margins.value, subMargin => {
+      each(this.entities.variables().sub_margins.value, subMargin => {
         totalSubMargins += Helpers.confirmNumber(subMargin.value);
       });
       this.marginPercent = totalSubMargins;
@@ -482,6 +455,7 @@ export default class Bid extends BidEntity {
         price: 0,
         markup: 0,
         tax: 0,
+        tax_percent: 0,
         taxable_cost: 0,
         margin_percent: 0,
         markup_percent: 0,
@@ -493,7 +467,7 @@ export default class Bid extends BidEntity {
       let predictedValues = new Set();
       let valuesWithNullDependency = new Set();
 
-      _.each(this.entities.lineItems(), li => {
+      each(this.entities.lineItems(), li => {
         if (li.isIncluded) {
           const dependantValuesMap = []; // track the values used for this line item
 
@@ -508,9 +482,13 @@ export default class Bid extends BidEntity {
             bidValues.labor_hours += li.laborHours;
             bidValues.labor_cost += li.cost;
 
+            if (this.entities.variables().taxable_labor.value) {
+              bidValues.taxable_cost += this.includeMarkupInTax() ? li.cost + li.markup : li.cost;
+            }
+
             dependantValuesMap.push("labor_hours", ["cost", "labor_cost"]);
           } else {
-            bidValues.taxable_cost += li.cost;
+            bidValues.taxable_cost += this.includeMarkupInTax() ? li.cost + li.markup : li.cost;
 
             dependantValuesMap.push(["cost", "taxable_cost"]);
           }
@@ -534,24 +512,27 @@ export default class Bid extends BidEntity {
       if (bidValues.cost > 0) {
         const subtotal = this.includeTaxInMarkup() ? bidValues.cost + bidValues.tax : bidValues.cost;
         bidValues.markup_percent = (bidValues.markup / subtotal) * 100;
+
+        bidValues.tax_percent =
+          bidValues.taxable_cost > 0 ? (bidValues.tax / bidValues.taxable_cost) * 100 : 0;
       }
 
       var isChanged = false;
 
-      _.each(bidValues, (value, key) => {
+      each(bidValues, (value, key) => {
         const roundPoint = ["price", "cost"].indexOf(key) >= 0 ? 1 : 3;
-        var originalVal = _.round(Helpers.confirmNumber(this._data[key]), roundPoint);
-        var updatedVal = _.round(Helpers.confirmNumber(value), roundPoint);
+        var originalVal = round(Helpers.confirmNumber(this._data[key]), roundPoint);
+        var updatedVal = round(Helpers.confirmNumber(value), roundPoint);
 
         if (originalVal !== updatedVal) {
-          this._data[key] = _.round(Helpers.confirmNumber(value), 4);
+          this._data[key] = round(Helpers.confirmNumber(value), 4);
           isChanged = true;
         }
       });
 
       if (
         !this._data.config.predicted_values ||
-        _.xor([...predictedValues.values()], this._data.config.predicted_values).length > 0
+        xor([...predictedValues.values()], this._data.config.predicted_values).length > 0
       ) {
         this._data.config.predicted_values = [...predictedValues.values()];
         isChanged = true;
@@ -559,7 +540,7 @@ export default class Bid extends BidEntity {
 
       if (
         !this._data.config.undefined_prop_flags ||
-        _.xor([...valuesWithNullDependency.values()], this._data.config.undefined_prop_flags).length > 0
+        xor([...valuesWithNullDependency.values()], this._data.config.undefined_prop_flags).length > 0
       ) {
         this._data.config.undefined_prop_flags = [...valuesWithNullDependency.values()];
         isChanged = true;
@@ -617,7 +598,7 @@ export default class Bid extends BidEntity {
       needsReassesment = this.price === 0 ? true : false;
 
     if (!needsReassesment) {
-      _.each(this.entities.components(), c => {
+      each(this.entities.components(), c => {
         if (!needsReassesment) {
           needsReassesment = this._componentNeedsReassessment(c);
         } else return false;
@@ -625,7 +606,7 @@ export default class Bid extends BidEntity {
     }
 
     if (!needsReassesment) {
-      _.each(this.entities.lineItems(), lineItem => {
+      each(this.entities.lineItems(), lineItem => {
         if (lineItem.isIncluded) {
           totalLineItemCosts += lineItem.cost;
           totalLineItemPrice += lineItem.price;
@@ -633,12 +614,12 @@ export default class Bid extends BidEntity {
       });
     }
 
-    totalLineItemCosts = _.floor(totalLineItemCosts, 0);
-    totalLineItemPrice = _.floor(totalLineItemPrice, 0);
+    totalLineItemCosts = floor(totalLineItemCosts, 0);
+    totalLineItemPrice = floor(totalLineItemPrice, 0);
 
     return needsReassesment ||
-      _.floor(this.price, 0) !== totalLineItemPrice ||
-      _.floor(this.cost, 0) != totalLineItemCosts
+      floor(this.price, 0) !== totalLineItemPrice ||
+      floor(this.cost, 0) != totalLineItemCosts
       ? true
       : false;
   }
@@ -653,7 +634,7 @@ export default class Bid extends BidEntity {
     var totalLineItemCosts = 0,
       totalLineItemPrice = 0;
 
-    _.each(component.getLineItems(true), lineItem => {
+    each(component.getLineItems(true), lineItem => {
       if (lineItem) {
         if (lineItem.isIncluded) {
           totalLineItemCosts += lineItem.cost;
@@ -662,11 +643,10 @@ export default class Bid extends BidEntity {
       } else throw "Line item not found during component reassessment check.";
     });
 
-    totalLineItemCosts = _.floor(totalLineItemCosts, 1);
-    totalLineItemPrice = _.floor(totalLineItemPrice, 1);
+    totalLineItemCosts = floor(totalLineItemCosts, 1);
+    totalLineItemPrice = floor(totalLineItemPrice, 1);
 
-    return _.floor(component.price, 1) !== totalLineItemPrice ||
-      _.floor(component.cost, 1) != totalLineItemCosts
+    return floor(component.price, 1) !== totalLineItemPrice || floor(component.cost, 1) != totalLineItemCosts
       ? true
       : false;
   }
@@ -819,10 +799,10 @@ export default class Bid extends BidEntity {
 
     let bidToClone = this._omit(this._data, blacklist);
 
-    let bid = _.cloneDeep(bidToClone);
+    let bid = cloneDeep(bidToClone);
     bid.variables = {};
 
-    _.each(this.entities.variables(), (value, key) => {
+    each(this.entities.variables(), (value, key) => {
       bid.variables[key] = value.exportData();
     });
 
@@ -836,7 +816,7 @@ export default class Bid extends BidEntity {
    */
   exportDataWithEntities() {
     const bidData = this.exportData();
-    bidData.assembly_maps = _.cloneDeep(this._data.assembly_maps);
+    bidData.assembly_maps = cloneDeep(this._data.assembly_maps);
 
     const entitiesToExport = {
       line_items: this.entities.lineItems(),
@@ -892,8 +872,8 @@ export default class Bid extends BidEntity {
       "datatables",
     ];
 
-    _.each(properties, prop => {
-      _.each(this.entities[prop](), item => {
+    each(properties, prop => {
+      each(this.entities[prop](), item => {
         item.pristine();
       });
     });
@@ -994,7 +974,7 @@ export default class Bid extends BidEntity {
     return (
       this.isLocked() ||
       !this.isLoaded ||
-      !_.isNull(this.project.closedAt) ||
+      this.project.closedAt !== null ||
       !this._bidService.context.user.can("edit-bid")
     );
   }
@@ -1139,7 +1119,7 @@ export default class Bid extends BidEntity {
    * @returns {boolean}
    */
   isValid() {
-    if (_.isUndefined(this.validationResults)) {
+    if (this.validationResults === undefined) {
       this.validate();
       return this.validationResults.length === 0;
     } else return this.validationResults.length === 0;
@@ -1239,16 +1219,16 @@ export default class Bid extends BidEntity {
    * Flags all fields, metrics, lineItems, and components as dirty.
    */
   dirtyAll() {
-    _.each(this.entities.fields(), f => {
+    each(this.entities.fields(), f => {
       f.dirty();
     });
-    _.each(this.entities.metrics(), m => {
+    each(this.entities.metrics(), m => {
       m.dirty();
     });
-    _.each(this.entities.lineItems(), li => {
+    each(this.entities.lineItems(), li => {
       li.dirty();
     });
-    _.each(this.entities.components(), c => {
+    each(this.entities.components(), c => {
       c.dirty();
     });
   }
