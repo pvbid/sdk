@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.13 (2020-02-26)
+
+Improvements:
+
+- **Bid|Component|DynamicGroup:** Added "Cost w/Markup" property.
+
 ### 1.2.12 (2020-02-19)
 
 Improvements:
