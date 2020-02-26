@@ -104,6 +104,14 @@ export default class Component extends BidEntity {
   }
 
   /**
+   * Cost With Markup
+   * @type {number}
+   */
+  get costWithMarkup() {
+    return this.markup + this.cost;
+  }
+
+  /**
    * @type {number}
    */
   get markup() {
