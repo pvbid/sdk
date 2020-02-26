@@ -150,6 +150,15 @@ export default class Bid extends BidEntity {
   }
 
   /**
+   * Cost including Markup
+   *
+   * @type {number}
+   */
+  get costWithMarkup() {
+    return this.cost + this.markup;
+  }
+
+  /**
    * Tax Percent Property
    *
    * @type {number}

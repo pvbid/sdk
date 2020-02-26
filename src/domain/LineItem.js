@@ -412,6 +412,14 @@ export default class LineItem extends BidEntity {
   }
 
   /**
+   * Cost With Markup
+   * @type {number}
+   */
+  get costWithMarkup() {
+    return this.markup + this.cost;
+  }
+
+  /**
    * OH&P Property (overhead and profit)
    * @type {number}
    */

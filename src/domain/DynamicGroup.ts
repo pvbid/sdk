@@ -382,6 +382,13 @@ export default class DynamicGroup extends BidEntity {
   }
 
   /**
+   * Summed Cost With Markup
+   */
+  public get costWithMarkup(): number {
+    return this.markup + this.cost;
+  }
+
+  /**
    * The summed markup from the nested entities
    */
   public get markup(): number {
