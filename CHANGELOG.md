@@ -1,5 +1,12 @@
 # CHANGELOG
 
+### 1.2.14 (2020-03-XX)
+
+Improvements:
+
+- **Bid Entities:** Added getDatatableByDefId method.
+- **Bid Entities:** Added 'component', 'datatable' & 'line_item' types to getBidEntitiesByDefId method. These will return an array with a single entity and it is still recommended to use the more specific get\*ByDefId for datatables and components if you can.
+
 ### 1.2.13 (2020-02-26)
 
 Improvements:

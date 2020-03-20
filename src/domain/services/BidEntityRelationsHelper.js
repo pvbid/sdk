@@ -312,15 +312,23 @@ export default class BidEntityRelationsHelper {
   }
 
   /**
-   * Get bid entities (field or metric) by a definition id
+   * Get bid entities by a definition id
    *
-   * @param {string} type The type of bid entity ('metric'|'field')
+   * @param {string} type The type of bid entity ('metric'|'field'|'line_item'|'datatable'|'component')
    * @param {number} defId The definition id to lookup by
    * @return {BidEntity[]} list of bid entities with the given def id
    */
   getBidEntitiesByDefId(type, defId) {
-    if (type === "metric" || type === "field") {
+    if (type === "metric" || type === "field" || type === "line_item") {
       return _.filter(this.getBidEntity(type), { definitionId: defId });
+    }
+
+    if (type === "datatable") {
+      return [this.getDatatableByDefId(defId)];
+    }
+
+    if (type === "component") {
+      return [this.getComponentByDefId(defId)];
     }
   }
 
@@ -401,6 +409,19 @@ export default class BidEntityRelationsHelper {
     return !_.isUndefined(this._componentsKeyedByDefinitionId[defId])
       ? this._componentsKeyedByDefinitionId[defId]
       : null;
+  }
+
+  /**
+   * Gets a datatable by definition id
+   *
+   * @param {number} defId
+   * @returns {Datatable}
+   */
+  getDatatableByDefId(defId) {
+    if (!this._datatablesKeyedByDefinitionId) {
+      this._datatablesKeyedByDefinitionId = _.keyBy(this.bid.entities.datatables(), "definitionId");
+    }
+    return this._datatablesKeyedByDefinitionId[defId] || null;
   }
 
   /**
