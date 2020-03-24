@@ -298,21 +298,23 @@ export default class Bid extends BidEntity {
    * Gets all the uncategorized Line Items by component group.
    *
    * @param  {number} componentGroupId     The component group id.
-   * @return {LineItem[]}              Returns an array of Line Items.
+   * @return {{[id: string]: LineItem}}    Uncategorized Line Items keyed by ID.
    */
   getUncategorizedLineItems(componentGroupId) {
-    var categorizedLineItemIds = [];
-    var uncategorizedLineItems = [];
+    const categorizedLineItemIds = new Set();
+    const uncategorizedLineItems = {};
 
     each(this.entities.components(), component => {
       if (component.config.component_group_id === componentGroupId) {
-        categorizedLineItemIds = categorizedLineItemIds.concat(component.config.line_items);
+        component.config.line_items.forEach(id => {
+          categorizedLineItemIds.add(id);
+        });
       }
     });
 
     each(this.entities.lineItems(), lineItem => {
-      if (categorizedLineItemIds.indexOf(lineItem.id) < 0) {
-        uncategorizedLineItems.push(lineItem);
+      if (!categorizedLineItemIds.has(lineItem.id)) {
+        uncategorizedLineItems[lineItem.id] = lineItem;
       }
     });
 

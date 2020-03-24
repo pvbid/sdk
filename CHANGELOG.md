@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.15 (2020-03-XX)
+
+Improvements:
+
+- **Bid:** `getUncategorizedLineItems` now returns the line items keyed by their ID instead of an array
+
 ### 1.2.14 (2020-03-20)
 
 Improvements:
