@@ -1674,10 +1674,7 @@ export default class LineItem extends BidEntity {
    * @returns {object}
    */
   exportData(alwaysIncludeConfig = false) {
-    const blacklist = ["prediction_model"];
-    if (!alwaysIncludeConfig && !this._hasConfigEverChanged) {
-      blacklist.push("config");
-    }
+    const blacklist = !alwaysIncludeConfig && !this._hasConfigEverChanged ? ["config"] : [];
     return cloneDeep(omit(this._data, blacklist));
   }
 
