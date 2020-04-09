@@ -370,13 +370,15 @@ export default class Project extends BidEntity {
   /**
    * Saves project and underlying bids.
    *
+   * @param {object} options
+   * @param {boolean} options.isAutoSave Indicate if this save is the result of an auto-save
    * @returns {Promise<null>}
    * @emits saving
    * @emits saved
    */
-  async save() {
+  async save({ isAutoSave = false } = {}) {
     this.emit("saving");
-    let response = await this._projectService.save(this);
+    let response = await this._projectService.save(this, { isAutoSave });
     this.emit("saved");
     return response;
   }
@@ -433,8 +435,17 @@ export default class Project extends BidEntity {
   enableAutoSave(delay) {
     delay = delay && typeof delay === "number" ? Math.max(delay, 1000) : 5000;
     this.onDelay("changed", delay, `project.${this.id}`, () => {
-      this.save();
+      this.save({ isAutoSave: true });
     });
+    this.isAutoSaveOn = true;
+  }
+
+  /**
+   * Disables auto saving when project or bid changes occur.
+   */
+  disableAutoSave() {
+    this.removeListenerByRequester("changed", `project.${this.id}`);
+    this.isAutoSaveOn = false;
   }
 
   /**

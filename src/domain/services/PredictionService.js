@@ -44,11 +44,7 @@ export default class PredictionService {
    * @return {boolean}
    */
   hasPredictionModels() {
-    return (
-      this.lineItem._data.prediction_model &&
-      this.lineItem._data.prediction_model.models &&
-      this.lineItem._data.prediction_model.models.length
-    );
+    return this.models.length > 0;
   }
 
   /**

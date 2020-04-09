@@ -838,6 +838,7 @@ export default class Bid extends BidEntity {
       assemblies: this.entities.assemblies(),
       field_groups: this.entities.fieldGroups(),
       datatables: this.entities.datatables(),
+      dynamic_groups: this.entities.dynamicGroups(),
     };
 
     Object.keys(entitiesToExport).forEach(entityType => {
