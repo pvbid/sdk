@@ -1,5 +1,16 @@
 # CHANGELOG
 
+### 1.2.16 (2020-04-09)
+
+Improvements:
+
+- **Project:** Added `batchUpdate` auto save flag (as query string parameter). Improves visibility into when auto save requests are being made.
+- **Project:** Added `disableAutoSave` setting to be used in congruence with `enableAutoSave`.
+
+Bug Fixes:
+
+- **PVBid:** Include prediction models in the virtual project clone's line items.
+
 ### 1.2.15 (2020-03-24)
 
 Improvements:
