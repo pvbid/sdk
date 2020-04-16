@@ -1160,7 +1160,7 @@ export default class LineItem extends BidEntity {
    * @return {number}
    */
   _getExtraScalarDependencies() {
-    return pickBy(this.config.dependencies, function(el, key) {
+    return pickBy(this.config.dependencies, function (el, key) {
       return key.indexOf("scalar_") === 0;
     });
   }
@@ -1171,7 +1171,7 @@ export default class LineItem extends BidEntity {
    * @return {Array}
    */
   _getExtraTagDependencies() {
-    return pickBy(this.config.dependencies, function(el, key) {
+    return pickBy(this.config.dependencies, function (el, key) {
       return key.indexOf("tag_") === 0;
     });
   }
@@ -1231,25 +1231,28 @@ export default class LineItem extends BidEntity {
    * @return {number}
    */
   _getLaborHoursValue() {
-    if (!this.isOverridden("labor_hours")) {
-      let hours;
-      if (this.isLabor()) {
-        if (this._shouldPredict(["quantity", "per_quantity", "base", "multiplier", "scalar"])) {
-          hours = this.getPredictedLaborHours();
-          this._applyConfig("is_predicted_labor_hours", true);
-        } else {
-          hours = (this.quantity * this.perQuantity + this.base) * this.multiplier;
-          this._applyConfig("is_predicted_labor_hours", false);
-          if (this._undefinedPropsIncludes("quantity", "per_quantity", "base", "multiplier")) {
-            this._undefinedPropFlags.push("labor_hours");
-          }
-        }
+    if (this.isOverridden("labor_hours")) {
+      this._applyConfig("is_predicted_labor_hours", false);
+      return round(Helpers.confirmNumber(this._data.labor_hours), 4);
+    }
+
+    let hours;
+    if (this.isLabor()) {
+      if (this._shouldPredict(["quantity", "per_quantity", "base", "multiplier", "scalar"])) {
+        hours = this.getPredictedLaborHours();
+        this._applyConfig("is_predicted_labor_hours", true);
       } else {
-        hours = 0;
+        hours = (this.quantity * this.perQuantity + this.base) * this.multiplier;
         this._applyConfig("is_predicted_labor_hours", false);
+        if (this._undefinedPropsIncludes("quantity", "per_quantity", "base", "multiplier")) {
+          this._undefinedPropFlags.push("labor_hours");
+        }
       }
-      return round(Helpers.confirmNumber(hours), 4);
-    } else return round(Helpers.confirmNumber(this._data.labor_hours), 4);
+    } else {
+      hours = 0;
+      this._applyConfig("is_predicted_labor_hours", false);
+    }
+    return round(Helpers.confirmNumber(hours), 4);
   }
 
   /**
@@ -1379,39 +1382,43 @@ export default class LineItem extends BidEntity {
    * @return {number}
    */
   _getCostValue() {
-    if (!this.isOverridden("cost")) {
-      const dependencies = ["escalator", "ohp"];
-      let cost = 0;
-      if (this.isLabor()) {
-        dependencies.push("wage", "burden");
-        // use predicted cost only if cost specific dependencies are undefined. Otherwise compute using predicted hours
-        if (this._undefinedPropsIncludes(...dependencies) && this._shouldPredict(dependencies)) {
-          this._applyConfig("is_predicted_cost", true);
-          let cost = this.getPredictedCost();
-          return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
-        }
-
-        cost = this.laborHours * (this.wage + this.burden);
-      } else {
-        dependencies.push("quantity", "per_quantity", "multiplier", "base", "scalar");
-        if (this._shouldPredict(dependencies)) {
-          this._applyConfig("is_predicted_cost", true);
-          let cost = this.getPredictedCost();
-          return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
-        }
-
-        cost = (this.quantity * this.perQuantity + this.base) * this.multiplier;
-      }
+    if (this.isOverridden("cost")) {
       this._applyConfig("is_predicted_cost", false);
+      return round(Helpers.confirmNumber(this._data.cost), 4);
+    }
 
-      cost = cost * this.escalator * this.ohp;
-
-      if (this._undefinedPropsIncludes(...dependencies)) {
-        this._undefinedPropFlags.push("cost");
+    const dependencies = ["escalator", "ohp"];
+    let cost = 0;
+    if (this.isLabor()) {
+      dependencies.push("wage", "burden");
+      // use predicted cost only if cost specific dependencies are undefined. Otherwise compute using predicted hours
+      if (this._undefinedPropsIncludes(...dependencies) && this._shouldPredict(dependencies)) {
+        this._applyConfig("is_predicted_cost", true);
+        let cost = this.getPredictedCost();
+        return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
       }
 
-      return round(Helpers.confirmNumber(cost), 4);
-    } else return round(Helpers.confirmNumber(this._data.cost), 4);
+      cost = this.laborHours * (this.wage + this.burden);
+      this._applyConfig("is_predicted_cost", this.isPredicted("labor_hours"));
+    } else {
+      dependencies.push("quantity", "per_quantity", "multiplier", "base", "scalar");
+      if (this._shouldPredict(dependencies)) {
+        this._applyConfig("is_predicted_cost", true);
+        let cost = this.getPredictedCost();
+        return this.isWeighted ? cost * this._predictionService.getContributionWeight() : cost;
+      }
+
+      cost = (this.quantity * this.perQuantity + this.base) * this.multiplier;
+      this._applyConfig("is_predicted_cost", false);
+    }
+
+    cost = cost * this.escalator * this.ohp;
+
+    if (this._undefinedPropsIncludes(...dependencies)) {
+      this._undefinedPropFlags.push("cost");
+    }
+
+    return round(Helpers.confirmNumber(cost), 4);
   }
 
   /**
@@ -1566,15 +1573,9 @@ export default class LineItem extends BidEntity {
    */
   _applyUndefinedPropFlags() {
     const oldFlags = this.config.undefined_prop_flags
-      ? this.config.undefined_prop_flags
-          .concat()
-          .sort()
-          .join(",")
+      ? this.config.undefined_prop_flags.concat().sort().join(",")
       : [];
-    const newFlags = Array.from(new Set(this._undefinedPropFlags))
-      .concat()
-      .sort()
-      .join(",");
+    const newFlags = Array.from(new Set(this._undefinedPropFlags)).concat().sort().join(",");
     if (oldFlags !== newFlags) {
       this.config.undefined_prop_flags = Array.from(new Set(this._undefinedPropFlags));
       return true;
