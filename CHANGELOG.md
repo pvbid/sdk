@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.17 (2020-04-16)
+
+Bug Fixes:
+
+- **Line Item:** Ensure prediction status flags are updated to false when cost is overridden.
+
 ### 1.2.16 (2020-04-09)
 
 Improvements:
