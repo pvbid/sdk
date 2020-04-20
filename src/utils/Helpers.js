@@ -131,8 +131,8 @@ export default class Helpers {
         .replace(/=/g, "==") // change equals to the js version of equal to
         .replace(/smallerEq/gi, "<=") // revert back to smaller than equal to
         .replace(/largerEq/gi, ">=") // revert back to smaller than equal to
-        .replace(/#/g, "pound_sign")
-    ); // replace pound sign
+        .replace(/#/g, "pound_sign") // replace pound sign
+    );
   }
 
   /**
