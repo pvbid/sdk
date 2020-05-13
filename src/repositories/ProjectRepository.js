@@ -1,4 +1,6 @@
 import BaseRepository from "./BaseRepository";
+import BidRepository from "./BidRepository";
+import BidEntityRelationsHelper from "@/domain/services/BidEntityRelationsHelper";
 
 export default class ProjectRepository extends BaseRepository {
   constructor(config) {
@@ -30,7 +32,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async attachBid(projectId, bidId) {
-    return this.http.post(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/bids/" + bidId).then(function (response) {
       return response.data.data;
     });
   }
@@ -43,7 +45,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async detachBid(projectId, bidId) {
-    return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
+    return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function (response) {
       return response.data.data;
     });
   }
@@ -56,7 +58,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async attachUser(projectId, userId) {
-    return this.http.post(this.endpoint + projectId + "/users/" + userId).then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/users/" + userId).then(function (response) {
       return response.data.data;
     });
   }
@@ -69,7 +71,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async detachUser(projectId, userId) {
-    return this.http.delete(this.endpoint + projectId + "/users/" + userId).then(function(response) {
+    return this.http.delete(this.endpoint + projectId + "/users/" + userId).then(function (response) {
       return response.data.data;
     });
   }
@@ -85,9 +87,22 @@ export default class ProjectRepository extends BaseRepository {
    */
   async batchUpdate(projectId, data, { isAutoSave = false } = {}) {
     const config = isAutoSave ? { params: { is_auto: isAutoSave } } : {};
-    return this.http
-      .put(this.endpoint + projectId + "/batch/", data, config)
-      .then(response => response.data.data);
+    return this.http.put(this.endpoint + projectId + "/batch/", data, config).then(response => {
+      if (response.data.data.project.updatedData) {
+        Object.entries(response.data.data.project.updatedData).forEach((bidResponse, bidId) => {
+          BidRepository.findById(bidId).then(bid => {
+            if (bidResponse.entities !== undefined) {
+              Object.entries(bidResponse.entities).forEach((updatedEntitiesByType, entityType) => {
+                Object.entries(updatedEntitiesByType).forEach((updatedEntity, entityId) => {
+                  BidEntityRelationsHelper(bid).getBidEntity(entityType, entityId).updated_at =
+                    updatedEntity.updated_at;
+                });
+              });
+            }
+          });
+        });
+      }
+    });
   }
 
   /**
@@ -97,7 +112,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<BidEntity>} Project clone
    */
   async clone(projectId) {
-    return this.http.post(this.endpoint + projectId + "/clone").then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/clone").then(function (response) {
       return response.data.data.project;
     });
   }
