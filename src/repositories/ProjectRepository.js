@@ -87,22 +87,9 @@ export default class ProjectRepository extends BaseRepository {
    */
   async batchUpdate(projectId, data, { isAutoSave = false } = {}) {
     const config = isAutoSave ? { params: { is_auto: isAutoSave } } : {};
-    return this.http.put(this.endpoint + projectId + "/batch/", data, config).then(response => {
-      if (response.data.data.project.updatedData) {
-        Object.entries(response.data.data.project.updatedData).forEach((bidResponse, bidId) => {
-          BidRepository.findById(bidId).then(bid => {
-            if (bidResponse.entities !== undefined) {
-              Object.entries(bidResponse.entities).forEach((updatedEntitiesByType, entityType) => {
-                Object.entries(updatedEntitiesByType).forEach((updatedEntity, entityId) => {
-                  BidEntityRelationsHelper(bid).getBidEntity(entityType, entityId).updated_at =
-                    updatedEntity.updated_at;
-                });
-              });
-            }
-          });
-        });
-      }
-    });
+    return this.http
+      .put(this.endpoint + projectId + "/batch/", data, config)
+      .then(response => response.data.data);
   }
 
   /**
