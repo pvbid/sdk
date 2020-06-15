@@ -119,37 +119,48 @@ export default class Helpers {
 
   static _cleanFormula(formula) {
     if (!formula) return "1";
-    return formula
-      .toString()
-      .toLowerCase()
-      .replace(/[\[\]]/g, "") // what is this?
-      .replace(/roundup/gi, "ceil") // change roundup to ceil
-      .replace(/rounddown/gi, "floor") // change rowndown to floor
-      .replace(/<=/g, "smallerEq") // temp hold the smallerEq val
-      .replace(/>=/g, "largerEq") // temp hold the largerEq val
-      .replace(/=/g, "==") // change equals to the js version of equal to
-      .replace(/smallerEq/gi, "<=") // revert back to smaller than equal to
-      .replace(/largerEq/gi, ">=") // revert back to smaller than equal to
-      .replace(/#/g, "pound_sign"); // replace pound sign
+    return (
+      formula
+        .toString()
+        .toLowerCase()
+        // .replace(/[\[\]]/g, "") // removed to support numeric key named objects (e.g. foo.abc[123])
+        .replace(/roundup/gi, "ceil") // change roundup to ceil
+        .replace(/rounddown/gi, "floor") // change rowndown to floor
+        .replace(/<=/g, "smallerEq") // temp hold the smallerEq val
+        .replace(/>=/g, "largerEq") // temp hold the largerEq val
+        .replace(/=/g, "==") // change equals to the js version of equal to
+        .replace(/smallerEq/gi, "<=") // revert back to smaller than equal to
+        .replace(/largerEq/gi, ">=") // revert back to smaller than equal to
+        .replace(/#/g, "pound_sign") // replace pound sign
+    );
   }
 
+  /**
+   * Clean values and cast when appropriate
+   *
+   * @param {Object.<string, any>} valuesMap
+   * @param {boolean} castAsNumbers
+   * @return {Object} The values mapped
+   */
   static _cleanValues(valuesMap, castAsNumbers = true) {
     if (valuesMap === undefined || valuesMap === null) return {};
     const map = { ...valuesMap };
-    Object.keys(map).forEach(key => {
-      const val = map[key];
+    Object.keys(map).forEach(k => {
+      const val = map[k];
+      const key = k.toLowerCase();
       if (val === null && castAsNumbers) {
-        map[key.toLowerCase()] = 1;
+        map[key] = 1;
+      } else if (val === null) {
+        map[key] = val;
       } else if (typeof val === "boolean" || val === "true" || val === "false") {
-        if (castAsNumbers) {
-          map[key.toLowerCase()] = val === true || val === "true" ? 1 : 0;
-        } else {
-          map[key.toLowerCase()] = val === true || val === "true";
-        }
+        const asBoolean = typeof val === "boolean" ? val : val === "true";
+        map[key] = castAsNumbers ? +asBoolean : asBoolean;
       } else if (this.isNumber(val)) {
-        map[key.toLowerCase()] = this.confirmNumber(val);
+        map[key] = this.confirmNumber(val);
+      } else if (typeof val === "object") {
+        map[key] = this._cleanValues(val, castAsNumbers);
       } else {
-        map[key.toLowerCase()] = val ? val.replace(/#/g, "pound_sign") : val;
+        map[key] = val ? val.replace(/#/g, "pound_sign") : val;
       }
     });
     return map;

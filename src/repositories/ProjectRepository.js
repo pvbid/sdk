@@ -1,4 +1,6 @@
 import BaseRepository from "./BaseRepository";
+import BidRepository from "./BidRepository";
+import BidEntityRelationsHelper from "@/domain/services/BidEntityRelationsHelper";
 
 export default class ProjectRepository extends BaseRepository {
   constructor(config) {
@@ -30,7 +32,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async attachBid(projectId, bidId) {
-    return this.http.post(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/bids/" + bidId).then(function (response) {
       return response.data.data;
     });
   }
@@ -43,7 +45,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async detachBid(projectId, bidId) {
-    return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function(response) {
+    return this.http.delete(this.endpoint + projectId + "/bids/" + bidId).then(function (response) {
       return response.data.data;
     });
   }
@@ -56,7 +58,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async attachUser(projectId, userId) {
-    return this.http.post(this.endpoint + projectId + "/users/" + userId).then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/users/" + userId).then(function (response) {
       return response.data.data;
     });
   }
@@ -69,7 +71,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<Object>} API response status
    */
   async detachUser(projectId, userId) {
-    return this.http.delete(this.endpoint + projectId + "/users/" + userId).then(function(response) {
+    return this.http.delete(this.endpoint + projectId + "/users/" + userId).then(function (response) {
       return response.data.data;
     });
   }
@@ -97,7 +99,7 @@ export default class ProjectRepository extends BaseRepository {
    * @return {Promise<BidEntity>} Project clone
    */
   async clone(projectId) {
-    return this.http.post(this.endpoint + projectId + "/clone").then(function(response) {
+    return this.http.post(this.endpoint + projectId + "/clone").then(function (response) {
       return response.data.data.project;
     });
   }
