@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.2.18 (2020-06-15)
+
+Improvements:
+
+- **Helpers:** Removed stripping of square brackets in `_cleanFormula` and made `_cleanValues` safer with types
+
 ### 1.2.17 (2020-04-16)
 
 Bug Fixes:
