@@ -1,10 +1,18 @@
 # CHANGELOG
 
-### 1.2.18 (2020-06-15)
+### 1.2.19 (2020-06-19)
 
 Improvements:
 
 - **Helpers:** Removed stripping of square brackets in `_cleanFormula` and made `_cleanValues` safer with types
+
+### 1.2.18 (2020-06-11)
+
+Bug Fixes:
+
+- **Component:** Updated Component `wage` and `burden` aggregation calculations. The new formulas are:
+  `wage` = sum of all labor Line Items' (wage _ hours) / sum of all labor Line Items' hours
+  `burden` = sum of all labor Line Items' (burden _ hours) / sum of all labor Line Items' hours
 
 ### 1.2.17 (2020-04-16)
 

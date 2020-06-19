@@ -472,7 +472,9 @@ export default class Component extends BidEntity {
       let totalLineItems = 0;
       let totalLaborLineItems = 0;
       let wage = 0;
+      let wageDividend = 0;
       let burden = 0;
+      let burdenDividend = 0;
       let quantity = 0;
       let perQuantity = 0;
       let laborCosts = 0;
@@ -520,7 +522,9 @@ export default class Component extends BidEntity {
         tax += lineItem.tax;
         base += lineItem.base;
         wage += lineItem.wage;
+        wageDividend += lineItem.laborHours * lineItem.wage;
         burden += lineItem.burden;
+        burdenDividend += lineItem.laborHours * lineItem.burden;
         quantity += lineItem.quantity;
         perQuantity += lineItem.perQuantity;
 
@@ -566,7 +570,9 @@ export default class Component extends BidEntity {
         nonLaborCosts += Helpers.confirmNumber(subComponent.nonLaborCost);
         base += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("base"));
         wage += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("wage"));
+        wageDividend += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("wage_dividend"));
         burden += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("burden"));
+        burdenDividend += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("burden_dividend"));
         quantity += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("quantity"));
         perQuantity += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("per_quantity"));
         totalLineItems += Helpers.confirmNumber(subComponent.getVirtualPropertyValue("included_count"));
@@ -617,8 +623,8 @@ export default class Component extends BidEntity {
 
       const taxPercent = taxableCost > 0 ? (tax / taxableCost) * 100 : 0;
       const baseAvg = totalLineItems > 0 ? base / totalLineItems : 0;
-      const wageAvg = totalLaborLineItems > 0 ? wage / totalLaborLineItems : 0;
-      const burdenAvg = totalLaborLineItems > 0 ? burden / totalLaborLineItems : 0;
+      const wageQuotient = totalLaborLineItems > 0 ? wageDividend / laborHours : 0;
+      const burdenQuotient = laborHours > 0 ? burdenDividend / laborHours : 0;
       const quantityAvg = totalLineItems > 0 ? quantity / totalLineItems : 0;
       const perQuantityAvg = totalLineItems > 0 ? perQuantity / totalLineItems : 0;
 
@@ -646,8 +652,10 @@ export default class Component extends BidEntity {
       this._applyVirtualProperty("included_labor_count", totalLaborLineItems);
       isChanged = this._applyVirtualProperty("included_count", totalLineItems) || isChanged;
       this._applyVirtualProperty("base_avg", baseAvg);
-      this._applyVirtualProperty("wage_avg", wageAvg);
-      this._applyVirtualProperty("burden_avg", burdenAvg);
+      this._applyVirtualProperty("wage_avg", wageQuotient);
+      this._applyVirtualProperty("wage_dividend", wageDividend);
+      this._applyVirtualProperty("burden_avg", burdenQuotient);
+      this._applyVirtualProperty("burden_dividend", burdenDividend);
       this._applyVirtualProperty("per_quantity_avg", perQuantityAvg);
       this._applyVirtualProperty("quantity_avg", quantityAvg);
 
