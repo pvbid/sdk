@@ -259,7 +259,9 @@ export default class Project extends BidEntity {
       this.emit("assessing");
     });
 
-    bid.on("changed", `project.${this.id}.bid-changed`, () => this.dirty());
+    if (this.isAutoSaveOn) {
+      bid.on("changed", `project.${this.id}.bid-changed`, () => this.dirty());
+    }
 
     bid.onDelay("assessed", 200, `project.${this.id}.assessed`, () => {
       //console.log("assess Cost/Price", this.cost, this.price);
