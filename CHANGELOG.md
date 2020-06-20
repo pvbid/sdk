@@ -1,11 +1,14 @@
 # CHANGELOG
 
+### 1.2.20 (2020-06-20)
+
+- **Project:** Only enable the change event listener on Bids if the Project's `autoSave` flag is enabled
+
 ### 1.2.19 (2020-06-19)
 
 Improvements:
 
 - **Helpers:** Removed stripping of square brackets in `_cleanFormula` and made `_cleanValues` safer with types
-- **Project:** Only enable the change event listener on Bids if the project's autoSave flag is enabled
 
 ### 1.2.18 (2020-06-11)
 
