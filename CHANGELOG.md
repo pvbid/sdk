@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.0 (2021-01-25) 
+
+Improvements:
+
+- **Line Item:** Added `_getStoplightPrediction` to return stoplight predictions and a related indicator 
+
 ### 1.2.20 (2020-06-20)
 
 - **Project:** Only enable the change event listener on Bids if the Project's `autoSave` flag is enabled
