@@ -34,6 +34,79 @@ test("add new null tag and ensure config.tags is empty array", () => {
   expect($lineItem.config.tags).toEqual([]);
 });
 
+test("test line item stoplight", () => {
+
+  const $lineItem = bid.entities.searchByTitle("line_item", "General Line Item")[0];
+
+  $lineItem._data.prediction_model.models = [
+    {
+      "model": {
+        "r2": 0.6801353011931235,
+        "type": "trendline-linear",
+        "equation": "1.1255477252487a + 16928.116213133",
+        "standard_deviation": {
+          "r2": 0.6861704841894797,
+          "type": "standard_deviation",
+          "mean_data": 95193.70259259258,
+          "std_dev_n": 54,
+          "std_dev_error": 0.4743656300651088,
+          "standard_deviation": 78133.83122771258,
+          "std_dev_error_mean": -0.0006802933978874216
+        }
+      },
+      "bounds": [
+        [
+          5850,
+          222300
+        ],
+        [
+          11552.76,
+          274974.87
+        ]
+      ],
+      "is_base": true,
+      "dependencies": {
+        "a": {
+          "type": "metric",
+          "field": "value",
+          "definition_id": 16346
+        },
+        "y": {
+          "type": "line_item",
+          "field": "cost",
+          "definition_id": 23829
+        }
+      },
+      "line_item_id": 23829,
+      "line_item_title": "Line Item 1.1.1 (this matches data in spreadsheet)"
+    }
+  ];
+  
+  const mock = jest.mock('@/domain/services/PredictionService');
+  mock.getCostPredictionModels = function() { return $lineItem._data.prediction_model.models; };
+  mock.evaluateModel = function() { return { value: 267137.38 }; };
+  $lineItem._predictionService = mock;  
+
+  $lineItem.cost = 435000;
+  expect($lineItem._getStoplightPrediction()).toEqual(0);
+  $lineItem.cost = 400000;
+  expect($lineItem._getStoplightPrediction()).toEqual(1);
+  $lineItem.cost = 310000;
+  expect($lineItem._getStoplightPrediction()).toEqual(2);
+  $lineItem.cost = 250000;
+  expect($lineItem._getStoplightPrediction()).toEqual(3);
+  $lineItem.cost = 230000;
+  expect($lineItem._getStoplightPrediction()).toEqual(4);
+  $lineItem.cost = 150000;
+  expect($lineItem._getStoplightPrediction()).toEqual(5);
+  $lineItem.cost = 60000;
+  expect($lineItem._getStoplightPrediction()).toEqual(6);
+  $lineItem.cost = 500000;
+  expect($lineItem._getStoplightPrediction()).toEqual(-1);
+  $lineItem.cost = 25000;
+  expect($lineItem._getStoplightPrediction()).toEqual(-1);
+});
+
 test("add new tags and ensure they are pushed to config.tags", () => {
   expect.assertions(1);
 

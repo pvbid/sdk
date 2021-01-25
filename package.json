@@ -111,6 +111,7 @@
   "dependencies": {
     "axios": "^0.16.2",
     "eventemitter3": "^4.0.0",
+    "jstat": "^1.9.4",
     "lodash": "^4.17.4",
     "mathjs": "^3.16.3",
     "performance-now": "^2.1.0"

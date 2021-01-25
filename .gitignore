@@ -6,3 +6,4 @@ docs
 esdocs
 .env
 coverage
+.idea
