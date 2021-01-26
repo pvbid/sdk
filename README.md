@@ -15,7 +15,7 @@ npm i pvbid-sdk --save
 **CDN**
 ~120kB gzipped
 
-https://unpkg.com/pvbid-sdk@1.2/dist/pvbid.min.js
+https://unpkg.com/pvbid-sdk@1.3.1/dist/pvbid.min.js
 
 ## Documentation
 
