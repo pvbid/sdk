@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.1 (2021-01-26) 
+
+Improvements:
+
+- **PVBid:** Updated the SDK's dependencies 
+
 ### 1.3.0 (2021-01-25) 
 
 Improvements:
