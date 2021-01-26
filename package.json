@@ -9,7 +9,7 @@
     "build-web": "PLATFORM=web webpack --mode=production",
     "watch": "WATCH=true webpack --mode=development",
     "watch-node": "WATCH=true PLATFORM=node webpack --mode=development",
-    "docs": "./node_modules/.bin/esdoc && xdg-open docs/index.html",
+    "docs": "./node_modules/.bin/esdoc && open docs/index.html",
     "publish-docs": "npm run test && npm run docs && PLATFORM=web DOCS=true webpack",
     "size": "size-limit",
     "test": "jest",
