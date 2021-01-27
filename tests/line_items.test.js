@@ -81,30 +81,57 @@ test("test line item stoplight", () => {
       "line_item_title": "Line Item 1.1.1 (this matches data in spreadsheet)"
     }
   ];
-  
+
   const mock = jest.mock('@/domain/services/PredictionService');
-  mock.getCostPredictionModels = function() { return $lineItem._data.prediction_model.models; };
-  mock.evaluateModel = function() { return { value: 267137.38 }; };
-  $lineItem._predictionService = mock;  
+  mock.getCostPredictionModels = function () {
+    return $lineItem._data.prediction_model.models;
+  };
+  mock.evaluateModel = function () {
+    return {value: 267137.38};
+  };
+  $lineItem._predictionService = mock;
 
   $lineItem.cost = 435000;
-  expect($lineItem._getStoplightPrediction()).toEqual(0);
+  expect($lineItem._getStoplightIndicator()).toEqual(0);
   $lineItem.cost = 400000;
-  expect($lineItem._getStoplightPrediction()).toEqual(1);
+  expect($lineItem._getStoplightIndicator()).toEqual(1);
   $lineItem.cost = 310000;
-  expect($lineItem._getStoplightPrediction()).toEqual(2);
+  expect($lineItem._getStoplightIndicator()).toEqual(2);
   $lineItem.cost = 250000;
-  expect($lineItem._getStoplightPrediction()).toEqual(3);
+  expect($lineItem._getStoplightIndicator()).toEqual(3);
   $lineItem.cost = 230000;
-  expect($lineItem._getStoplightPrediction()).toEqual(4);
+  expect($lineItem._getStoplightIndicator()).toEqual(4);
   $lineItem.cost = 150000;
-  expect($lineItem._getStoplightPrediction()).toEqual(5);
+  expect($lineItem._getStoplightIndicator()).toEqual(5);
   $lineItem.cost = 60000;
-  expect($lineItem._getStoplightPrediction()).toEqual(6);
+  expect($lineItem._getStoplightIndicator()).toEqual(6);
   $lineItem.cost = 500000;
-  expect($lineItem._getStoplightPrediction()).toEqual(-1);
+  expect($lineItem._getStoplightIndicator()).toEqual(-1);
   $lineItem.cost = 25000;
-  expect($lineItem._getStoplightPrediction()).toEqual(-1);
+  expect($lineItem._getStoplightIndicator()).toEqual(-2);
+
+  // if there are no models
+  $lineItem._data.prediction_model.models = [];
+  expect($lineItem._getStoplightIndicator()).toEqual(-3);
+
+  // if a model doesnt have 'standard_deviation'
+  delete mock.getCostPredictionModels.standard_deviation;
+  expect($lineItem._getStoplightIndicator()).toEqual(-3);
+
+  // if only a line item's cost is being predicted
+  $lineItem._data.config.is_predicted_cost = true;
+  $lineItem._data.config.is_predicted_labor_hours = false;
+  expect($lineItem._getStoplightIndicator()).toEqual(-3);
+
+  // if only line item's labor cost is being predicted
+  $lineItem._data.config.is_predicted_cost = false;
+  $lineItem._data.config.is_predicted_labor_hours = true;
+  expect($lineItem._getStoplightIndicator()).toEqual(-3);
+
+  // if a line item's cost is being predicted
+  $lineItem._data.config.is_predicted_cost = true;
+  $lineItem._data.config.is_predicted_labor_hours = true;
+  expect($lineItem._getStoplightIndicator()).toEqual(-3);
 });
 
 test("add new tags and ensure they are pushed to config.tags", () => {
