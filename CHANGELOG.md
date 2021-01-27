@@ -1,5 +1,19 @@
 # CHANGELOG
 
+### 1.3.2 (2021-01-27) 
+
+Improvements:
+
+- **PVBid:** Updated the SDK's dependencies 
+- **Line Item:**  Changed `_getStoplightPredictions` to `_getStoplightIndicator`
+- **Line Item:**  Updated the stoplight indicator to show `positive` and `negative` `Out of Bounds` for a lineItem 
+if its cost is too far above or too far below its predicted value.
+- **Line Item:**  Added a check to prevent the stoplight indicator from showing for a specific 
+lineItem if its cost or labor cost is predicted
+- **Line Item:**  Removed the check preventing the stoplight indicator from showing if predictions are enabled
+- **Line Item:**  Updated Line Item tests
+
+
 ### 1.3.1 (2021-01-26) 
 
 Improvements:
