@@ -1,5 +1,12 @@
 # CHANGELOG
 
+### 1.3.3 (2021-02-04) 
+
+Improvements:
+
+- **Line Item:**  Optimized the  `_getStoplightIndicator` for better performance.
+- **Component:** Added `getStoplightIndicator` to return stoplight predictions and a related indicator for **components** and **subcomponents**
+
 ### 1.3.2 (2021-01-27) 
 
 Improvements:
