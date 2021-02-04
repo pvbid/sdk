@@ -13,7 +13,7 @@ import BidEntity from "./BidEntity";
 import Helpers from "../utils/Helpers";
 import PredictionService from "./services/PredictionService";
 import LineItemRuleService from "./services/LineItemRuleService";
-import { setAssembly, getAssembly } from "./services/BidEntityAssemblyService";
+import {setAssembly, getAssembly} from "./services/BidEntityAssemblyService";
 import WorkupService from "./services/WorkupService";
 import Workup from "./Workup";
 import jStat from "jstat";
@@ -663,7 +663,7 @@ export default class LineItem extends BidEntity {
       // This line converts the array to an object.
       if (Array.isArray(this._data.config.overrides)) {
         this._data.config.overrides = this._data.config.overrides.reduce(
-          (o, k) => Object.assign(o, { [k]: true }),
+          (o, k) => Object.assign(o, {[k]: true}),
           {}
         );
       }
@@ -1669,187 +1669,208 @@ export default class LineItem extends BidEntity {
   }
 
   /**
-   * Returns a integer value indicating which distribution range a lineItem's cost falls
-   * Returns 0,1,2,3,4,5,6 or (distributionRanges.length - 1) the value being the percent range that the current cost falls under.
+   *  Returns a integer value indicating which distribution range a lineItem's cost falls
+   * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
    * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
    * Returns -3 if the lineItem does not have prediction models, or does not have models with 'standard_deviation' or if the lineItem's cost is currently being predicted.
-   * @return {int}
+   * @returns {number}
+   * @private
    */
   _getStoplightIndicator() {
-    let lineItem = this;
-    let lineItemCost = this.cost;
-    let modelR2, sumR2, stoplightRange, currentWeightedValue, nextWeightedValue, predictedValue;
-    let isPredicted = (lineItem._data.config.is_predicted_cost === true || lineItem._data.config.is_predicted_labor_hours === true);
-    let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
-    let predictionModels;
-    const r2Values = [];
-    // Check if the models are based on cost or labor hours
-    if (this._data.config.type === "dollar") {
-      predictionModels = lineItem._predictionService.getCostPredictionModels();
-    } else {
-      predictionModels = lineItem._predictionService.getLaborPredictionModels();
-    }
-    // If there are no prediction models, return -3 meaning Data Not Available
-    if (predictionModels.length === 0) {
-      return -3;
-    }
-
-    /**
-     *  Get the r-squared values for each model and add them to an array
-     *  This will be used to calculate the sum of all of the standard deviation r-squared values from the prediction model.
-     *  If the model is an older model without the standard_deviation data return -3 for frontend output: Data Not Available
-     */
-    predictionModels.forEach((model) => {
-      if (model.model.hasOwnProperty('standard_deviation')) {
-        modelR2 = model.model.standard_deviation.r2;
-        r2Values.push(modelR2);
-      } else {
-        return -3;
-      }
-    });
-
-    /**
-     * Calculate the sum of the R-Squared Values
-     * If the r2Values array is empty
-     * return -3 (Data not available)
-     */
-    if (r2Values.length !== 0) {
-      sumR2 = r2Values.reduce((x, y) => x + y);
+    let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult,weightedNormalValues;
+    if (this.getWeightedNormalValues()) {
+      weightedNormalValues = this.getWeightedNormalValues();
     } else {
       return -3;
     }
-
+    if (this.isPredicted()) {
+      return -3;
+    }
     /**
      *  Initiate the Stoplight Calculations
-     *  If the lineItem's cost is being predicted return -3 (Data Not Available)
+     *  For each weighted normal value, determine the stoplight range  based on the current and next weighted value
      */
-    if (!isPredicted) {
-      // For each distribution range determine the weighted normal value and the stoplight range it falls under
-      for (let normValueIndex = 0; normValueIndex < distributionRanges.length - 1; normValueIndex++) {
-        currentWeightedValue = weightedNormalValueResult(predictionModels, distributionRanges[normValueIndex], lineItem).value;
-        nextWeightedValue = weightedNormalValueResult(predictionModels, distributionRanges[normValueIndex + 1], lineItem).value;
-        stoplightRange = determineStoplightRange(normValueIndex, lineItemCost, currentWeightedValue, nextWeightedValue);
-        if (stoplightRange !== null && stoplightRange !== undefined) break;
+    for (let normValueIndex = 0; normValueIndex < weightedNormalValues.length; normValueIndex++) {
+      currentWeightedValue = weightedNormalValues[normValueIndex];
+      nextWeightedValue = weightedNormalValues[(normValueIndex + 1) % weightedNormalValues.length];
+      rawResult = this.determineStoplightRange(normValueIndex, currentWeightedValue, nextWeightedValue);
+      if (rawResult !== null && rawResult !== undefined) {
+        stoplightRange = rawResult;
       }
-
-      // If the stoplight range cannot be found for the current cost
-      if (typeof stoplightRange === 'undefined') {
-        // Get the predicted value from the PredictionService
-        predictedValue = lineItem._predictionService.evaluateModel(predictionModels[0]).value;
-        // If the lineItem's cost is greater than the predicted value
-        // set the stoplight range to -1 (out of range on the upper bound)
-        if (lineItemCost > predictedValue) {
-          stoplightRange = -1;
-        }
-        // If the lineItem's cost is less than the predicted value
-        // set the stoplight range to -2 (out of range on the lower bound)
-        if (lineItemCost < predictedValue) {
-          stoplightRange = -2;
-        }
+    }
+    if (typeof stoplightRange === 'undefined') {
+      // If the lineItem's cost is greater than the predicted value
+      // set the stoplight range to -1 (out of range on the upper bound)
+      if (this._getCostValue() > this.getPredictedValue()) {
+        stoplightRange = -1;
       }
-      return stoplightRange;
-    } else {
-      return -3;
+      // If the lineItem's cost is less than the predicted value
+      // set the stoplight range to -2 (out of range on the lower bound)
+      if (this._getCostValue() < this.getPredictedValue()) {
+        stoplightRange = -2;
+      }
     }
 
-    /**
-     * Determines the Stoplight Range a lineItem's cost falls under.
-     * @param {int} currentIndex -> The current index of the range being used for calculation
-     * @param {number} cost -> The lineItem's current cost
-     * @param {float} currentWeightedValue -> The current weightedValue in the loop
-     * @param {float} nextWeightedValue -> The next weightedValue in the loop
-     * @returns {int} range  -> The ending stoplight range being the range index that the cost falls under
-     */
-    function determineStoplightRange(currentIndex, cost, currentWeightedValue, nextWeightedValue) {
-      let range;
-      //console.log(currentIndex, cost, currentWeightedValue, nextWeightedValue)
-      // If the normal value falls in the ranges below or equal to 40%
-      if (currentIndex < 4) {
-        if ((cost < currentWeightedValue) && (cost >= nextWeightedValue)) {
-          range = currentIndex;
-        }
-      }
-      // If the normal value falls in the ranges below or equal to 40%
-      if (currentIndex >= 4) {
-        if ((cost <= currentWeightedValue) && (cost > nextWeightedValue)) {
-          range = currentIndex;
-        }
-      }
-      return range;
-    }
+    return stoplightRange;
+  }
 
-    /**
-     * Calculate the resultant weighted normal value.
-     * For each range we go through each model and determine its normal values.
-     * From the normal values we compare the current model's normal value at x range to the next model's normal value at x range.
-     * We return the result being the calculated weighted normal value of the model at x range
-     * @param {predictionModels} models
-     * @param {number} range
-     * @param {LineItem} lineItem
-     * @returns {object} // Value: weightedNormalValue -> The calculated weighted normal, range: range -> The current range that was used to determine the value
-     */
-    function weightedNormalValueResult(models, range, lineItem) {
-      let currentNormalError, currentNormalValue, currentSumR2, nextNormalError, nextNormalValue, nextSumR2,
-        weightedNormalValue;
-      for (let modelIndex = 0; modelIndex < models.length; modelIndex++) {
+  /**
+   *  Determines the stoplight range to be used with the indicator.
+   * @param currentIndex
+   * @param currentWeightedValue
+   * @param nextWeightedValue
+   * @returns {int} The index that the result falls upon
+   */
+  determineStoplightRange(currentIndex, currentWeightedValue, nextWeightedValue) {
+    // If the normal value falls in the ranges below or equal to 40%
+    if (currentIndex < 5) {
+      if ((this._getCostValue() < currentWeightedValue) && (this._getCostValue() >= nextWeightedValue)) {
+        return currentIndex;
+      }
+    }
+    // If the normal value falls in the ranges below or equal to 40%
+    if (currentIndex >= 5) {
+      if ((this._getCostValue() <= currentWeightedValue) && (this._getCostValue() > nextWeightedValue)) {
+        return currentIndex;
+      }
+    }
+  }
+
+  /**
+   *  Calculate the weighted normal value given a set of distribution ranges.
+   * @returns {array} Array of weighted normal values
+   */
+  getWeightedNormalValues() {
+    let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
+    let values = [];
+    for (let normValueIndex = 0; normValueIndex < distributionRanges.length; normValueIndex++) {
+      values.push(this.getWeightedNormalValue(distributionRanges[normValueIndex]));
+    }
+    return values.every(e => e === null) ? null : values;
+  }
+
+  /**
+   *  Calculates the weighted normal value at x range
+   * @param range
+   * @returns {int|null} weighted normal value
+   */
+  getWeightedNormalValue(range) {
+    let currentNormalError, currentNormalValue, currentSumR2, nextNormalError, nextNormalValue, nextSumR2, weightedNormalValue;
+    if (this._predictionService.hasPredictionModels()) {
+      let predictionModels = this.getPredictionModels();
+      let sumR2 = this.calculateStdDevSumR2();
+      let predictedValue = this.getPredictedValue();
+      for (let modelIndex = 0; modelIndex < predictionModels.length; modelIndex++) {
         // first we calculate the normal error
-        currentNormalError = calculateNormalErrors(range,
-          models[modelIndex].model.standard_deviation.std_dev_error,
-          models[modelIndex].model.standard_deviation.std_dev_error_mean);
+        currentNormalError = this.calculateNormalError(range, predictionModels[modelIndex]);
         // then we calculate the normal values from the current  model value (predicted value) and the array of normal errors just calculated.
-        currentNormalValue = calculateNormalValues(lineItem._predictionService.evaluateModel(models[modelIndex]).value, currentNormalError);
+        currentNormalValue = this.calculateNormalValue(predictedValue, currentNormalError);
         // finally we get the weighted normal values from the current model normal values, the current model's r-squared weight,
         // then the next models normal values and r-squared weight
-        currentSumR2 = (models[modelIndex].model.standard_deviation.r2 / sumR2);
+        currentSumR2 = (predictionModels[modelIndex].model.standard_deviation.r2 / sumR2);
         // make sure to stay within the amount of models available
-        if (models.length > 1) {
-          let ix = (modelIndex + 1) % models.length;
-          nextNormalError = calculateNormalErrors(range,
-            models[ix].model.standard_deviation.std_dev_error,
-            models[ix].model.standard_deviation.std_dev_error_mean);
-          nextNormalValue = calculateNormalValues(lineItem._predictionService.evaluateModel(models[ix]).value, nextNormalError);
-          nextSumR2 = (models[ix].model.standard_deviation.r2 / sumR2);
-          weightedNormalValue = calculateWeightedNormalValues(currentNormalValue, currentSumR2, nextNormalValue, nextSumR2);
+        if (predictionModels.length === 1) {
+          weightedNormalValue = this.calculateWeightedNormalValue(currentNormalValue, currentSumR2, 0, 0);
         } else {
-          weightedNormalValue = calculateWeightedNormalValues(currentNormalValue, currentSumR2, 0, 0);
+          let ix = (modelIndex + 1) % predictionModels.length;
+          nextNormalError = this.calculateNormalError(range, predictionModels[ix]);
+          nextNormalValue = this.calculateNormalValue(predictedValue, nextNormalError);
+          nextSumR2 = (predictionModels[ix].model.standard_deviation.r2 / sumR2);
+          weightedNormalValue = this.calculateWeightedNormalValue(currentNormalValue, currentSumR2, nextNormalValue, nextSumR2);
         }
       }
-      return {value: weightedNormalValue, range: range};
+      return weightedNormalValue;
     }
+    return null;
+  }
 
-    /**
-     * Calculates the normal errors for each model
-     * @param {int} range  // Current distribution range.
-     * @param {float} error // the calculated standard deviation error.
-     * @param {float} mean  // the calculated standard deviation mean.
-     * @returns {float}  The CDF - inverse normal distribution result
-     */
-    function calculateNormalErrors(range, error, mean) {
-      return jStat.normal.inv((range / 100), mean, error);
+  /**
+   * Gets the prediction models for the current line item by type
+   * @returns {Object[]}
+   */
+  getPredictionModels() {
+    let predictionModels = [];
+    // Check if the models are based on cost or labor hours
+    if (this._predictionService.hasPredictionModels()) {
+      if (this.isLabor()) {
+        let models  = this._predictionService.getLaborPredictionModels();
+        for (let m = 0; m < models.length; m++) {
+          if (models[m].model.hasOwnProperty('standard_deviation')) {
+            predictionModels.push(models[m]);
+          }
+        }
+      } else {
+        let models = this._predictionService.getCostPredictionModels();
+        for (let m = 0; m < models.length; m++) {
+          if (models[m].model.hasOwnProperty('standard_deviation')) {
+            predictionModels.push(models[m]);
+          }
+        }
+      }
     }
+    return predictionModels;
+  }
 
-    /**
-     * Calculates the normal values for each model
-     * @param {number} value // the current model's predicted value.
-     * @param {float} error // an array of normal errors calculated in the previous step.
-     * @returns {number} // the calculated normal value
-     */
-    function calculateNormalValues(value, error) {
-      return value * (1 + error);
+  /**
+   * Gets the predicted value for the line item based on type
+   * @returns {number}
+   */
+  getPredictedValue() {
+    if (this.isLabor()) {
+      return this.getPredictedLaborHours();
+    } else {
+      return this.getPredictedCost();
     }
+  }
 
-    /**
-     *  Calculates the weighted normal values for each model
-     * @param {float} currentModelNormalValue  // the current model's calculated normal value
-     * @param {float} currentModelSumR2 // the current model's weighted r-square
-     * @param {float} nextModelNormalValue  // the next model's calculated normal value
-     * @param {float} nextModelSumR2 // the next model in the iteration r-squared value
-     * @returns {number} weightedNormalValues // return the stoplight prediction values
-     */
-    function calculateWeightedNormalValues(currentModelNormalValue, currentModelSumR2, nextModelNormalValue, nextModelSumR2) {
-      return (currentModelNormalValue * currentModelSumR2) + (nextModelNormalValue * nextModelSumR2);
+  /**
+   * Calculates the sum of the r2 values from each model's ['standard_deviation'] object
+   * @returns {sumOfR2|null}
+   */
+  calculateStdDevSumR2() {
+    let r2Values = [];
+    if (this._predictionService.hasPredictionModels()) {
+      let models = this.getPredictionModels();
+      for (let m = 0; m < models.length; m++) {
+        if (models[m].model.hasOwnProperty('standard_deviation')) {
+          r2Values.push(models[m].model.standard_deviation.r2);
+        }
+      }
     }
+    return r2Values.length > 0 ? r2Values.reduce((x, y) => x + y) : null;
+  }
+
+  /**
+   * Calculates the  based on a distribution range, a model's standard_deviation_error_mean and error
+   * @param range
+   * @param model
+   * @returns {float}  The CDF - inverse normal distribution result
+   */
+  calculateNormalError(range, model) {
+    return jStat.normal.inv((range / 100), model.model.standard_deviation.std_dev_error_mean, model.model.standard_deviation.std_dev_error);
+  }
+
+  /**
+   * Calculates the normal value from the normal error
+   * @param value
+   * @param error
+   * @returns {number}
+   */
+  calculateNormalValue(value, error) {
+    return value * (1 + error);
+  }
+
+  /**
+   * Calculates the weighted normal value from the current normal value and sumOfR2 and the next normal value and sumOfR2
+   * @param currentModelNormalValue
+   * @param currentModelSumR2
+   * @param nextModelNormalValue
+   * @param nextModelSumR2
+   * @returns {number}
+   */
+  calculateWeightedNormalValue(currentModelNormalValue, currentModelSumR2, nextModelNormalValue, nextModelSumR2) {
+    return (currentModelNormalValue * currentModelSumR2) + (nextModelNormalValue * nextModelSumR2);
   }
 
   /**
@@ -1971,6 +1992,6 @@ export default class LineItem extends BidEntity {
       await this.bid.project.save();
       this.bid.assess();
       return;
-    } else Promise.reject({ message: "Line item has dependants." });
+    } else Promise.reject({message: "Line item has dependants."});
   }
 }

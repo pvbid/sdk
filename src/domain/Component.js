@@ -3,7 +3,7 @@ import round from "lodash/round";
 import xor from "lodash/xor";
 import each from "lodash/each";
 import isEqual from "lodash/isEqual";
-import { waitForFinalEvent } from "@/utils/WaitForFinalEvent";
+import {waitForFinalEvent} from "@/utils/WaitForFinalEvent";
 import Helpers from "@/utils/Helpers";
 import BidEntity from "./BidEntity";
 import LineItemGroupEntityHelper from "./services/LineItemGroupEntityHelper";
@@ -829,6 +829,125 @@ export default class Component extends BidEntity {
     const hasPredictions = !!(this.config.predicted_values && this.config.predicted_values.length);
     if (!value) return hasPredictions;
     return hasPredictions && this.config.predicted_values.indexOf(value) >= 0;
+  }
+
+  /**
+   *  Returns a integer value indicating which distribution range a lineItem's cost falls
+   * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
+   * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
+   * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
+   * Returns -3 if the lineItem does not have prediction models, or does not have models with 'standard_deviation' or if the lineItem's cost is currently being predicted.
+   * @returns {number}
+   * @private
+   */
+  getStoplightIndicator() {
+    let weightedValues, currentWeightedValue, nextWeightedValue, stoplightRange, rawResult;
+    if (this.getWeightedNormalValues()) {
+      weightedValues = this.getWeightedNormalValues();
+    } else {
+      return -3;
+    }
+    /**
+     *  Initiate the Stoplight Calculations
+     *  For each weighted normal value, determine the stoplight range  based on the current and next weighted value
+     */
+    for (let normValueIndex = 0; normValueIndex < weightedValues.length; normValueIndex++) {
+      currentWeightedValue = weightedValues[normValueIndex];
+      nextWeightedValue = weightedValues[(normValueIndex + 1) % weightedValues.length];
+      rawResult = this.determineStoplightRange(normValueIndex, currentWeightedValue, nextWeightedValue);
+      if (rawResult !== null && rawResult !== undefined) {
+        stoplightRange = rawResult;
+      }
+    }
+    if (typeof stoplightRange === 'undefined') {
+      // If the component's cost is greater than the predicted value
+      // set the stoplight range to -1 (out of range on the upper bound)
+      if (this.cost > this.getPredictedValue()) {
+        stoplightRange = -1;
+      }
+      // If the component's cost is less than the predicted value
+      // set the stoplight range to -2 (out of range on the lower bound)
+      if (this.cost < this.getPredictedValue()) {
+        stoplightRange = -2;
+      }
+    }
+
+    return stoplightRange;
+  }
+
+  /**
+   *  Determines the stoplight range to be used with the indicator.
+   * @param currentIndex
+   * @param currentWeightedValue
+   * @param nextWeightedValue
+   * @returns {int} The index that the result falls upon
+   */
+  determineStoplightRange(currentIndex, currentWeightedValue, nextWeightedValue) {
+    // If the normal value falls in the ranges below or equal to 40%
+    if (currentIndex < 5) {
+      if ((this.cost < currentWeightedValue) && (this.cost >= nextWeightedValue)) {
+        return currentIndex;
+      }
+    }
+    // If the normal value falls in the ranges below or equal to 40%
+    if (currentIndex >= 5) {
+      if ((this.cost <= currentWeightedValue) && (this.cost > nextWeightedValue)) {
+        return currentIndex;
+      }
+    }
+  }
+
+  /**
+   *  Calculates the weighted normal value given a set of distribution ranges.
+   * @returns {array} Array of weighted normal values
+   */
+  getWeightedNormalValues() {
+    let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
+    let values = [];
+    for (let normValueIndex = 0; normValueIndex < distributionRanges.length; normValueIndex++) {
+      values.push(this.getWeightedNormalValue(normValueIndex));
+    }
+    return values.every(e => e === null) ? null : values;
+  }
+
+  /**
+   *  For each line item, get all of its weightedNormalValues
+   *  return the sum of all line item's weightedNormalValues at distributionIndex
+   * @returns {T|null} weighted normal value
+   * @param distributionIndex
+   */
+  getWeightedNormalValue(distributionIndex) {
+    let weightArray = [];
+    let lineItems = this.getLineItems(true);
+    for (let li = 0; li < lineItems.length; li++) {
+      if (!lineItems[li].isPredicted()) {
+        let lineItem = lineItems[li];
+        let weights = lineItem.getWeightedNormalValues();
+        if(weights) {
+          weightArray.push(weights)
+        }
+      }
+    }
+    return (weightArray.length > 0 && !weightArray.every(e => e === null)) ?
+      weightArray.map(x => x[distributionIndex]).reduce((z, y) => z + y)
+      : null;
+  }
+
+  /**
+   * Gets the predicted value of the component by calculating the sum total of the predicted values for all line items
+   * @returns {sum|null}
+   */
+  getPredictedValue() {
+    let predictedValues = [];
+    let lineItems = this.getLineItems(true);
+    for (let li = 0; li < lineItems.length; li++) {
+      if (!lineItems[li].isPredicted()) {
+        let item = lineItems[li];
+        let predictedValue = item.getPredictedValue();
+        predictedValues.push(predictedValue)
+      }
+    }
+    return predictedValues.length > 0 ? predictedValues.reduce((z, y) => z + y) : null;
   }
 
   /**

@@ -83,14 +83,19 @@ test("test line item stoplight", () => {
   ];
 
   const mock = jest.mock('@/domain/services/PredictionService');
-  mock.getCostPredictionModels = function () {
-    return $lineItem._data.prediction_model.models;
+  mock.hasPredictionModels = function () {
+    return true;
   };
+   mock.getCostPredictionModels = function () {
+    return $lineItem._data.prediction_model.models;
+   };
+   mock.evaluateModels = function () {
+     return 267137.38;
+   };
   mock.evaluateModel = function () {
     return {value: 267137.38};
   };
   $lineItem._predictionService = mock;
-
   $lineItem.cost = 435000;
   expect($lineItem._getStoplightIndicator()).toEqual(0);
   $lineItem.cost = 400000;
@@ -111,8 +116,10 @@ test("test line item stoplight", () => {
   expect($lineItem._getStoplightIndicator()).toEqual(-2);
 
   // if there are no models
-  $lineItem._data.prediction_model.models = [];
-  expect($lineItem._getStoplightIndicator()).toEqual(-3);
+  mock.hasPredictionModels = function () {
+    return false;
+  };
+ expect($lineItem._getStoplightIndicator()).toEqual(-3);
 
   // if a model doesnt have 'standard_deviation'
   delete mock.getCostPredictionModels.standard_deviation;
