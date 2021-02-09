@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.4 (2021-02-09) 
+
+Bug Fixes:
+
+- **Line Item:** Fixed a bug where the stoplight indicator was pulling `cost` instead of `labor_hours` for line items typed as `labor_hours`
+
 ### 1.3.3 (2021-02-04) 
 
 Improvements:
