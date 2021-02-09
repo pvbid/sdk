@@ -1669,6 +1669,23 @@ export default class LineItem extends BidEntity {
   }
 
   /**
+   * Gets the line item's value. Either Cost or Labor Hours
+   * @returns {number}
+   */
+  getValue() {
+    if (this.isLabor()) {
+      if ((this._getWageValue() && this._getBurdenValue() > 0) &&
+        (typeof this._getWageValue() && typeof this._getBurdenValue() !== 'undefined')) {
+        return this._getLaborHoursValue();
+      } else {
+        return this._getCostValue();
+      }
+    } else {
+      return this._getCostValue();
+    }
+  }
+
+  /**
    *  Returns a integer value indicating which distribution range a lineItem's cost falls
    * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
@@ -1678,7 +1695,7 @@ export default class LineItem extends BidEntity {
    * @private
    */
   _getStoplightIndicator() {
-    let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult,weightedNormalValues;
+    let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult, weightedNormalValues;
     if (this.getWeightedNormalValues()) {
       weightedNormalValues = this.getWeightedNormalValues();
     } else {
@@ -1702,16 +1719,15 @@ export default class LineItem extends BidEntity {
     if (typeof stoplightRange === 'undefined') {
       // If the lineItem's cost is greater than the predicted value
       // set the stoplight range to -1 (out of range on the upper bound)
-      if (this._getCostValue() > this.getPredictedValue()) {
+      if (this.getValue() > this.getPredictedValue()) {
         stoplightRange = -1;
       }
       // If the lineItem's cost is less than the predicted value
       // set the stoplight range to -2 (out of range on the lower bound)
-      if (this._getCostValue() < this.getPredictedValue()) {
+      if (this.getValue() < this.getPredictedValue()) {
         stoplightRange = -2;
       }
     }
-
     return stoplightRange;
   }
 
@@ -1725,16 +1741,17 @@ export default class LineItem extends BidEntity {
   determineStoplightRange(currentIndex, currentWeightedValue, nextWeightedValue) {
     // If the normal value falls in the ranges below or equal to 40%
     if (currentIndex < 5) {
-      if ((this._getCostValue() < currentWeightedValue) && (this._getCostValue() >= nextWeightedValue)) {
+      if ((this.getValue() < currentWeightedValue) && (this.getValue() >= nextWeightedValue)) {
         return currentIndex;
       }
     }
     // If the normal value falls in the ranges below or equal to 40%
     if (currentIndex >= 5) {
-      if ((this._getCostValue() <= currentWeightedValue) && (this._getCostValue() > nextWeightedValue)) {
+      if ((this.getValue() <= currentWeightedValue) && (this.getValue() > nextWeightedValue)) {
         return currentIndex;
       }
     }
+
   }
 
   /**
@@ -1756,7 +1773,8 @@ export default class LineItem extends BidEntity {
    * @returns {int|null} weighted normal value
    */
   getWeightedNormalValue(range) {
-    let currentNormalError, currentNormalValue, currentSumR2, nextNormalError, nextNormalValue, nextSumR2, weightedNormalValue;
+    let currentNormalError, currentNormalValue, currentSumR2, nextNormalError, nextNormalValue, nextSumR2,
+      weightedNormalValue;
     if (this._predictionService.hasPredictionModels()) {
       let predictionModels = this.getPredictionModels();
       let sumR2 = this.calculateStdDevSumR2();
@@ -1794,7 +1812,7 @@ export default class LineItem extends BidEntity {
     // Check if the models are based on cost or labor hours
     if (this._predictionService.hasPredictionModels()) {
       if (this.isLabor()) {
-        let models  = this._predictionService.getLaborPredictionModels();
+        let models = this._predictionService.getLaborPredictionModels();
         for (let m = 0; m < models.length; m++) {
           if (models[m].model.hasOwnProperty('standard_deviation')) {
             predictionModels.push(models[m]);
@@ -1818,7 +1836,12 @@ export default class LineItem extends BidEntity {
    */
   getPredictedValue() {
     if (this.isLabor()) {
-      return this.getPredictedLaborHours();
+      if ((this._getWageValue() && this._getBurdenValue() > 0) &&
+        (typeof this._getWageValue() && typeof this._getBurdenValue() !== 'undefined')) {
+        return this.getPredictedLaborHours();
+      } else {
+        return this.getPredictedCost();
+      }
     } else {
       return this.getPredictedCost();
     }
