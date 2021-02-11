@@ -851,10 +851,10 @@ export default class Component extends BidEntity {
      *  Initiate the Stoplight Calculations
      *  For each weighted normal value, determine the stoplight range  based on the current and next weighted value
      */
-    for (let normValueIndex = 0; normValueIndex < weightedValues.length; normValueIndex++) {
-      currentWeightedValue = weightedValues[normValueIndex];
-      nextWeightedValue = weightedValues[(normValueIndex + 1) % weightedValues.length];
-      rawResult = this.determineStoplightRange(normValueIndex, currentWeightedValue, nextWeightedValue);
+    for (let nvi = 0, nvx = weightedValues.length; nvi < nvx; nvi++) {
+      currentWeightedValue = weightedValues[nvi];
+      nextWeightedValue = weightedValues[(nvi + 1) % weightedValues.length];
+      rawResult = this.determineStoplightRange(nvi, currentWeightedValue, nextWeightedValue);
       if (rawResult !== null && rawResult !== undefined) {
         stoplightRange = rawResult;
       }
@@ -904,8 +904,8 @@ export default class Component extends BidEntity {
   getWeightedNormalValues() {
     let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
     let values = [];
-    for (let normValueIndex = 0; normValueIndex < distributionRanges.length; normValueIndex++) {
-      values.push(this.getWeightedNormalValue(normValueIndex));
+    for (let nvi = 0, nvx = distributionRanges.length; nvi < nvx; nvi++) {
+      values.push(this.getWeightedNormalValue(nvi));
     }
     return values.every(e => e === null) ? null : values;
   }
@@ -918,13 +918,21 @@ export default class Component extends BidEntity {
    */
   getWeightedNormalValue(distributionIndex) {
     let weightArray = [];
+    let lineItem, weightedCost;
     let lineItems = this.getLineItems(true);
-    for (let li = 0; li < lineItems.length; li++) {
-      if (!lineItems[li].isPredicted()) {
-        let lineItem = lineItems[li];
-        let weights = lineItem.getWeightedNormalValues();
-        if(weights) {
-          weightArray.push(weights)
+    for (let li = 0, lx = lineItems.length; li < lx; li++) {
+      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded) {
+        lineItem = lineItems[li];
+        if (lineItem.isLabor()) {
+          weightedCost = lineItem.getWeightedLaborHourCost();
+          if(weightedCost) {
+            weightArray.push(weightedCost);
+          }
+        } else {
+          weightedCost = lineItem.getWeightedNormalValues();
+          if(weightedCost) {
+            weightArray.push(weightedCost);
+          }
         }
       }
     }
@@ -940,8 +948,8 @@ export default class Component extends BidEntity {
   getPredictedValue() {
     let predictedValues = [];
     let lineItems = this.getLineItems(true);
-    for (let li = 0; li < lineItems.length; li++) {
-      if (!lineItems[li].isPredicted()) {
+    for (let li = 0, lx = lineItems.length; li < lx; li++) {
+      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded) {
         let item = lineItems[li];
         let predictedValue = item.getPredictedValue();
         predictedValues.push(predictedValue)

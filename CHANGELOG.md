@@ -1,5 +1,20 @@
 # CHANGELOG
 
+### 1.3.5 (2021-02-11) 
+
+Improvements:
+
+- **Stoplight Indicator:** 
+  - Added a check to determine if a line item’s predicted value exists and is not zero. 
+    This will prevent the indicator from showing for line items without predicted values. 
+  - Added a check to **line items** that include or exclude the **line item** from stoplight calculations 
+  based on its set `isIncluded` attribute.
+  
+- **Line Item:**
+    - Added two new functions called `getWeightedLaborHourCost` and `calculateWeightedLaborCost` 
+    that converts the weighted normal values for line items typed as `labor` into weighted labor cost. 
+    This function is called upon at the **`component` level** to convert the labor hours for those line items into a centralized value (cost).
+
 ### 1.3.4 (2021-02-09) 
 
 Bug Fixes:
