@@ -4,7 +4,7 @@
 
 Improvements:
 
-- **Stoplight Indicator:** The indicator now displays a `~` for line items that are currently being predicted
+- **Stoplight Indicator:** The indicator now displays a `Data Not Available` for line items that are currently being predicted
 
 - **Line Item:** Modified `getWeightedNormalValues` to filter out all values less than 0
 

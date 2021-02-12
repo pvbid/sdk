@@ -1680,10 +1680,6 @@ export default class LineItem extends BidEntity {
   _getStoplightIndicator() {
     let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult
     let weightedNormalValues = []
-    // if the line item is predicted return -4 (~)
-    if(this.isPredicted()) {
-      return -4;
-    }
     //  if the line item has prediction models but is not included return -4 (~)
     if (this._predictionService.hasPredictionModels() && !this.isIncluded) {
       return -4;
@@ -1698,6 +1694,14 @@ export default class LineItem extends BidEntity {
     }
     // if the line item has a predicted value that is equal to zero or undefined return -3 (Data Not Available)
     if (this.getPredictedValue() === 0 || typeof this.getPredictedValue() === 'undefined') {
+      return -3;
+    }
+    // if the line item is predicted return -4 (~)
+    if(this.isPredicted()) {
+      return -3;
+    }
+    // if the line item has no prediction models
+    if(!this._predictionService.hasPredictionModels()) {
       return -3;
     }
     // if the calculated weighted normal values exists
