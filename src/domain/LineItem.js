@@ -1680,6 +1680,10 @@ export default class LineItem extends BidEntity {
   _getStoplightIndicator() {
     let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult
     let weightedNormalValues = []
+    // if the line item is predicted return -4 (~)
+    if(this.isPredicted()) {
+      return -4;
+    }
     //  if the line item has prediction models but is not included return -4 (~)
     if (this._predictionService.hasPredictionModels() && !this.isIncluded) {
       return -4;
@@ -1738,13 +1742,13 @@ export default class LineItem extends BidEntity {
    */
   determineStoplightRange(currentIndex, currentWeightedValue, nextWeightedValue) {
     // If the normal value falls in the ranges below or equal to 40%
-    if (currentIndex < 5) {
+    if (currentIndex < 4) {
       if ((this.getValue() < currentWeightedValue) && (this.getValue() >= nextWeightedValue)) {
         return currentIndex;
       }
     }
     // If the normal value falls in the ranges below or equal to 40%
-    if (currentIndex >= 5) {
+    if (currentIndex >= 4) {
       if ((this.getValue() <= currentWeightedValue) && (this.getValue() > nextWeightedValue)) {
         return currentIndex;
       }
@@ -1762,7 +1766,8 @@ export default class LineItem extends BidEntity {
     const notANumberCond = (currentValue) => isNaN(currentValue);
     const nullCond = (currentValue) => currentValue === null;
     for (let nvi = 0, nvx = distributionRanges.length; nvi < nvx; nvi++) {
-      values.push(this.getWeightedNormalValue(distributionRanges[nvi]));
+      let value = this.getWeightedNormalValue(distributionRanges[nvi]);
+      values.push(value > 0 ? value : 0);
     }
     return (values.every(nullCond) || values.every(notANumberCond)) ? null : values;
   }
@@ -1945,10 +1950,10 @@ export default class LineItem extends BidEntity {
   calculateWeightedLaborCost(weightedValue) {
     if ((
       (this._getWageValue() && this._getBurdenValue()) > 0 &&
-      (this._getScalarValue() && this._getEscalatorValue()) > 0
+      (this._getOhpValue() && this._getEscalatorValue()) > 0
     )) {
       return weightedValue * ((this._getWageValue() + this._getBurdenValue()) *
-        (this._getScalarValue() * this._getEscalatorValue()));
+        (this._getOhpValue() * this._getEscalatorValue()));
     }
   }
 

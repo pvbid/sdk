@@ -874,7 +874,6 @@ export default class Component extends BidEntity {
 
     return stoplightRange;
   }
-
   /**
    *  Determines the stoplight range to be used with the indicator.
    * @param currentIndex
@@ -884,13 +883,13 @@ export default class Component extends BidEntity {
    */
   determineStoplightRange(currentIndex, currentWeightedValue, nextWeightedValue) {
     // If the normal value falls in the ranges below or equal to 40%
-    if (currentIndex < 5) {
+    if (currentIndex < 4) {
       if ((this.cost < currentWeightedValue) && (this.cost >= nextWeightedValue)) {
         return currentIndex;
       }
     }
     // If the normal value falls in the ranges below or equal to 40%
-    if (currentIndex >= 5) {
+    if (currentIndex >= 4) {
       if ((this.cost <= currentWeightedValue) && (this.cost > nextWeightedValue)) {
         return currentIndex;
       }
