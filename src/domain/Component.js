@@ -901,7 +901,7 @@ export default class Component extends BidEntity {
    * @returns {array} Array of weighted normal values
    */
   getWeightedNormalValues() {
-    let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
+    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {return x.value;});
     let values = [];
     for (let nvi = 0, nvx = distributionRanges.length; nvi < nvx; nvi++) {
       values.push(this.getWeightedNormalValue(nvi));
@@ -924,14 +924,13 @@ export default class Component extends BidEntity {
         lineItem = lineItems[li];
         if (lineItem.isLabor()) {
           weightedCost = lineItem.getWeightedLaborHourCost();
-          if(weightedCost) {
-            weightArray.push(weightedCost);
-          }
+          weightArray.push(weightedCost !== null ? weightedCost : null);
         } else {
-          weightedCost = lineItem.getWeightedNormalValues();
-          if(weightedCost) {
-            weightArray.push(weightedCost);
-          }
+          weightedCost = (!lineItem._predictionService.hasPredictionModels()) ?
+            Array.from({length:this.bid.entities.variables()
+              .distribution_ranges.value.length}).map(x => lineItem.getValue())
+            : lineItem.getWeightedNormalValues();
+          weightArray.push(weightedCost !== null ? weightedCost : null);
         }
       }
     }

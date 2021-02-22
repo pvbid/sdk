@@ -1,5 +1,15 @@
 # CHANGELOG
 
+### 1.3.7 (2021-02-22) 
+
+Improvements:
+
+- **Stoplight Indicator:** 
+  - Modified the stoplight calculations to pass up the line items calculated value to the component 
+    level if the line item is contributing but does not have any prediction models. 
+  - Modified distribution ranges to be received from bid variables instead of being hardcoded. This allows the ranges to
+   be dynamically inserted by the user in Admin->BidVariables.
+
 ### 1.3.6 (2021-02-12) 
 
 Improvements:

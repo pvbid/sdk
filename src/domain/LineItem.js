@@ -1673,7 +1673,9 @@ export default class LineItem extends BidEntity {
    * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
    * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
-   * Returns -3 if the lineItem does not have prediction models, or does not have models with 'standard_deviation' or if the lineItem's cost is currently being predicted.
+   * Returns -3 if the lineItem does not have prediction models, is excluded from contributing, or if the lineItem's
+   * cost is currently being predicted or has a predicted value being 0 or undefined which result in weightedValues being 0.
+   * Returns -4 if the line item has prediction models but is excluded, and if a line item is excluded and has 0 prediction models
    * @returns {number}
    * @private
    */
@@ -1765,7 +1767,7 @@ export default class LineItem extends BidEntity {
    * @returns {array} Array of weighted normal values
    */
   getWeightedNormalValues() {
-    let distributionRanges = [96, 90, 75, 60, 40, 25, 10, 4];
+    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {return x.value;});
     let values = [];
     const notANumberCond = (currentValue) => isNaN(currentValue);
     const nullCond = (currentValue) => currentValue === null;
@@ -1823,13 +1825,20 @@ export default class LineItem extends BidEntity {
       return null;
     }
     if (!this._predictionService.hasPredictionModels()) {
-      return null;
+      weights = Array.from({length:this.bid.entities.variables()
+          .distribution_ranges.value.length}).map(x => this.getValue());
+      for (let w = 0, x = weights.length; w < x; w++) {
+        conversion = this.calculateWeightedLaborCost(weights[w]);
+        weightedLaborCost.push(conversion);
+      }
+    } else {
+      weights = this.getWeightedNormalValues();
+      for (let w = 0, x = weights.length; w < x; w++) {
+        conversion = this.calculateWeightedLaborCost(weights[w]);
+        weightedLaborCost.push(conversion);
+      }
     }
-    weights = this.getWeightedNormalValues();
-    for (let w = 0, x = weights.length; w < x; w++) {
-      conversion = this.calculateWeightedLaborCost(weights[w]);
-      weightedLaborCost.push(conversion);
-    }
+
     return weightedLaborCost;
   }
 
