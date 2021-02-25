@@ -2,6 +2,12 @@
 
 ### 1.3.7 (2021-02-22) 
 
+Bug Fix:
+
+- **Stoplight Indicator:** The indicator has been updated to properly calculate the `weightedNormalValue`s for a line item.
+   
+### 1.3.7 (2021-02-22) 
+
 Improvements:
 
 - **Stoplight Indicator:** 
