@@ -1784,8 +1784,8 @@ export default class LineItem extends BidEntity {
    * @returns {int|null} weighted normal value
    */
   getWeightedNormalValue(range) {
-    let currentNormalError, currentNormalValue, currentSumR2, nextNormalError, nextNormalValue, nextSumR2,
-      weightedNormalValue;
+    let currentNormalError, currentNormalValue, currentSumR2, weightedNormalValue;
+    let modelValueArray = [];
     if (this._predictionService.hasPredictionModels()) {
       let predictionModels = this.getPredictionModels();
       let sumR2 = this.calculateStdDevSumR2();
@@ -1793,22 +1793,15 @@ export default class LineItem extends BidEntity {
       for (let mi = 0, mix = predictionModels.length; mi < mix; mi++) {
         // first we calculate the normal error
         currentNormalError = this.calculateNormalError(range, predictionModels[mi]);
-        // then we calculate the normal values from the current  model value (predicted value) and the array of normal errors just calculated.
-        currentNormalValue = this.calculateNormalValue(predictedValue, currentNormalError);
-        // finally we get the weighted normal values from the current model normal values, the current model's r-squared weight,
-        // then the next models normal values and r-squared weight
+        // then we calculate the normal value from the current  model value (predicted value) and the normal error just calculated.
+        currentNormalValue = this.calculateNormalValue(predictedValue, currentNormalError) < 0
+          ? 0 : this.calculateNormalValue(predictedValue, currentNormalError);
         currentSumR2 = (predictionModels[mi].model.standard_deviation.r2 / sumR2);
-        // make sure to stay within the amount of models available
-        if (predictionModels.length === 1) {
-          weightedNormalValue = this.calculateWeightedNormalValue(currentNormalValue, currentSumR2, 0, 0);
-        } else {
-          let ix = (mi + 1) % mix;
-          nextNormalError = this.calculateNormalError(range, predictionModels[ix]);
-          nextNormalValue = this.calculateNormalValue(predictedValue, nextNormalError);
-          nextSumR2 = (predictionModels[ix].model.standard_deviation.r2 / sumR2);
-          weightedNormalValue = this.calculateWeightedNormalValue(currentNormalValue, currentSumR2, nextNormalValue, nextSumR2);
-        }
+        // finally we get the weighted normal value from the current model's normal value and the current model's r-squared weight
+        modelValueArray.push(this.calculateWeightedNormalValue(currentNormalValue, currentSumR2));
       }
+      // weightedNormalValue = sum(modelValueArray)
+      weightedNormalValue = modelValueArray.reduce((x, y) => x + y);
       return weightedNormalValue;
     }
     return null;
@@ -1951,8 +1944,8 @@ export default class LineItem extends BidEntity {
    * @param nextModelSumR2
    * @returns {number}
    */
-  calculateWeightedNormalValue(currentModelNormalValue, currentModelSumR2, nextModelNormalValue, nextModelSumR2) {
-    return (currentModelNormalValue * currentModelSumR2) + (nextModelNormalValue * nextModelSumR2);
+  calculateWeightedNormalValue(currentModelNormalValue, currentModelSumR2) {
+    return (currentModelNormalValue * currentModelSumR2);
   }
 
   /**
