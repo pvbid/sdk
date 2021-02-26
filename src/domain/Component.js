@@ -920,13 +920,13 @@ export default class Component extends BidEntity {
     let lineItem, weightedCost;
     let lineItems = this.getLineItems(true);
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
-      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded) {
+      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded && lineItems[li]._predictionService.hasPredictionModels()) {
         lineItem = lineItems[li];
         if (lineItem.isLabor()) {
           weightedCost = lineItem.getWeightedLaborHourCost();
           weightArray.push(weightedCost !== null ? weightedCost : null);
         } else {
-          weightedCost = (!lineItem._predictionService.hasPredictionModels()) ?
+          weightedCost = (lineItem.getPredictedValue() === 0 || typeof lineItem.getPredictedValue() === 'undefined') ?
             Array.from({length:this.bid.entities.variables()
               .distribution_ranges.value.length}).map(x => lineItem.getValue())
             : lineItem.getWeightedNormalValues();

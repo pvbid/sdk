@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.9 (2021-02-26) 
+
+Bug Fix:
+
+- **Stoplight Indicator:** Fixed a bug where line items with a predicted value equal to zero were skewing component level calculations
+
 ### 1.3.8 (2021-02-25) 
 
 Bug Fix:

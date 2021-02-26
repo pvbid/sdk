@@ -1801,8 +1801,7 @@ export default class LineItem extends BidEntity {
         modelValueArray.push(this.calculateWeightedNormalValue(currentNormalValue, currentSumR2));
       }
       // weightedNormalValue = sum(modelValueArray)
-      weightedNormalValue = modelValueArray.reduce((x, y) => x + y);
-      return weightedNormalValue;
+      return modelValueArray.length > 0 ? modelValueArray.reduce((x, y) => x + y) : null;
     }
     return null;
   }
@@ -1842,10 +1841,11 @@ export default class LineItem extends BidEntity {
   getPredictionModels() {
     let predictionModels = [];
     let models;
-    // Check if the models are based on cost or labor hours
+    // Check if the line item has prediction models
     if (!this._predictionService.hasPredictionModels()) {
       return null;
     }
+    // Check if the models are based on cost or labor hours
     if (this.isLabor()) {
       models = this._predictionService.getLaborPredictionModels();
       for (let m = 0, mx = models.length; m < mx; m++) {
