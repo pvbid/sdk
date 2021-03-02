@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.10 (2021-03-02) 
+
+Improvements:
+
+- **Stoplight Indicator:** - Component level stoplight indication now accurately calculates its prediction from the associated line items.
+
 ### 1.3.9 (2021-02-26) 
 
 Bug Fix:

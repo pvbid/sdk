@@ -833,6 +833,7 @@ export default class Component extends BidEntity {
 
   /**
    *  Returns a integer value indicating which distribution range a lineItem's cost falls
+   *  
    * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
    * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
@@ -920,7 +921,7 @@ export default class Component extends BidEntity {
     let lineItem, weightedCost;
     let lineItems = this.getLineItems(true);
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
-      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded && lineItems[li]._predictionService.hasPredictionModels()) {
+      if (lineItems[li].isIncluded && lineItems[li]._predictionService.hasPredictionModels()) {
         lineItem = lineItems[li];
         if (lineItem.isLabor()) {
           weightedCost = lineItem.getWeightedLaborHourCost();
