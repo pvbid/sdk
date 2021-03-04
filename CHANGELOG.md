@@ -1,5 +1,21 @@
 # CHANGELOG
 
+### 1.3.11 (2021-03-04) 
+
+Improvements:
+
+- **Stoplight Indicator:** 
+   - Modified **Component level** stoplight indicator to properly display the correct indicator based on whether or not 
+   a line item is predicted, has prediction models, and is included in calculations. 
+     
+   - Modified **Component level** `getWeightedNormalValue`  & `getPredictedValue` to filter the line items by their 
+   `isincluded` property.
+     
+   - Modified **LineItem level** stoplight indicator to properly display the correct indicator based on 
+   whether or not a line item is predicted, has prediction models, and is included in calculations. 
+ 
+   - Minor calculation fixes to the **Component level** when calculating the `weightedLaborHourCost`  for `labor` line items.
+
 ### 1.3.10 (2021-03-02) 
 
 Improvements:

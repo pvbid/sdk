@@ -833,16 +833,40 @@ export default class Component extends BidEntity {
 
   /**
    *  Returns a integer value indicating which distribution range a lineItem's cost falls
-   *  
-   * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
+   *
+   * Returns 0,1,2,3,4,5,6,7: the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
    * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
-   * Returns -3 if the lineItem does not have prediction models, or does not have models with 'standard_deviation' or if the lineItem's cost is currently being predicted.
+   * Returns -3 if there are no included line items, or the line items have zero prediction models or a predicted value = 0
+   * Return -4 if every line item has zero prediction models or is predicted.
    * @returns {number}
    * @private
    */
   getStoplightIndicator() {
     let weightedValues, currentWeightedValue, nextWeightedValue, stoplightRange, rawResult;
+    let includedLineItems = this.getLineItems(true).filter(lineItem => lineItem.isIncluded);
+    // if every line item has 0 models and is predicted
+    let cond1 = includedLineItems.every(item => (item.isPredicted() && item.getPredictedValue() > 0));
+    // if any line item has no models or has a predicted  value > zero
+    let cond2 = includedLineItems.filter(item => !item._predictionService.hasPredictionModels() ||
+      item.getPredictedValue() > 0).length > 0;
+    // if any line item has models, is not predicted, a value not equal to zero, and a predicted value greater than 0
+    let cond3 = includedLineItems.filter(item => item._predictionService.hasPredictionModels() &&
+      !item.isPredicted() && item.getValue !== 0 && item.getPredictedValue() > 0).length > 0;
+    // if there are no included line items
+    if (includedLineItems.length === 0) {
+      return -3;
+    }
+    // if every line item has zero prediction models and is predicted
+    if (cond1) {
+      return -4;
+    }
+    // if any line item has zero prediction models and a predicted value greater than zero  and
+    // if any line item doesnt have prediction models, is predicted, and  has a predicted value less than zero
+    if (cond2 && !cond3) {
+      return -3;
+    }
+    // if the weighted normal values exist use them for calculations
     if (this.getWeightedNormalValues()) {
       weightedValues = this.getWeightedNormalValues();
     } else {
@@ -872,7 +896,6 @@ export default class Component extends BidEntity {
         stoplightRange = -2;
       }
     }
-
     return stoplightRange;
   }
   /**
@@ -902,7 +925,9 @@ export default class Component extends BidEntity {
    * @returns {array} Array of weighted normal values
    */
   getWeightedNormalValues() {
-    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {return x.value;});
+    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {
+      return x.value;
+    });
     let values = [];
     for (let nvi = 0, nvx = distributionRanges.length; nvi < nvx; nvi++) {
       values.push(this.getWeightedNormalValue(nvi));
@@ -919,20 +944,21 @@ export default class Component extends BidEntity {
   getWeightedNormalValue(distributionIndex) {
     let weightArray = [];
     let lineItem, weightedCost;
-    let lineItems = this.getLineItems(true);
+    let lineItems = this.getLineItems(true)
+      .filter(lineItem => lineItem.isIncluded);
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
-      if (lineItems[li].isIncluded && lineItems[li]._predictionService.hasPredictionModels()) {
-        lineItem = lineItems[li];
-        if (lineItem.isLabor()) {
-          weightedCost = lineItem.getWeightedLaborHourCost();
-          weightArray.push(weightedCost !== null ? weightedCost : null);
-        } else {
-          weightedCost = (lineItem.getPredictedValue() === 0 || typeof lineItem.getPredictedValue() === 'undefined') ?
-            Array.from({length:this.bid.entities.variables()
-              .distribution_ranges.value.length}).map(x => lineItem.getValue())
-            : lineItem.getWeightedNormalValues();
-          weightArray.push(weightedCost !== null ? weightedCost : null);
-        }
+      lineItem = lineItems[li];
+      if (lineItem.isLabor()) {
+        weightedCost = lineItem.getWeightedLaborHourCost();
+        weightArray.push(weightedCost !== null ? weightedCost : null);
+      } else {
+        weightedCost = (lineItem.getPredictedValue() === 0 || typeof lineItem.getPredictedValue() === 'undefined') ?
+          Array.from({
+            length: this.bid.entities.variables()
+              .distribution_ranges.value.length
+          }).map(x => lineItem.getValue())
+          : lineItem.getWeightedNormalValues();
+        weightArray.push(weightedCost !== null ? weightedCost : null);
       }
     }
     return (weightArray.length > 0 && !weightArray.every(e => e === null)) ?
@@ -946,13 +972,12 @@ export default class Component extends BidEntity {
    */
   getPredictedValue() {
     let predictedValues = [];
-    let lineItems = this.getLineItems(true);
+    let lineItems = this.getLineItems(true)
+      .filter(lineItem => lineItem.isIncluded && !lineItem.isPredicted());
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
-      if (!lineItems[li].isPredicted() && lineItems[li].isIncluded) {
-        let item = lineItems[li];
-        let predictedValue = item.getPredictedValue();
-        predictedValues.push(predictedValue)
-      }
+      let item = lineItems[li];
+      let predictedValue = item.getPredictedValue();
+      predictedValues.push(predictedValue)
     }
     return predictedValues.length > 0 ? predictedValues.reduce((z, y) => z + y) : null;
   }

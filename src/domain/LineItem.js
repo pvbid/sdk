@@ -1673,37 +1673,29 @@ export default class LineItem extends BidEntity {
    * Returns 0,1,2,3,4,5,6 or (distributionRanges.length) the value being the percent range that the current cost falls under.
    * Returns -1 if the current cost is out of bounds and above (greater than) the predicted value.
    * Returns -2 if the current cost is out of bounds and below (less than) the predicted value.
-   * Returns -3 if the lineItem does not have prediction models, is excluded from contributing, or if the lineItem's
-   * cost is currently being predicted or has a predicted value being 0 or undefined which result in weightedValues being 0.
-   * Returns -4 if the line item has prediction models but is excluded, and if a line item is excluded and has 0 prediction models
+   * Returns -3 if the line item has zero prediction models, a predicted value equal to zero or undefined,
+   * and undefined weightedNormalValues
+   * Returns -4 if the line item is predicted and not overwritten and the line item is excluded
    * @returns {number}
    * @private
    */
   _getStoplightIndicator() {
     let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult
     let weightedNormalValues = []
-    //  if the line item has prediction models but is not included return -4 (~)
-    if (this._predictionService.hasPredictionModels() && !this.isIncluded) {
-      return -4;
-    }
-    // if the line item does not have prediction models and is not included return -4 (~)
-    if (!this._predictionService.hasPredictionModels() && !this.isIncluded) {
-      return -4;
-    }
-    // it the line item is predicted and not included return -3 (Data Not Available)
-    if (this.isPredicted() && !this.isIncluded) {
+    // if the line item has no prediction models
+    if(!this._predictionService.hasPredictionModels()) {
       return -3;
+    }
+    // if the line item is predicted and not overwritten return -4 (~)
+    if((this.isPredicted() && !this.isOverridden()) || this.isPredicted() ) {
+      return -4;
+    }
+    // it the line item is not included return -4 (~)
+    if (!this.isIncluded) {
+      return -4;
     }
     // if the line item has a predicted value that is equal to zero or undefined return -3 (Data Not Available)
     if (this.getPredictedValue() === 0 || typeof this.getPredictedValue() === 'undefined') {
-      return -3;
-    }
-    // if the line item is predicted return -4 (~)
-    if(this.isPredicted()) {
-      return -3;
-    }
-    // if the line item has no prediction models
-    if(!this._predictionService.hasPredictionModels()) {
       return -3;
     }
     // if the calculated weighted normal values exists
@@ -1872,8 +1864,8 @@ export default class LineItem extends BidEntity {
     if (!this.isLabor()) {
       return this.getPredictedCost();
     }
-    if ((this._getWageValue() && this._getBurdenValue() > 0) &&
-      (typeof this._getWageValue() && typeof this._getBurdenValue() !== 'undefined')) {
+    if ((this._getWageValue() > 0) &&
+      (typeof this._getWageValue() !== 'undefined' && typeof this._getBurdenValue() !== 'undefined')) {
       return this.getPredictedLaborHours();
     } else {
       return this.getPredictedCost();
@@ -1889,8 +1881,8 @@ export default class LineItem extends BidEntity {
     if (!this.isLabor()) {
       return this._getCostValue();
     }
-    if ((this._getWageValue() && this._getBurdenValue() > 0) &&
-      (typeof this._getWageValue() && typeof this._getBurdenValue() !== 'undefined')) {
+    if ((this._getWageValue() > 0 ) &&
+      (typeof this._getWageValue() !== 'undefined' && typeof this._getBurdenValue() !== 'undefined')) {
       return this._getLaborHoursValue();
     } else {
       return this._getCostValue();
@@ -1955,7 +1947,7 @@ export default class LineItem extends BidEntity {
    */
   calculateWeightedLaborCost(weightedValue) {
     if ((
-      (this._getWageValue() && this._getBurdenValue()) > 0 &&
+      (typeof this._getWageValue() !== 'undefined' && typeof this._getBurdenValue() !== 'undefined') &&
       (this._getOhpValue() && this._getEscalatorValue()) > 0
     )) {
       return weightedValue * ((this._getWageValue() + this._getBurdenValue()) *
