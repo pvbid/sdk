@@ -1,5 +1,11 @@
 # CHANGELOG
 
+### 1.3.12 (2021-03-08) 
+
+Bug Fix:
+
+- **Stoplight Indicator:** - Modified line item and component level calculations to properly apply contribution weight to line item values.
+
 ### 1.3.11 (2021-03-04) 
 
 Improvements:
