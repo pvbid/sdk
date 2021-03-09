@@ -846,7 +846,7 @@ export default class Component extends BidEntity {
     let weightedValues, currentWeightedValue, nextWeightedValue, stoplightRange, rawResult;
     let includedLineItems = this.getLineItems(true).filter(lineItem => lineItem.isIncluded);
     // if every line item has 0 models and is predicted
-    let cond1 = includedLineItems.every(item => (item.isPredicted() && item.getPredictedValue() > 0));
+     let cond1 = includedLineItems.every(item => (item.isPredicted() && item.getPredictedValue() > 0));
     // if any line item has no models or has a predicted  value > zero
     let cond2 = includedLineItems.filter(item => !item._predictionService.hasPredictionModels() ||
       item.getPredictedValue() > 0).length > 0;
@@ -857,7 +857,7 @@ export default class Component extends BidEntity {
     if (includedLineItems.length === 0) {
       return -3;
     }
-    // if every line item has zero prediction models and is predicted
+    //if every line item has zero prediction models and is predicted
     if (cond1) {
       return -4;
     }
@@ -943,7 +943,8 @@ export default class Component extends BidEntity {
    */
   getWeightedNormalValue(distributionIndex) {
     let weightArray = [];
-    let lineItem, weightedCost;
+    let lineItem, weightedCost,contributionWeight, weights;
+    let contributionWeights = [];
     let lineItems = this.getLineItems(true)
       .filter(lineItem => lineItem.isIncluded);
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
@@ -952,12 +953,21 @@ export default class Component extends BidEntity {
         weightedCost = lineItem.getWeightedLaborHourCost();
         weightArray.push(weightedCost !== null ? weightedCost : null);
       } else {
+        if(lineItem.isWeighted) {
+          _.forEach(lineItem.getWeightedNormalValues(), (weight) => {
+            contributionWeight = weight * lineItem._predictionService.getContributionWeight();
+            contributionWeights.push(contributionWeight);
+          });
+          weights = contributionWeights;
+        } else {
+          weights = lineItem.getWeightedNormalValues()
+        }
         weightedCost = (lineItem.getPredictedValue() === 0 || typeof lineItem.getPredictedValue() === 'undefined') ?
           Array.from({
             length: this.bid.entities.variables()
               .distribution_ranges.value.length
           }).map(x => lineItem.getValue())
-          : lineItem.getWeightedNormalValues();
+          : weights;
         weightArray.push(weightedCost !== null ? weightedCost : null);
       }
     }
@@ -973,7 +983,7 @@ export default class Component extends BidEntity {
   getPredictedValue() {
     let predictedValues = [];
     let lineItems = this.getLineItems(true)
-      .filter(lineItem => lineItem.isIncluded && !lineItem.isPredicted());
+      .filter(lineItem => lineItem.isIncluded);
     for (let li = 0, lx = lineItems.length; li < lx; li++) {
       let item = lineItems[li];
       let predictedValue = item.getPredictedValue();

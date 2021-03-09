@@ -1240,9 +1240,19 @@ export default class LineItem extends BidEntity {
     }
 
     let hours;
+    const bidTimeStamp = new Date(this.bid._data.created_at);
+    const newBidDate = new Date('03/09/2021');
+    const dateCondition = bidTimeStamp > newBidDate;
+
     if (this.isLabor()) {
       if (this._shouldPredict(["quantity", "per_quantity", "base", "multiplier", "scalar"])) {
-        hours = this.getPredictedLaborHours();
+        // check if the line item is weighted and created after patch 1.3.12
+        // this applies the contribution weight to the bid labor hours value.
+        if (this.isWeighted && dateCondition) {
+          hours = this.getPredictedLaborHours() * this._predictionService.getContributionWeight();
+        } else {
+          hours = this.getPredictedLaborHours();
+        }
         this._applyConfig("is_predicted_labor_hours", true);
       } else {
         hours = (this.quantity * this.perQuantity + this.base) * this.multiplier;
@@ -1683,11 +1693,11 @@ export default class LineItem extends BidEntity {
     let stoplightRange, currentWeightedValue, nextWeightedValue, rawResult
     let weightedNormalValues = []
     // if the line item has no prediction models
-    if(!this._predictionService.hasPredictionModels()) {
+    if (!this._predictionService.hasPredictionModels()) {
       return -3;
     }
     // if the line item is predicted and not overwritten return -4 (~)
-    if((this.isPredicted() && !this.isOverridden()) || this.isPredicted() ) {
+    if ((this.isPredicted() && !this.isOverridden())) {
       return -4;
     }
     // it the line item is not included return -4 (~)
@@ -1759,7 +1769,9 @@ export default class LineItem extends BidEntity {
    * @returns {array} Array of weighted normal values
    */
   getWeightedNormalValues() {
-    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {return x.value;});
+    let distributionRanges = this.bid.entities.variables().distribution_ranges.value.map(x => {
+      return x.value;
+    });
     let values = [];
     const notANumberCond = (currentValue) => isNaN(currentValue);
     const nullCond = (currentValue) => currentValue === null;
@@ -1778,23 +1790,24 @@ export default class LineItem extends BidEntity {
   getWeightedNormalValue(range) {
     let currentNormalError, currentNormalValue, currentSumR2, weightedNormalValue;
     let modelValueArray = [];
-    if (this._predictionService.hasPredictionModels()) {
-      let predictionModels = this.getPredictionModels();
-      let sumR2 = this.calculateStdDevSumR2();
-      let predictedValue = this.getPredictedValue();
-      for (let mi = 0, mix = predictionModels.length; mi < mix; mi++) {
-        // first we calculate the normal error
-        currentNormalError = this.calculateNormalError(range, predictionModels[mi]);
-        // then we calculate the normal value from the current  model value (predicted value) and the normal error just calculated.
-        currentNormalValue = this.calculateNormalValue(predictedValue, currentNormalError) < 0
-          ? 0 : this.calculateNormalValue(predictedValue, currentNormalError);
-        currentSumR2 = (predictionModels[mi].model.standard_deviation.r2 / sumR2);
-        // finally we get the weighted normal value from the current model's normal value and the current model's r-squared weight
-        modelValueArray.push(this.calculateWeightedNormalValue(currentNormalValue, currentSumR2));
-      }
-      // weightedNormalValue = sum(modelValueArray)
-      return modelValueArray.length > 0 ? modelValueArray.reduce((x, y) => x + y) : null;
+    if (!this._predictionService.hasPredictionModels()) {
+      return null;
     }
+    let predictionModels = this.getPredictionModels();
+    let sumR2 = this.calculateStdDevSumR2();
+    let predictedValue = this.getPredictedValue();
+    for (let mi = 0, mix = predictionModels.length; mi < mix; mi++) {
+      // first we calculate the normal error
+      currentNormalError = this.calculateNormalError(range, predictionModels[mi]);
+      // then we calculate the normal value from the current  model value (predicted value) and the normal error just calculated.
+      currentNormalValue = this.calculateNormalValue(predictedValue, currentNormalError) < 0
+        ? 0 : this.calculateNormalValue(predictedValue, currentNormalError);
+      currentSumR2 = (predictionModels[mi].model.standard_deviation.r2 / sumR2);
+      // finally we get the weighted normal value from the current model's normal value and the current model's r-squared weight
+      modelValueArray.push(this.calculateWeightedNormalValue(currentNormalValue, currentSumR2));
+    }
+    // weightedNormalValue = sum(modelValueArray)
+    return modelValueArray.length > 0 ? modelValueArray.reduce((x, y) => x + y) : null;
     return null;
   }
 
@@ -1809,8 +1822,10 @@ export default class LineItem extends BidEntity {
       return null;
     }
     if (!this._predictionService.hasPredictionModels()) {
-      weights = Array.from({length:this.bid.entities.variables()
-          .distribution_ranges.value.length}).map(x => this.getValue());
+      weights = Array.from({
+        length: this.bid.entities.variables()
+          .distribution_ranges.value.length
+      }).map(x => this.getValue());
       for (let w = 0, x = weights.length; w < x; w++) {
         conversion = this.calculateWeightedLaborCost(weights[w]);
         weightedLaborCost.push(conversion);
@@ -1822,7 +1837,6 @@ export default class LineItem extends BidEntity {
         weightedLaborCost.push(conversion);
       }
     }
-
     return weightedLaborCost;
   }
 
@@ -1881,7 +1895,7 @@ export default class LineItem extends BidEntity {
     if (!this.isLabor()) {
       return this._getCostValue();
     }
-    if ((this._getWageValue() > 0 ) &&
+    if ((this._getWageValue() > 0) &&
       (typeof this._getWageValue() !== 'undefined' && typeof this._getBurdenValue() !== 'undefined')) {
       return this._getLaborHoursValue();
     } else {
@@ -1942,16 +1956,30 @@ export default class LineItem extends BidEntity {
 
   /**
    * Calculates the weighted labor hours cost.
+   * If line item has a contribution weight, multiply the result by the contribution
    * @param weightedValue
    * @returns {number}
    */
+
   calculateWeightedLaborCost(weightedValue) {
-    if ((
-      (typeof this._getWageValue() !== 'undefined' && typeof this._getBurdenValue() !== 'undefined') &&
-      (this._getOhpValue() && this._getEscalatorValue()) > 0
-    )) {
-      return weightedValue * ((this._getWageValue() + this._getBurdenValue()) *
-        (this._getOhpValue() * this._getEscalatorValue()));
+    // check if the wage is !== undefined && > 0
+    // check if burden is !== undefined
+    // check if SubContractor Scalar and Escalator are > 0
+    if (((typeof this._getWageValue() !== 'undefined' && this._getWageValue() > 0)
+      && typeof this._getBurdenValue() !== 'undefined' &&
+      (this._getOhpValue() > 0 && this._getEscalatorValue() > 0))) {
+      if (this.isWeighted) {
+        return (weightedValue * ((this._getWageValue() + this._getBurdenValue()) *
+          (this._getOhpValue() * this._getEscalatorValue()))) * this._predictionService.getContributionWeight();
+      } else {
+        return weightedValue * ((this._getWageValue() + this._getBurdenValue()) *
+          (this._getOhpValue() * this._getEscalatorValue()));
+      }
+    } else {
+      if (this.isWeighted) {
+        return weightedValue * this._predictionService.getContributionWeight();
+      }
+      return weightedValue;
     }
   }
 
